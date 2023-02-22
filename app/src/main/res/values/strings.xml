@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">App Chat</string>
+    <string name="welcome_to_vanthe_s_chat_app">Welcome to EasyChat</string>
+    <string name="chat">Chat</string>
+    <string name="search">Search</string>
+    <string name="friend">Friend</string>
+    <string name="user">User</string>
+    <string name="setting">Setting</string>
+</resources>
