@@ -13,4 +13,5 @@
     <color name="blue">#0099ff</color>
     <color name="primary_text" >#212121</color>
     <color name="error" >#B00020</color>
+    <color name="status">#12FF29</color>
 </resources>

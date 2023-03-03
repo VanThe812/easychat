@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import va.vanthe.app_chat_2.R;
-import va.vanthe.app_chat_2.databinding.ItemContainerRecentConversionBinding;
+import va.vanthe.app_chat_2.databinding.ItemContainerConversionVerticalBinding;
 import va.vanthe.app_chat_2.listeners.ConversionListener;
 import va.vanthe.app_chat_2.models.ChatMessage;
 import va.vanthe.app_chat_2.models.User;
@@ -30,7 +30,8 @@ public class RecentConversionsAdapter extends RecyclerView.Adapter<RecentConvers
     @Override
     public ConversionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ConversionViewHolder(
-                ItemContainerRecentConversionBinding.inflate(
+
+                ItemContainerConversionVerticalBinding.inflate(
                         LayoutInflater.from(parent.getContext()),
                         parent,
                         false
@@ -50,9 +51,9 @@ public class RecentConversionsAdapter extends RecyclerView.Adapter<RecentConvers
     }
 
     class ConversionViewHolder extends RecyclerView.ViewHolder {
-        ItemContainerRecentConversionBinding binding;
+        ItemContainerConversionVerticalBinding binding;
 
-        ConversionViewHolder(ItemContainerRecentConversionBinding itemContainerRecentConversionBinding) {
+        ConversionViewHolder(ItemContainerConversionVerticalBinding itemContainerRecentConversionBinding) {
             super(itemContainerRecentConversionBinding.getRoot());
             binding = itemContainerRecentConversionBinding;
         }

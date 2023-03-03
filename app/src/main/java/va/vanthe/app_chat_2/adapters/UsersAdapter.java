@@ -18,8 +18,8 @@ import va.vanthe.app_chat_2.models.User;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewholder>{
 
-    private final List<User> users;
-    private final UserListener userListener;
+    public static List<User> users;
+    public static UserListener userListener;
 
     public UsersAdapter(List<User> users, UserListener userListener) {
         this.users = users;
@@ -59,7 +59,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewhol
         }
         void setUserData(User user) {
             binding.textName.setText(user.name);
-            binding.textEmail.setText(user.email);
+//            binding.textEmail.setText(user.email);
             binding.imageProfile.setImageBitmap(getUserImage(user.image));
         }
     }

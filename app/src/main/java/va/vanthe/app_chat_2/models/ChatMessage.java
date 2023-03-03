@@ -11,3 +11,9 @@ public class ChatMessage {
 
     public String statusMessage;
 }
+// conversation:
+//- id, type (1:chat/2:group), time, avatar, newMessage, senderId,
+//
+
+// singleChat
+// id, avatar, newMessage, listUserId,
