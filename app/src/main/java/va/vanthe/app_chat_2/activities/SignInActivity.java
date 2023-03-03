@@ -39,8 +39,15 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
-        binding.registerUser.setOnClickListener(view -> {
-            startActivity(new Intent(SignInActivity.this, SignUpActivity.class));
+
+        binding.registerUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(SignInActivity.this,SignUpActivity.class);
+                startActivity(i);
+                finish();
+
+            }
         });
         binding.buttonSignIn.setOnClickListener(view -> {
             if (isValidSignInDetails()) {

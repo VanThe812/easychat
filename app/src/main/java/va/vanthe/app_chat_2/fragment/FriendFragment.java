@@ -6,31 +6,46 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import va.vanthe.app_chat_2.databinding.LayoutFragmentFriendBinding;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FriendFragment extends Fragment {
+import va.vanthe.app_chat_2.adapters.UsersAdapter;
+import va.vanthe.app_chat_2.databinding.LayoutFragmentFriendBinding;
+import va.vanthe.app_chat_2.listeners.UserListener;
+import va.vanthe.app_chat_2.models.User;
+
+public class FriendFragment extends Fragment  {
 
     LayoutFragmentFriendBinding binding;
     private boolean isFragmentVisible;
 
+
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        Log.e("Vanthe", "Friend");
     }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = LayoutFragmentFriendBinding.inflate(inflater, container, false);
 
+
+
         // Trả về View đã được inflate
         return binding.getRoot();
 
     }
+
+
+
+
+
+
 //    @Override
 //    public void setUserVisibleHint(boolean isVisibleToUser) {
 //        super.setUserVisibleHint(isVisibleToUser);

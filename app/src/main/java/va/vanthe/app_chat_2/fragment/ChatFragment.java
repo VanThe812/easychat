@@ -205,7 +205,7 @@ public class ChatFragment extends Fragment  implements ConversionListener, UserL
         users.add(empty);
         for (int i = 0; i<10; i++) {
             User user = new User();
-            user.name = "Vu Van The" + (i+1);
+            user.name = "Diu Thanh" + (i+1);
             user.image = IMAGE_GROUP_CHAT_DEFAULT;
             user.id = ""+i;
             users.add(user);

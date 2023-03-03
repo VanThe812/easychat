@@ -51,6 +51,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewhol
 
     class UsersViewholder extends RecyclerView.ViewHolder {
 
+
         ItemContainerUserBinding binding;
 
         UsersViewholder(ItemContainerUserBinding itemContainerUserBinding) {
