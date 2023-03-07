@@ -47,10 +47,7 @@ public class ChatActivity extends AppCompatActivity {
         binding.chatRCV.setAdapter(chatAdapter);
 
     }
-    private Bitmap getBitmapFromEncodedString(String encodedImage) {
-        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-    }
+
     private void setListeners() {
         binding.imageback.setOnClickListener(v -> {
             onBackPressed();
@@ -117,6 +114,10 @@ public class ChatActivity extends AppCompatActivity {
 
         binding.chatRCV.setVisibility(View.VISIBLE);
         binding.progressBar.setVisibility(View.GONE);
+    }
+    private Bitmap getBitmapFromEncodedString(String encodedImage) {
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
 }

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import va.vanthe.app_chat_2.databinding.LayoutFragmentInformationBinding;
+
 
 public class InformationAdapter {
 

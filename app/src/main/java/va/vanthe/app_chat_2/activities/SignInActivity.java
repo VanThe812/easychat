@@ -57,11 +57,8 @@ public class SignInActivity extends AppCompatActivity {
     }
     @NonNull
     private Boolean isValidSignInDetails() {
-        if(binding.inputEmail.getText().toString().isEmpty()) {
-            showToast("Enter email");
-            return false;
-        }else if(!Patterns.EMAIL_ADDRESS.matcher(binding.inputEmail.getText().toString()).matches()) {
-            showToast("Enter valid email");
+        if(binding.inputPhoneNumber.getText().toString().isEmpty()) {
+            showToast("Enter phone number");
             return false;
         }else if(binding.inputPassword.getText().toString().trim().isEmpty()) {
             showToast("Enter password");
@@ -75,7 +72,7 @@ public class SignInActivity extends AppCompatActivity {
         loading(true);
 
         database.collection(Constants.KEY_USER)
-                .whereEqualTo(Constants.KEY_ACCOUNT_EMAIL, binding.inputEmail.getText().toString())
+                .whereEqualTo(Constants.KEY_ACCOUNT_PHONE_NUMBER, binding.inputPhoneNumber.getText().toString())
                 .whereEqualTo(Constants.KEY_ACCOUNT_PASSWORD, SHA256Encryptor.encrypt(binding.inputPassword.getText().toString()))
                 .get()
                 .addOnCompleteListener(task -> {
@@ -84,10 +81,14 @@ public class SignInActivity extends AppCompatActivity {
                         DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
                         account.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
                         account.putString(Constants.KEY_ACCOUNT_USER_ID, documentSnapshot.getId());
-                        account.putString(Constants.KEY_ACCOUNT_EMAIL, documentSnapshot.getString(Constants.KEY_ACCOUNT_EMAIL));
-//                        account.putString(Constants.KEY_IMAGE, documentSnapshot.getString(Constants.KEY_IMAGE));
-//                        account.putString(Constants.KEY_STATUS_LANGUAGE, "en");
+                        account.putString(Constants.KEY_ACCOUNT_PHONE_NUMBER, documentSnapshot.getString(Constants.KEY_ACCOUNT_PHONE_NUMBER));
                         account.putString(Constants.KEY_ACCOUNT_PASSWORD, documentSnapshot.getString(Constants.KEY_ACCOUNT_PASSWORD));
+
+                        account.putString(Constants.KEY_ACCOUNT_IMAGE, documentSnapshot.getString(Constants.KEY_IMAGE));
+                        account.putString(Constants.KEY_ACCOUNT_FIRST_NAME, documentSnapshot.getString(Constants.KEY_ACCOUNT_FIRST_NAME));
+                        account.putString(Constants.KEY_ACCOUNT_LAST_NAME, documentSnapshot.getString(Constants.KEY_ACCOUNT_LAST_NAME));
+                        account.putBoolean(Constants.KEY_ACCOUNT_SEX, documentSnapshot.getBoolean(Constants.KEY_ACCOUNT_SEX));
+                        account.putString(Constants.KEY_ACCOUNT_DateOfBirth, documentSnapshot.getString(Constants.KEY_ACCOUNT_DateOfBirth));
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);

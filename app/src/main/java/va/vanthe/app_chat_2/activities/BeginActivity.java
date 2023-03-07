@@ -3,15 +3,16 @@ package va.vanthe.app_chat_2.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import va.vanthe.app_chat_2.adapters.InformationAdapter;
+import va.vanthe.app_chat_2.adapters.AboutTheAppAdapter;
 import va.vanthe.app_chat_2.databinding.ActivityBeginBinding;
+import va.vanthe.app_chat_2.models.AboutTheApp;
 
 public class BeginActivity extends AppCompatActivity {
 
@@ -22,26 +23,36 @@ public class BeginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(binding.getRoot());
 
-//        List<String> data = new ArrayList<>();
-//        data.add("Page 1");
-//        data.add("Page 2");
-//        data.add("Page 3");
+        List<AboutTheApp> data = new ArrayList<>();
+        data.add(new AboutTheApp("Trang giới thiệu 1", false));
+        data.add(new AboutTheApp("Trang giới thiệu 2", false));
+        data.add(new AboutTheApp("Trang giới thiệu 3", false));
 
 
-//        InformationAdapter adapter = new InformationAdapter(data);
-//        binding.viewPagerBegin.setAdapter(adapter);
-//        binding.viewPagerBegin.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        // Chặn sự kiện vuốt bằng cách trả về true
-//                        return true;
-//                    default:
-//                        break;
-//                }
-//                return false;
-//            }
-//        });
+        AboutTheAppAdapter adapter = new AboutTheAppAdapter(data);
+        binding.viewPagerBegin.setAdapter(adapter);
+
+        binding.circleIndicator.createIndicators(3,0);
+        binding.circleIndicator.animatePageSelected(0);
+
+
+        binding.viewPagerBegin.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                binding.circleIndicator.animatePageSelected(binding.viewPagerBegin.getCurrentItem());
+
+                if(binding.viewPagerBegin.getCurrentItem() == 2) {
+                    binding.buttonGetStart.setVisibility(View.VISIBLE);
+                } else {
+                    binding.buttonGetStart.setVisibility(View.GONE);
+                }
+            }
+        });
+        binding.buttonGetStart.setOnClickListener(view -> {
+            Intent intent = new Intent(BeginActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
+
     }
 }

@@ -6,36 +6,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
-import va.vanthe.app_chat_2.adapters.ViewPagerInfoAdapter;
-import va.vanthe.app_chat_2.adapters.ViewPagerSearchAdapter;
-import va.vanthe.app_chat_2.dataencrypt.SHA256Encryptor;
 import va.vanthe.app_chat_2.ulitilies.Constants;
-import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
-import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.databinding.ActivitySignupBinding;
 
 public class SignUpActivity extends AppCompatActivity {
 
     private ActivitySignupBinding binding;
-    private PreferenceManager preferenceManager;
+
     private String encodedImage;
     private FirebaseFirestore database = FirebaseFirestore.getInstance();
+
+    private FirebaseAuth mAuth;
+    public static final String TAG = "SentOTP";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,30 +49,25 @@ public class SignUpActivity extends AppCompatActivity {
         setListeners();
     }
     private void init() {
-        preferenceManager = new PreferenceManager(getApplicationContext());
 
+        mAuth = FirebaseAuth.getInstance();
     }
     private void setListeners() {
         binding.loginUser.setOnClickListener(view -> {
             startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
         });
-        binding.buttonSignUp.setOnClickListener(view -> {
-//            if (isValidSignUpDetails()) {
-//                signUp();
-//            }
 
-            //
-            ViewPagerInfoAdapter adapter = new ViewPagerInfoAdapter(getSupportFragmentManager());
-            binding.viewPagerInfo.setAdapter(adapter);
+        binding.buttonSignUp.setOnClickListener(view -> {
+            if (isValidSignUpDetails()) {
+                signUp();
+            }
         });
     }
+
     @NonNull
     private Boolean isValidSignUpDetails() {
-        if(binding.inputEmail.getText().toString().isEmpty()) {
-            showToast("Enter email");
-            return false;
-        }else if(!Patterns.EMAIL_ADDRESS.matcher(binding.inputEmail.getText().toString()).matches()) {
-            showToast("Enter valid email");
+        if(binding.inputPhoneNumber.getText().toString().isEmpty()) {
+            showToast("Enter phone number");
             return false;
         }else if(binding.inputPassword.getText().toString().trim().isEmpty()) {
             showToast("Enter password");
@@ -86,14 +83,14 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    private CompletableFuture<Boolean> checkIfAccountExists(String email) {
+    private CompletableFuture<Boolean> checkIfAccountExists(String phoneNumber) {
 
         // Tạo một CompletableFuture để trả về kết quả kiểm tra
         CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         // Thực hiện truy vấn để kiểm tra xem có tài khoản nào chứa email này hay không
         database.collection(Constants.KEY_USER)
-                .whereEqualTo(Constants.KEY_ACCOUNT_EMAIL, email)
+                .whereEqualTo(Constants.KEY_ACCOUNT_PHONE_NUMBER, phoneNumber)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
@@ -107,50 +104,90 @@ public class SignUpActivity extends AppCompatActivity {
         return future;
     }
 
-    private void addAccountToDB() {
-        HashMap<String, Object> user = new HashMap<>();
-        user.put(Constants.KEY_ACCOUNT_EMAIL, binding.inputEmail.getText().toString().trim());
-        user.put(Constants.KEY_ACCOUNT_PASSWORD, SHA256Encryptor.encrypt(binding.inputPassword.getText().toString()));
-        database.collection(Constants.KEY_USER)
-                .add(user)
-                .addOnSuccessListener(documentReference -> {
-                    loading(false);
-                    preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
-                    preferenceManager.putString(Constants.KEY_ACCOUNT_USER_ID, documentReference.getId());
-                    preferenceManager.putString(Constants.KEY_ACCOUNT_EMAIL, binding.inputEmail.getText().toString().trim());
-                    preferenceManager.putString(Constants.KEY_ACCOUNT_PASSWORD, SHA256Encryptor.encrypt(binding.inputPassword.getText().toString()));
-                    showToast("Account successfully created");
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                })
-                .addOnFailureListener(exception -> {
-                    loading(false);
-                    showToast(exception.getMessage());
-                });
-    }
+
+
 
     private void signUp(){
         loading(true);
 
-        //check email
-        CompletableFuture<Boolean> future = checkIfAccountExists(binding.inputEmail.getText().toString().trim());
+        //check phone number tồn tại
+        CompletableFuture<Boolean> future = checkIfAccountExists(binding.inputPhoneNumber.getText().toString().trim());
         future.thenAccept(accountExists -> {
             if (accountExists) {
                 // Account exists
                 Log.d("checkAcc", "Account exists");
                 showToast("Account already exists");
                 loading(false);
-                binding.inputEmail.findFocus();
+                binding.inputPhoneNumber.findFocus();
             } else {
                 // Account does not exist
                 Log.d("checkAcc", "Account does not exists");
-                addAccountToDB();
+                // Send OTP
+                mAuth.setLanguageCode("vi");
+                PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                        .setPhoneNumber(binding.inputPhoneNumber.getText().toString().trim())       // Phone number to verify
+                        .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                        .setActivity(this)                 // Activity (for callback binding)
+                        .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                            @Override
+                            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                                Log.d(TAG, "onVerificationCompleted:" + phoneAuthCredential);
+                                signInWithPhoneAuthCredential(phoneAuthCredential);
+                            }
+
+                            @Override
+                            public void onVerificationFailed(@NonNull FirebaseException e) {
+                                // This callback is invoked in an invalid request for verification is made,
+                                // for instance if the the phone number format is not valid.
+                                Log.w(TAG, "onVerificationFailed", e);
+                                Toast.makeText(SignUpActivity.this, "Verification Failed", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                                super.onCodeSent(verificationId, forceResendingToken);
+                                Log.d(TAG, "onCodeSent" + verificationId);
+
+                                Intent intent = new Intent(SignUpActivity.this, VerificationCodeOTPActivity.class);
+                                intent.putExtra("mVerificationId", verificationId);
+                                intent.putExtra("phoneNumber", binding.inputPhoneNumber.getText().toString().trim());
+                                intent.putExtra("password", binding.inputPassword.getText().toString().trim());
+
+                                startActivity(intent);
+                            }
+                        })
+                        .build();
+                PhoneAuthProvider.verifyPhoneNumber(options);
+
             }
         });
+    }
 
+    // Dành cho những máy tự động xác nhận ma OTP
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
 
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.e(TAG, "signInWithCredential:success");
+//                            FirebaseUser user = task.getResult().getUser();
+                            // Update UI
 
+                            // CHuyển người dùng tới Activity Information
+                            Toast.makeText(SignUpActivity.this, "Sign Up Success", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Sign in failed, display a message and update the UI
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                // The verification code entered was invalid
+                                Toast.makeText(SignUpActivity.this, "The verification code entered was invalid", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
     }
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();

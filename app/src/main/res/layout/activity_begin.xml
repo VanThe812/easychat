@@ -11,6 +11,19 @@
         android:layout_height="match_parent"
         android:id="@+id/view_pager_begin"
         />
+    <Button
+        android:id="@+id/buttonGetStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get Start"
+        android:background="@drawable/bg_button"
+        android:textSize="@dimen/_15ssp"
+        android:padding="@dimen/_10sdp"
+        android:layout_margin="@dimen/_8sdp"
+        android:layout_above="@id/circleIndicator"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/white"
+        android:visibility="gone"/>
     <me.relex.circleindicator.CircleIndicator
         android:id="@+id/circleIndicator"
         android:layout_width="wrap_content"
@@ -18,4 +31,5 @@
         android:layout_alignParentBottom="true"
         app:ci_drawable="@drawable/bg_circle"
         android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>

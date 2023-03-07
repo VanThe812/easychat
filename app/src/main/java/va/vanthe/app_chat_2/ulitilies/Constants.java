@@ -6,6 +6,9 @@ public class Constants {
     public static final String KEY_ACCOUNT_USER_ID = "userId";
     public static final String KEY_ACCOUNT_FIRST_NAME = "firstName";
     public static final String KEY_ACCOUNT_LAST_NAME = "lastName";
+    public static final String KEY_ACCOUNT_SEX = "sex";
+    public static final String KEY_ACCOUNT_DateOfBirth = "dateOfBrith";
+    public static final String KEY_ACCOUNT_PHONE_NUMBER = "phoneNumber";
     public static final String KEY_ACCOUNT_EMAIL = "email";
     public static final String KEY_ACCOUNT_PASSWORD = "password";
     public static final String KEY_ACCOUNT_IMAGE = "image";

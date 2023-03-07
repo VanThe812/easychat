@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity{
     private ViewPagerMenuAdapter viewPagerMenuAdapter;
     private PreferenceManager account; //Bảng tài khoản trong db của máy
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
