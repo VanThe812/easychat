@@ -5,9 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import va.vanthe.app_chat_2.fragment.ChatFragment;
-import va.vanthe.app_chat_2.fragment.FriendFragment;
-import va.vanthe.app_chat_2.fragment.SettingFragment;
+import va.vanthe.app_chat_2.fragment.MenuChatFragment;
+import va.vanthe.app_chat_2.fragment.MenuFriendFragment;
+import va.vanthe.app_chat_2.fragment.MenuSettingFragment;
 
 
 public class ViewPagerMenuAdapter extends FragmentStatePagerAdapter {
@@ -20,13 +20,13 @@ public class ViewPagerMenuAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return new ChatFragment();
+                return new MenuChatFragment();
             case 1:
-                return new FriendFragment();
+                return new MenuFriendFragment();
             case 2:
-                return new SettingFragment();
+                return new MenuSettingFragment();
             default:
-                return new ChatFragment();
+                return new MenuChatFragment();
         }
     }
 

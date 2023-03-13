@@ -14,7 +14,7 @@ import java.util.List;
 
 import va.vanthe.app_chat_2.databinding.ItemContainerReceivedMessageBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerSentMessageBinding;
-import va.vanthe.app_chat_2.models.ChatMessage;
+import va.vanthe.app_chat_2.entity.ChatMessage;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -57,11 +57,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public int getItemViewType(int position) {
-        if(chatMessages.get(position).datatime == "1") {
-            return VIEW_TYPE_SENT;
-        }else {
+//        if(chatMessages.get(position).datatime == "1") {
+//            return VIEW_TYPE_SENT;
+//        }else {
             return VIEW_TYPE_RECEIVED;
-        }
+//        }
     }
 
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
@@ -73,7 +73,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             binding = itemContainerSentMessageBinding;
         }
         void setData(ChatMessage chatMessage) {
-            binding.textMessage.setText(chatMessage.message);
+            binding.textMessage.setText(chatMessage.getMessage());
 //            binding.textDateTime.setText(chatMessage.datatime);
 
         }
@@ -89,7 +89,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
 
         void setData(ChatMessage chatMessage)  {
-            binding.textMessage.setText(chatMessage.message);
+            binding.textMessage.setText(chatMessage.getMessage());
 //            binding.textDateTime.setText(chatMessage.datatime);
 //            if(chatMessage.senderName != "" && chatMessage.senderName != null) {
 //                if (chatMessage.senderImage == "" || chatMessage == null) {

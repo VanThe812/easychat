@@ -15,7 +15,7 @@ import java.util.List;
 
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.databinding.ItemContainerUserChatBinding;
-import va.vanthe.app_chat_2.models.User;
+import va.vanthe.app_chat_2.entity.User;
 
 public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.UserChatViewHolder>{
 
@@ -58,8 +58,8 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.UserCh
         }
         void setUserData(User user, int pos) {
             if(pos != 0) {
-                binding.textName.setText(user.name);
-                binding.imageProfile.setImageBitmap(getUserImage(user.image));
+                binding.textName.setText(user.getLastName());
+                binding.imageProfile.setImageBitmap(getUserImage(user.getImage()));
             }else{
                 binding.imageProfile.setBackgroundResource(R.drawable.ic_laughing_meuu);
                 binding.textName.setText("Đặt trạng thái tùy chỉnh");

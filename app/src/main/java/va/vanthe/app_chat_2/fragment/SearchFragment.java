@@ -1,10 +1,10 @@
 package va.vanthe.app_chat_2.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,11 +14,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import va.vanthe.app_chat_2.activities.ChatMessageActivity;
 import va.vanthe.app_chat_2.adapters.UserChatAdapter;
 import va.vanthe.app_chat_2.adapters.UsersAdapter;
 import va.vanthe.app_chat_2.databinding.LayoutFragmentSearchBinding;
 import va.vanthe.app_chat_2.listeners.UserListener;
-import va.vanthe.app_chat_2.models.User;
+import va.vanthe.app_chat_2.entity.User;
+import va.vanthe.app_chat_2.ulitilies.Constants;
 
 public class SearchFragment extends Fragment implements UserListener {
     public static LayoutFragmentSearchBinding binding;
@@ -41,15 +43,16 @@ public class SearchFragment extends Fragment implements UserListener {
         return binding.getRoot();
     }
     private void setListeners() {
-//        binding.s
+
     }
     private void dataTest() {
         List<User> users = new ArrayList<>();
         for (int i = 0; i<8; i++) {
             User user = new User();
-            user.name = "Vu Van The" + (i+1);
-            user.image = IMAGE_GROUP_CHAT_DEFAULT;
-            user.id = ""+i;
+            user.setFirstName("Vu Van");
+            user.setLastName("The" + (i +1));
+            user.setImage(IMAGE_GROUP_CHAT_DEFAULT);
+            user.setId(""+i);
             users.add(user);
         }
         UserChatAdapter userChatAdapter = new UserChatAdapter(users, getContext());
@@ -65,9 +68,10 @@ public class SearchFragment extends Fragment implements UserListener {
         List<User> users = new ArrayList<>();
         for (int i = 0; i<8; i++) {
             User user = new User();
-            user.name = "Vu Van The" + (i+1);
-            user.image = IMAGE_GROUP_CHAT_DEFAULT;
-            user.id = ""+i;
+            user.setFirstName("Vu Van");
+            user.setLastName("The" + (i +1));
+            user.setImage(IMAGE_GROUP_CHAT_DEFAULT);
+            user.setId(""+i);
             users.add(user);
         }
         UsersAdapter usersAdapter = new UsersAdapter(users, this);
@@ -79,7 +83,11 @@ public class SearchFragment extends Fragment implements UserListener {
 
     @Override
     public void onUserClicked(User user) {
-        Toast.makeText(getContext(), "hii", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getContext(), ChatMessageActivity.class);
+        intent.putExtra(Constants.KEY_USER, (CharSequence) user);
+//        intent.putExtra(Constants.KEY_CONVERSATION_ID, user.conversationId);
+        intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
+        startActivity(intent);
     }
 
 

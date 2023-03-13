@@ -2,25 +2,17 @@ package va.vanthe.app_chat_2.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import va.vanthe.app_chat_2.adapters.UsersAdapter;
 import va.vanthe.app_chat_2.databinding.LayoutFragmentFriendBinding;
-import va.vanthe.app_chat_2.listeners.UserListener;
-import va.vanthe.app_chat_2.models.User;
 
-public class FriendFragment extends Fragment  {
+public class MenuFriendFragment extends Fragment  {
 
     LayoutFragmentFriendBinding binding;
     private boolean isFragmentVisible;

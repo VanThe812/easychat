@@ -1,8 +1,21 @@
 package va.vanthe.app_chat_2.ulitilies;
 
 public class Constants {
+
+    // version Room Database
+    public static final int KEY_VERSION_ROOM = 2;
+    //
+
+    public static final String KEY_TYPE = "typeChat";
+    public static final int KEY_TYPE_CHAT_SINGLE = 1;
+    public static final int KEY_TYPE_CHAT_GROUP = 2;
+
+
     public static final String KEY_PREFERENCE_ACCOUNT = "account";
 
+    public static final String KEY_USERS = "users";
+    /// account
+    public static final String KEY_ACCOUNT = "accounts";
     public static final String KEY_ACCOUNT_USER_ID = "userId";
     public static final String KEY_ACCOUNT_FIRST_NAME = "firstName";
     public static final String KEY_ACCOUNT_LAST_NAME = "lastName";
@@ -13,11 +26,39 @@ public class Constants {
     public static final String KEY_ACCOUNT_PASSWORD = "password";
     public static final String KEY_ACCOUNT_IMAGE = "image";
 
-    public static final String KEY_USERS = "users";
-
-
-
     public static final String KEY_IS_SIGNED_IN = "isSignedIn";
+
+
+
+    /// chat_message
+    public static final String KEY_CHAT_MESSAGE = "chatMessage";
+    public static final String KEY_CHAT_MESSAGE_ID = "chatMessageId";
+    public static final String KEY_CHAT_MESSAGE_SENDER_ID = "senderId";
+    public static final String KEY_CHAT_MESSAGE_MESSAGE = "message";
+    public static final String KEY_CHAT_MESSAGE_DATA_TIME = "dataTime";
+    public static final String KEY_CHAT_MESSAGE_CONVERSATION_ID = "conversationId";
+    public static final String KEY_CHAT_MESSAGE_STYLE_MESSAGE = "styleMessage";
+    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_NORMAL = 1;
+    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_FILE = 2;
+    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_LOCATION = 3;
+
+    /// group_member: id, userId, conversationId, status
+        public static final String KEY_GROUP_MEMBER = "groupMember";
+    public static final String KEY_GROUP_MEMBER_ID = "groupMemberId";
+    public static final String KEY_GROUP_MEMBER_USER_ID = "userId";
+    public static final String KEY_GROUP_MEMBER_RECEIVER_ID = "receiverId";
+    public static final String KEY_GROUP_MEMBER_CONVERSATION_ID = "conversationId";
+    public static final String KEY_GROUP_MEMBER_STATUS = "status";
+
+    /// conversation: id,
+    public static final String KEY_CONVERSATION = "conversation";
+    public static final String KEY_CONVERSATION_ID = "conversationId";
+    public static final String KEY_CONVERSATION_CREATE_TIME = "createTime";
+    public static final String KEY_CONVERSATION_SENDER_ID = "senderId";
+    public static final String KEY_CONVERSATION_NEW_MESSAGE = "newMessage";
+    public static final String KEY_CONVERSATION_MESSAGE_TIME = "messageTime";
+
+
 
 
     public static final String KEY_IMAGE = "image";
@@ -64,3 +105,4 @@ public class Constants {
 
     public static final String KEY_STATUS_LANGUAGE = "statusLanguage";
 }
+

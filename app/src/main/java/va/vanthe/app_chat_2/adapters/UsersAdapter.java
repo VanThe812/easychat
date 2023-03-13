@@ -14,7 +14,7 @@ import java.util.List;
 
 import va.vanthe.app_chat_2.databinding.ItemContainerUserBinding;
 import va.vanthe.app_chat_2.listeners.UserListener;
-import va.vanthe.app_chat_2.models.User;
+import va.vanthe.app_chat_2.entity.User;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewholder>{
 
@@ -59,9 +59,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UsersViewhol
             binding = itemContainerUserBinding;
         }
         void setUserData(User user) {
-            binding.textName.setText(user.name);
-//            binding.textEmail.setText(user.email);
-            binding.imageProfile.setImageBitmap(getUserImage(user.image));
+            binding.textName.setText(user.getLastName());
+            binding.imageProfile.setImageBitmap(getUserImage(user.getImage()));
+            binding.getRoot().setOnClickListener(v -> {
+                userListener.onUserClicked(user);
+            });
         }
     }
 

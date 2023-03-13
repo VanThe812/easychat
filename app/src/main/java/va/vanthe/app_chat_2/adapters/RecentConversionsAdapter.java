@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.databinding.ItemContainerConversionVerticalBinding;
 import va.vanthe.app_chat_2.listeners.ConversionListener;
-import va.vanthe.app_chat_2.models.ChatMessage;
-import va.vanthe.app_chat_2.models.User;
+import va.vanthe.app_chat_2.entity.ChatMessage;
 
 public class RecentConversionsAdapter extends RecyclerView.Adapter<RecentConversionsAdapter.ConversionViewHolder>{
 
@@ -58,18 +56,18 @@ public class RecentConversionsAdapter extends RecyclerView.Adapter<RecentConvers
             binding = itemContainerRecentConversionBinding;
         }
         void setData(ChatMessage chatMessage) {
-            binding.imageProfile.setImageBitmap(getConverdionImage(chatMessage.conversionImage));
-            binding.textName.setText(chatMessage.receiverNickname);
-            binding.textRecentMessage.setText(chatMessage.message);
-            binding.getRoot().setOnClickListener(v -> {
-                User user= new User();
-                user.id = chatMessage.conversionId;
-                user.name = chatMessage.conversionName;
-                user.image = chatMessage.conversionImage;
-                user.conversationId = chatMessage.conversationId;
-                user.receiverNickname = chatMessage.receiverNickname;
-                conversionListener.onConversionCLicked(user);
-            });
+//            binding.imageProfile.setImageBitmap(getConverdionImage(chatMessage.conversionImage));
+//            binding.textName.setText(chatMessage.receiverNickname);
+//            binding.textRecentMessage.setText(chatMessage.message);
+//            binding.getRoot().setOnClickListener(v -> {
+//                User user= new User();
+//                user.id = chatMessage.conversionId;
+//                user.name = chatMessage.conversionName;
+//                user.image = chatMessage.conversionImage;
+//                user.conversationId = chatMessage.conversationId;
+//                user.receiverNickname = chatMessage.receiverNickname;
+//                conversionListener.onConversionCLicked(user);
+//            });
         }
     }
 
