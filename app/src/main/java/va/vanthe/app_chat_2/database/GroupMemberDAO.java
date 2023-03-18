@@ -15,4 +15,7 @@ public interface GroupMemberDAO {
 
     @Query("SELECT * FROM groupmember WHERE userId = :userId AND status = 1")
     GroupMember hasTextedUser(String userId);
+
+    @Query("SELECT * FROM groupmember where userId != :userId AND conversationId = :conversationId")
+    GroupMember getGroupMember(String userId, String conversationId);
 }

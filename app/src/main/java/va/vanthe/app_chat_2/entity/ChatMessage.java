@@ -5,6 +5,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.util.Date;
+import java.util.HashMap;
 
 @Entity
 public class ChatMessage {
@@ -75,5 +76,15 @@ public class ChatMessage {
 
     public void setStyleMessage(int styleMessage) {
         this.styleMessage = styleMessage;
+    }
+
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> chatMessageMap = new HashMap<>();
+        chatMessageMap.put("senderId", senderId);
+        chatMessageMap.put("message", message);
+        chatMessageMap.put("dataTime", dataTime);
+        chatMessageMap.put("conversationId", conversationId);
+        chatMessageMap.put("styleMessage", styleMessage);
+        return chatMessageMap;
     }
 }

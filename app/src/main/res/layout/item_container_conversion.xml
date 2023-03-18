@@ -25,7 +25,7 @@
         android:padding="@dimen/_2sdp"
         android:background="@drawable/bg_status"
         android:src="@drawable/ic_dot"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/imageProfile"
         app:layout_constraintEnd_toEndOf="@id/imageProfile"/>
     <TextView
@@ -38,7 +38,7 @@
         android:paddingRight="@dimen/_2sdp"
         app:layout_constraintBottom_toBottomOf="@id/imageProfile"
         app:layout_constraintEnd_toEndOf="@id/imageProfile"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:text="25 phút">
 
     </TextView>
@@ -66,20 +66,45 @@
         app:layout_constraintEnd_toStartOf="@id/imageStatusView"
         app:layout_constraintStart_toEndOf="@id/imageProfile" />
 
-    <TextView
-        android:id="@+id/textRecentMessage"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8sdp"
         android:layout_marginEnd="@dimen/_8sdp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="Tin nhắn test · 14:32"
-        android:textColor="#80000000"
-        android:textSize="@dimen/_12sdp"
         app:layout_constraintEnd_toStartOf="@id/imageStatusView"
         app:layout_constraintStart_toEndOf="@id/imageProfile"
-        app:layout_constraintTop_toBottomOf="@id/viewSupporter" />
+        app:layout_constraintTop_toBottomOf="@id/viewSupporter">
+        <TextView
+            android:id="@+id/textRecentMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Tin nhắn test"
+            android:textColor="#80000000"
+            android:textSize="@dimen/_12sdp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="·"
+            android:textColor="#80000000"
+            android:textSize="@dimen/_12sdp"
+            />
+        <TextView
+            android:id="@+id/textTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="14:32"
+            android:textColor="#80000000"
+            android:textSize="@dimen/_12sdp"
+            />
+    </LinearLayout>
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageStatusView"
         android:layout_width="@dimen/_12sdp"
@@ -88,7 +113,7 @@
         android:src="@drawable/ic_dot_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"/>
     <!--
      ic_dot_view

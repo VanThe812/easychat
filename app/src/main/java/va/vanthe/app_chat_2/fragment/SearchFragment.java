@@ -83,11 +83,7 @@ public class SearchFragment extends Fragment implements UserListener {
 
     @Override
     public void onUserClicked(User user) {
-        Intent intent = new Intent(getContext(), ChatMessageActivity.class);
-        intent.putExtra(Constants.KEY_USER, (CharSequence) user);
-//        intent.putExtra(Constants.KEY_CONVERSATION_ID, user.conversationId);
-        intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
-        startActivity(intent);
+
     }
 
 

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +30,14 @@ import java.util.Locale;
 
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.adapters.ChatAdapter;
+import va.vanthe.app_chat_2.database.ChatMessageDatabase;
+import va.vanthe.app_chat_2.database.ConversationDatabase;
+import va.vanthe.app_chat_2.database.GroupMemberDatabase;
+import va.vanthe.app_chat_2.database.UserDatabase;
 import va.vanthe.app_chat_2.databinding.ActivityChatMessageBinding;
 import va.vanthe.app_chat_2.entity.ChatMessage;
+import va.vanthe.app_chat_2.entity.Conversation;
+import va.vanthe.app_chat_2.entity.GroupMember;
 import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
@@ -37,20 +45,21 @@ import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 public class ChatMessageActivity extends AppCompatActivity {
 
     private ActivityChatMessageBinding binding;
-    private List<ChatMessage> chatMessages;
-    private ChatAdapter chatAdapter;
     private FirebaseFirestore database;
     private PreferenceManager account;
+
+    private Conversation conversation;
+    private List<ChatMessage> chatMessageList;
+    private ChatAdapter chatAdapter;
+
     //
     private User userChat;
     //
-    private String conversationId;
-    private int typeChat = 1; // để mặc định là chat giữa 2 user
-    private boolean STATUS_USER_NEW_CHAT = false;
+//    private String conversationId;
+    private int typeChat;
+    private boolean statusNewChat;
 
 
-
-    private String TAG = "ChatActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,40 +68,45 @@ public class ChatMessageActivity extends AppCompatActivity {
 
         init();
         setListeners();
-
+        getChatMessage();
+//        setDataTest();
     }
 
 
     private void init() {
         database = FirebaseFirestore.getInstance();
         account = new PreferenceManager(getApplicationContext());
-
-        conversationId = getIntent().getStringExtra(Constants.KEY_CONVERSATION_ID);
+        conversation = new Conversation();
 
         typeChat = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
-
-        if (typeChat == Constants.KEY_TYPE_CHAT_SINGLE) { // nếu là chat đơn
-//            userChat = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
-            // lấy user từ trong db ra
-            loadUserAvatar();
-            if (conversationId.matches("")) {
-                STATUS_USER_NEW_CHAT = true;
+        if (typeChat == Constants.KEY_TYPE_CHAT_SINGLE) {
+            userChat = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
+            statusNewChat = getIntent().getBooleanExtra(Constants.KEY_IS_NEW_CHAT, false);
+            // set data
+            loadUserAvatar(userChat);
+            if (statusNewChat) {
                 binding.layoutNewChat.setVisibility(View.VISIBLE);
-                // Check friend....
-                //
-                //
+
             }
+            else {
+//                conversation = (Conversation) getIntent().getParcelableExtra(Constants.KEY_CONVERSATION);
+            String conversationId = getIntent().getStringExtra(Constants.KEY_CONVERSATION_ID);
+            conversation = ConversationDatabase.getInstance(this).conversationDAO().getOneConversation(conversationId);
+            }
+
         }
+//        conversationId = getIntent().getStringExtra(Constants.KEY_CONVERSATION_ID);
 
         // set adapter rỗng cho RCV, sẽ thêm tin nhắn vào sau
-        chatMessages = new ArrayList<>();
-        chatAdapter = new ChatAdapter(chatMessages);
+        chatMessageList = new ArrayList<>();
+        chatAdapter = new ChatAdapter(chatMessageList,getBitmapFromEncodedString(userChat.getImage()), account.getString(Constants.KEY_ACCOUNT_USER_ID));
         binding.chatRCV.setAdapter(chatAdapter);
 
     }
-    private void  loadUserAvatar() {
-        binding.textName.setText(userChat.getLastName());
-        byte[] bytes = Base64.decode(userChat.getImage(), Base64.DEFAULT);
+
+    private void  loadUserAvatar(@NonNull User user) {
+        binding.textName.setText(user.getLastName());
+        byte[] bytes = Base64.decode(user.getImage(), Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         binding.imageProfile.setImageBitmap(bitmap);
         binding.imageProfile2.setImageBitmap(bitmap);
@@ -146,73 +160,144 @@ public class ChatMessageActivity extends AppCompatActivity {
         binding.textviewSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (binding.layoutNewChat.getVisibility() == View.VISIBLE) { // Đoạn này làm mẹo, nếu layoutNewChat hiện lên thì có nghĩa là chưa có cuộc hội thoại
-                    // Tạo mới 1 cuộc hội thoại: Conversation
-                    HashMap<String, Object> conversation = new HashMap<>();
-                    conversation.put(Constants.KEY_CONVERSATION_CREATE_TIME, new Date());
-                    database.collection(Constants.KEY_CONVERSATION)
-                            .add(conversation)
-                            .addOnSuccessListener(documentReference -> {
-                                // Sau khi tạo mới thành công một hội thoại => tạo mới 2 bản ghi groupMember
-                                // Khởi tạo batch write
-                                WriteBatch batch = FirebaseFirestore.getInstance().batch();
-                                // Thêm bản ghi 1
-                                DocumentReference docRef1 = FirebaseFirestore.getInstance().collection(Constants.KEY_GROUP_MEMBER).document();
-                                HashMap<String, Object> groupMember1 = new HashMap<>();
-                                groupMember1.put(Constants.KEY_GROUP_MEMBER_USER_ID, userChat.getId());
-                                groupMember1.put(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID, documentReference.getId());
-                                groupMember1.put(Constants.KEY_GROUP_MEMBER_STATUS, true);
-                                batch.set(docRef1, groupMember1);
+                String textSend = binding.inputMessage.getText().toString().trim();
+                if (typeChat == Constants.KEY_TYPE_CHAT_SINGLE) {
+                    if (statusNewChat) { // true la new chat
 
-                                DocumentReference docRef2 = FirebaseFirestore.getInstance().collection(Constants.KEY_GROUP_MEMBER).document();
-                                HashMap<String, Object> groupMember2 = new HashMap<>();
-                                groupMember2.put(Constants.KEY_GROUP_MEMBER_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID));
-                                groupMember2.put(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID, documentReference.getId());
-                                groupMember2.put(Constants.KEY_GROUP_MEMBER_STATUS, true);
-                                batch.set(docRef2, groupMember2);
+                        conversation.setCreateTime(new Date());
+                        conversation.setNewMessage(textSend);
+                        conversation.setSenderId(userChat.getId());
+                        conversation.setMessageTime(new Date());
+                        conversation.setStyleChat(Constants.KEY_TYPE_CHAT_SINGLE);
 
-                                // Commit batch write
-                                batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        // Thao tác thành công
-                                        sendMessage(binding.inputMessage.getText().toString().trim(), documentReference.getId());
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        // Thao tác thất bại
-                                    }
+                        // chuyen quan map
+                        HashMap<String, Object> conversationMap = conversation.toHashMap();
+
+                        database.collection(Constants.KEY_CONVERSATION)
+                                .add(conversationMap)
+                                .addOnSuccessListener(documentReference -> {
+                                    // Sau khi tạo mới thành công một hội thoại => tạo mới 2 bản ghi groupMember
+                                    // truoc do them conversation vao room da
+                                    conversation.setId(documentReference.getId());
+                                    ConversationDatabase.getInstance(getApplicationContext()).conversationDAO().insertConversation(conversation);
+
+                                    GroupMember groupMember1 = new GroupMember();
+                                    groupMember1.setUserId(userChat.getId());
+                                    groupMember1.setConversationId(documentReference.getId());
+                                    groupMember1.setTimeJoin(new Date());
+                                    groupMember1.setStatus(1);
+
+                                    GroupMember groupMember2 = new GroupMember();
+                                    groupMember2.setUserId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+                                    groupMember2.setConversationId(documentReference.getId());
+                                    groupMember2.setTimeJoin(new Date());
+                                    groupMember2.setStatus(1);
+
+                                    // Khởi tạo batch write (Đe them cung luc 2 ban ghi)
+                                    WriteBatch batch = FirebaseFirestore.getInstance().batch();
+
+                                    DocumentReference docRef1 = FirebaseFirestore.getInstance().collection(Constants.KEY_GROUP_MEMBER).document();
+                                    HashMap<String, Object> groupMember1Map = groupMember1.toHashMap();
+                                    batch.set(docRef1, groupMember1Map);
+
+                                    DocumentReference docRef2 = FirebaseFirestore.getInstance().collection(Constants.KEY_GROUP_MEMBER).document();
+                                    HashMap<String, Object> groupMember2Map = groupMember2.toHashMap();
+                                    batch.set(docRef2, groupMember2Map);
+
+                                    // Commit batch write
+                                    batch.commit()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    // Thao tác thành công
+                                                    // insert 2 group member vao room
+                                                    groupMember1.setId(docRef1.getId());
+                                                    groupMember2.setId(docRef2.getId());
+                                                    GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().insertGroupMember(groupMember1);
+                                                    GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().insertGroupMember(groupMember2);
+
+                                                    //Thêm user đó và Room
+                                                    UserDatabase.getInstance(getApplicationContext()).userDAO().insertUser(userChat);
+
+                                                    sendMessage(textSend, conversation.getId());
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    // Thao tác thất bại
+                                                }
+                                            });
+                                })
+                                .addOnFailureListener(runnable -> {
+                                    Toast.makeText(ChatMessageActivity.this, "Có một số lỗi xảy ra, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
                                 });
-                            })
-                            .addOnFailureListener(runnable -> {
-                                Toast.makeText(ChatMessageActivity.this, "Có một số lỗi xảy ra, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
-                            });
-                } else { // tiếp tục nhắn tin
-//                    sendMessage(binding.inputMessage.getText().toString().trim(), );
+                    } else { // tiếp tục nhắn tin
+                    sendMessage(textSend, conversation.getId());
+                    }
                 }
+
             }
         });
     }
     private void sendMessage(String textSend, String conversationId) {
 
         binding.inputMessage.setText("");
-        HashMap<String, Object> message = new HashMap<>();
-        message.put(Constants.KEY_CHAT_MESSAGE_SENDER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID));
-        message.put(Constants.KEY_CHAT_MESSAGE_MESSAGE, textSend);
-        message.put(Constants.KEY_CHAT_MESSAGE_DATA_TIME, new Date());
-        message.put(Constants.KEY_CHAT_MESSAGE_CONVERSATION_ID, conversationId);
-        message.put(Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE, Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NORMAL);
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setSenderId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+        chatMessage.setMessage(textSend);
+        chatMessage.setDataTime(new Date());
+        chatMessage.setConversationId(conversationId);
+        chatMessage.setStyleMessage(Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NORMAL);
+        
+        HashMap<String, Object> message = chatMessage.toHashMap();
+        
         database.collection(Constants.KEY_CHAT_MESSAGE)
                 .add(message)
                 .addOnSuccessListener(documentReference -> {
+                    chatMessage.setId(documentReference.getId());
+                    ChatMessageDatabase.getInstance(getApplicationContext()).chatMessageDAO().insertChatMessage(chatMessage);
 
+                    Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show();
+                    addOneMessageToBelow(chatMessage);
                 })
                 .addOnFailureListener(runnable -> {
 
                 });
     }
 
+    private void getChatMessage() {
+        int count = chatMessageList.size();
+        List<ChatMessage> chatMessages = ChatMessageDatabase.getInstance(this).chatMessageDAO().getChatMessage(conversation.getId());
+        for (ChatMessage chatMessage :
+                chatMessages) {
+            chatMessageList.add(chatMessage);
+        }
+
+        if (chatMessageList != null) {
+
+            Collections.sort(chatMessageList, (obj1, obj2) -> obj1.getDataTime().compareTo(obj2.getDataTime()));
+            if(count == 0) {
+                chatAdapter.notifyDataSetChanged();
+            }else{
+                chatAdapter.notifyItemRangeInserted(chatMessageList.size(), chatMessageList.size());
+                binding.chatRCV.smoothScrollToPosition(chatMessageList.size() - 1);
+            }
+            binding.chatRCV.setVisibility(View.VISIBLE);
+            binding.progressBar.setVisibility(View.GONE);
+        }
+    }
+    private void addOneMessageToBelow(ChatMessage chatMessage) {
+        chatMessageList.add(chatMessage);
+        int count = chatMessageList.size();
+        if(count == 0) {
+            chatAdapter.notifyDataSetChanged();
+        }else{
+            chatAdapter.notifyItemRangeInserted(chatMessageList.size(), chatMessageList.size());
+            binding.chatRCV.smoothScrollToPosition(chatMessageList.size() - 1);
+        }
+    }
+
+    @NonNull
     private String getReadableDateTIme(Date date) {
         return new SimpleDateFormat("MMMM dd, YYYY - hh:mm a", Locale.getDefault()).format(date);
     }

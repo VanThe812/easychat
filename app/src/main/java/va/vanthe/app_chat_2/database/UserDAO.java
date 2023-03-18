@@ -20,6 +20,7 @@ public interface UserDAO {
     @Query("SELECT * FROM user WHERE phoneNUmber= :phoneNumber")
     List<User> checkUser(String phoneNumber);
 
-
+    @Query("SELECT * FROM user WHERE id = :userId")
+    User getUser(String userId);
 
 }

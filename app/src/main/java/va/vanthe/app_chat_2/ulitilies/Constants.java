@@ -3,12 +3,14 @@ package va.vanthe.app_chat_2.ulitilies;
 public class Constants {
 
     // version Room Database
-    public static final int KEY_VERSION_ROOM = 2;
+    public static final int KEY_VERSION_ROOM = 4;
     //
 
     public static final String KEY_TYPE = "typeChat";
     public static final int KEY_TYPE_CHAT_SINGLE = 1;
     public static final int KEY_TYPE_CHAT_GROUP = 2;
+
+    public static final String KEY_IS_NEW_CHAT = "statusNewChat";
 
 
     public static final String KEY_PREFERENCE_ACCOUNT = "account";

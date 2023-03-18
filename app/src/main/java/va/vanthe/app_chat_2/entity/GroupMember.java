@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 
 @Entity
 public class GroupMember implements Serializable {
@@ -66,5 +67,24 @@ public class GroupMember implements Serializable {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "GroupMember{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", conversationId='" + conversationId + '\'' +
+                ", timeJoin=" + timeJoin +
+                ", status=" + status +
+                '}';
+    }
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> groupMemberMap = new HashMap<>();
+        groupMemberMap.put("userId", userId);
+        groupMemberMap.put("conversationId", conversationId);
+        groupMemberMap.put("timeJoin", timeJoin);
+        groupMemberMap.put("status", status);
+        return groupMemberMap;
     }
 }

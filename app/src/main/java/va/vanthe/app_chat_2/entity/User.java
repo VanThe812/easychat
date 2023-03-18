@@ -4,12 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.firebase.firestore.PropertyName;
+import com.google.j2objc.annotations.Property;
+
 import org.checkerframework.common.aliasing.qual.Unique;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 
 @Entity
-public class User {
+public class User implements Serializable {
     @PrimaryKey
     @NonNull
     private String id;
@@ -21,11 +26,11 @@ public class User {
     @Unique
     private String phoneNumber;
     private boolean sex;
-    private Date dateOfBrith;
+    private String dateOfBrith;
 
     public User() {}
 
-    public User(String id, String firstName, String lastName, String password, String image, String email, @Unique String phoneNumber, boolean sex, Date dateOfBrith) {
+    public User(String id, String firstName, String lastName, String password, String image, String email, @Unique String phoneNumber, boolean sex, String dateOfBrith) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -101,11 +106,37 @@ public class User {
         this.sex = sex;
     }
 
-    public Date getDateOfBrith() {
+    public String getDateOfBrith() {
         return dateOfBrith;
     }
 
-    public void setDateOfBrith(Date dateOfBrith) {
+    public void setDateOfBrith(String dateOfBrith) {
         this.dateOfBrith = dateOfBrith;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", sex=" + sex +
+                ", dateOfBrith='" + dateOfBrith + '\'' +
+                '}';
+    }
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> userMap = new HashMap<>();
+        userMap.put("firstName", firstName);
+        userMap.put("lastName", lastName);
+        userMap.put("password", password);
+        userMap.put("image", image);
+        userMap.put("email", email);
+        userMap.put("phoneNumber", phoneNumber);
+        userMap.put("sex", sex);
+        userMap.put("dateOfBrith", dateOfBrith);
+        return userMap;
     }
 }

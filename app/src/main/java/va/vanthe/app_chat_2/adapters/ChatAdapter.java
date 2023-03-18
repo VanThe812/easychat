@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,15 +20,16 @@ import va.vanthe.app_chat_2.entity.ChatMessage;
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private final List<ChatMessage> chatMessages;
-//    private final Bitmap receiverProfileImage;
-//    private final String sendrId;
+    private final Bitmap receiverProfileImage;
+    private final String senderId;
 
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
 
-    public ChatAdapter(List<ChatMessage> chatMessages) {
+    public ChatAdapter(List<ChatMessage> chatMessages, Bitmap receiverProfileImage, String senderId) {
         this.chatMessages = chatMessages;
-//        this.sendrId = sendrId;
+        this.receiverProfileImage = receiverProfileImage;
+        this.senderId = senderId;
     }
 
 
@@ -57,11 +59,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public int getItemViewType(int position) {
-//        if(chatMessages.get(position).datatime == "1") {
-//            return VIEW_TYPE_SENT;
-//        }else {
+        if(chatMessages.get(position).getSenderId().equals(senderId)) {
+            return VIEW_TYPE_SENT;
+        }else {
             return VIEW_TYPE_RECEIVED;
-//        }
+        }
     }
 
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
@@ -90,22 +92,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
         void setData(ChatMessage chatMessage)  {
             binding.textMessage.setText(chatMessage.getMessage());
-//            binding.textDateTime.setText(chatMessage.datatime);
-//            if(chatMessage.senderName != "" && chatMessage.senderName != null) {
-//                if (chatMessage.senderImage == "" || chatMessage == null) {
-//                    binding.imageProfile.setImageBitmap(getUserImage(Constants.IMAGE_AVATAR_DEFAULT));
-//                }
-//                else {
-//                    binding.imageProfile.setImageBitmap(getUserImage(chatMessage.senderImage));
-//                }
-//                if (chatMessage.senderNickname != "") {
-//                    binding.textName.setText(chatMessage.senderNickname);
-//                }else {
-//                    binding.textName.setText(chatMessage.senderName);
-//                }
-//            }else {
-//                binding.imageProfile.setImageBitmap(receiverProfileImage);
-//            }
+
 
         }
         private Bitmap getUserImage(String encodedImage) {

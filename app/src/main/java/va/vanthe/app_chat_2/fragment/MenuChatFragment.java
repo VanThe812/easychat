@@ -1,16 +1,14 @@
 package va.vanthe.app_chat_2.fragment;
 
-import static va.vanthe.app_chat_2.adapters.UsersAdapter.userListener;
-
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,28 +27,32 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EventListener;
 import java.util.List;
+import java.util.logging.Handler;
 
-import va.vanthe.app_chat_2.activities.ChatMessageActivity;
-import va.vanthe.app_chat_2.adapters.RecentConversionsAdapter;
-import va.vanthe.app_chat_2.adapters.UsersAdapter;
+import va.vanthe.app_chat_2.adapters.ConversionsAdapter;
+import va.vanthe.app_chat_2.adapters.UserSearchAdapter;
 import va.vanthe.app_chat_2.adapters.ViewPagerSearchAdapter;
+import va.vanthe.app_chat_2.database.ConversationDatabase;
 import va.vanthe.app_chat_2.database.GroupMemberDatabase;
 import va.vanthe.app_chat_2.databinding.LayoutFragmentChatBinding;
+import va.vanthe.app_chat_2.entity.Conversation;
 import va.vanthe.app_chat_2.entity.GroupMember;
-import va.vanthe.app_chat_2.listeners.UserListener;
 import va.vanthe.app_chat_2.entity.ChatMessage;
 import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
-public class MenuChatFragment extends Fragment  implements UserListener {
+public class MenuChatFragment extends Fragment {
 
     private LayoutFragmentChatBinding binding;
-    private List<ChatMessage> conversation;
-    private RecentConversionsAdapter recentConversionsAdapter;
+    private List<Conversation> mConversations;
+    private ConversionsAdapter conversionsAdapter;
     private PreferenceManager account;
     private FirebaseFirestore database = FirebaseFirestore.getInstance();
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -62,9 +64,11 @@ public class MenuChatFragment extends Fragment  implements UserListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = LayoutFragmentChatBinding.inflate(inflater, container, false);
 
+
         init();
         loadUserDetails();
         setListeners();
+        getConversation();
         listenConversations();
 //        dataTest();
         return binding.getRoot();
@@ -72,10 +76,12 @@ public class MenuChatFragment extends Fragment  implements UserListener {
     }
 
     private void init() {
-//        conversation = new ArrayList<>();
-//        recentConversionsAdapter = new RecentConversionsAdapter(conversation, this);
-//        binding.conversionsRCV.setAdapter(recentConversionsAdapter);
         account = new PreferenceManager(getActivity().getApplicationContext());
+        mConversations = new ArrayList<>();
+        conversionsAdapter = new ConversionsAdapter(mConversations, account.getString(Constants.KEY_ACCOUNT_USER_ID));
+        binding.conversionsRCV.setAdapter(conversionsAdapter);
+
+
 
     }
     private void loadUserDetails() {
@@ -172,58 +178,33 @@ public class MenuChatFragment extends Fragment  implements UserListener {
                                             List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
                                             if (!documents.isEmpty()) {
                                                 // check đã nhắn tin bao giờ chưa
+
                                                 User user = documents.get(0).toObject(User.class);
+                                                user.setId(documents.get(0).getId());
+
                                                 GroupMember groupMember = GroupMemberDatabase.getInstance(getContext()).groupMemberDAO().hasTextedUser(user.getId());
-                                                if (groupMember.getId().equals("")) {
+                                                if (groupMember == null) {
                                                     //chưa nhắn
+                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getView().getContext(),user, true);
+
+                                                    SearchFragment.binding.searchRCV.setAdapter(userSearchAdapter);
+                                                    SearchFragment.binding.searchRCV.setVisibility(View.VISIBLE);
                                                 } else {
                                                     //da nhan
+                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getView().getContext(),user, false);
 
-                                                    UsersAdapter usersAdapter = new UsersAdapter(List<user>, userListener);
-                                                    SearchFragment.binding.searchRCV.setAdapter(usersAdapter);
+                                                    SearchFragment.binding.searchRCV.setAdapter(userSearchAdapter);
                                                     SearchFragment.binding.searchRCV.setVisibility(View.VISIBLE);
+//                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(new UserSearchAdapter.IClickItemUserSearch() {
+//                                                        @Override
+//                                                        public void clickUser(User user, boolean isNewChat) {
+//                                                            clickUserSearch(user, isNewChat);
+//                                                        }
+//                                                    });
+//
+//                                                    SearchFragment.binding.searchRCV.setAdapter(userSearchAdapter);
+//                                                    SearchFragment.binding.searchRCV.setVisibility(View.VISIBLE);
                                                 }
-                                                database.collection(Constants.KEY_GROUP_MEMBER)
-                                                        .whereEqualTo(Constants.KEY_GROUP_MEMBER_USER_ID, documents.get(0).getId())
-                                                        .whereEqualTo(Constants.KEY_GROUP_MEMBER_RECEIVER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
-                                                        .get()
-                                                        .addOnSuccessListener(queryDocumentSnapshots -> {
-                                                            List<DocumentSnapshot> documentGroupMember = queryDocumentSnapshots.getDocuments();
-                                                            if(!queryDocumentSnapshots.isEmpty()) { // Đã từng nhắn tin
-                                                                Toast.makeText(getContext(), "Co ne", Toast.LENGTH_SHORT).show();
-                                                                List<User> users = new ArrayList<>();
-                                                                User user = new User();
-                                                                user.setId(documents.get(0).getId());
-                                                                user.setImage(documents.get(0).getString(Constants.KEY_ACCOUNT_IMAGE));
-                                                                user.setFirstName(documents.get(0).getString(Constants.KEY_ACCOUNT_FIRST_NAME));
-                                                                user.setLastName(documents.get(0).getString(Constants.KEY_ACCOUNT_LAST_NAME));
-//                                                                user.conversationId = documentGroupMember.get(0).getString(Constants.KEY_CONVERSATION_ID);
-                                                                users.add(user);
-
-                                                                UsersAdapter usersAdapter = new UsersAdapter(users, userListener);
-                                                                SearchFragment.binding.searchRCV.setAdapter(usersAdapter);
-                                                                SearchFragment.binding.searchRCV.setVisibility(View.VISIBLE);
-
-                                                            } else { // Chưa nhắn tin với người này
-                                                                Toast.makeText(getContext(), "Hong nhan", Toast.LENGTH_SHORT).show();
-                                                                List<User> users = new ArrayList<>();
-                                                                User user = new User();
-                                                                user = documents.get(0).toObject(User.class);
-                                                                user.setId(documents.get(0).getId());
-//                                                                user.setImage(documents.get(0).getString(Constants.KEY_ACCOUNT_IMAGE));
-//                                                                user.setFirstName(documents.get(0).getString(Constants.KEY_ACCOUNT_FIRST_NAME));
-//                                                                user.setLastName(documents.get(0).getString(Constants.KEY_ACCOUNT_LAST_NAME));
-                                                                users.add(user);
-
-                                                                UsersAdapter usersAdapter = new UsersAdapter(users, userListener);
-                                                                SearchFragment.binding.searchRCV.setAdapter(usersAdapter);
-                                                                SearchFragment.binding.searchRCV.setVisibility(View.VISIBLE);
-
-                                                            }
-                                                        });
-
-
-
                                             }
                                         }
                                     });
@@ -236,25 +217,38 @@ public class MenuChatFragment extends Fragment  implements UserListener {
     }
 
 
-
+    private void getConversation() {
+        List<Conversation> conversationList = ConversationDatabase.getInstance(getContext()).conversationDAO().getConversation();
+        for (Conversation conversation : conversationList) {
+            mConversations.add(conversation);
+//            if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
+//
+//            } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
+//                Toast.makeText(getContext(), "Hii chat group", Toast.LENGTH_SHORT).show();
+//            }
+        }
+        Collections.sort(mConversations, (obj1, obj2) -> obj2.getMessageTime().compareTo(obj1.getMessageTime()));
+        conversionsAdapter.notifyDataSetChanged();
+        binding.conversionsRCV.smoothScrollToPosition(0);
+        binding.conversionsRCV.setVisibility(View.VISIBLE);
+        binding.progressBar.setVisibility(View.GONE);
+    }
 
     private void listenConversations() {
+        database.collection(Constants.KEY_GROUP_MEMBER)
+                .whereEqualTo(Constants.KEY_GROUP_MEMBER_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
+                .addSnapshotListener(eventListenerConversation);
+    }
+    private final EventListener<QuerySnapshot> eventListenerConversation = (value, error) -> {
+        if(error != null) {
+            return;
+        }
+        if(value != null) {
+
+        }
     }
 
-//    @Override
-//    public void onConversionCLicked(User user) {
-//        Intent intent = new Intent(getContext(), ChatActivity.class);
-//        // chuyền thông tin của ng muốn nhắn tin qua activity chat
-////        intent.putExtra(Constants.KEY_USER, user);
-//        startActivity(intent);
-//    }
 
-    @Override
-    public void onUserClicked(User user) {
-        Intent intent = new Intent(getContext(), ChatMessageActivity.class);
-        intent.putExtra(Constants.KEY_USER, (CharSequence) user);
-        startActivity(intent);
-    }
     private void loading(@NonNull Boolean isLoading) {
         if(isLoading) {
             binding.conversionsRCV.setVisibility(View.INVISIBLE);

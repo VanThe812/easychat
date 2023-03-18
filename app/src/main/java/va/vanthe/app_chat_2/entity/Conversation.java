@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 
 
 @Entity
-public class Conversation {
+public class Conversation implements Serializable {
 
     @PrimaryKey
     @NonNull
@@ -17,13 +19,16 @@ public class Conversation {
     private String newMessage;
     private String senderId;
     private Date messageTime;
+    private int styleChat;
 
-    public Conversation(String id, Date createTime, String newMessage, String senderId, Date messageTime) {
+    public Conversation() {}
+    public Conversation(String id, Date createTime, String newMessage, String senderId, Date messageTime, int styleChat) {
         this.id = id;
         this.createTime = createTime;
         this.newMessage = newMessage;
         this.senderId = senderId;
         this.messageTime = messageTime;
+        this.styleChat = styleChat;
     }
 
     public String getId() {
@@ -64,5 +69,23 @@ public class Conversation {
 
     public void setMessageTime(Date messageTime) {
         this.messageTime = messageTime;
+    }
+
+    public int getStyleChat() {
+        return styleChat;
+    }
+
+    public void setStyleChat(int styleChat) {
+        this.styleChat = styleChat;
+    }
+
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> conversationMap = new HashMap<>();
+        conversationMap.put("createTime", createTime);
+        conversationMap.put("newMessage", newMessage);
+        conversationMap.put("senderId", senderId);
+        conversationMap.put("messageTime", messageTime);
+        conversationMap.put("styleChat", styleChat);
+        return conversationMap;
     }
 }
