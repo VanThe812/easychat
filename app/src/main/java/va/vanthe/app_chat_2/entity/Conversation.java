@@ -88,4 +88,16 @@ public class Conversation implements Serializable {
         conversationMap.put("styleChat", styleChat);
         return conversationMap;
     }
+
+    @Override
+    public String toString() {
+        return "Conversation{" +
+                "id='" + id + '\'' +
+                ", createTime=" + createTime +
+                ", newMessage='" + newMessage + '\'' +
+                ", senderId='" + senderId + '\'' +
+                ", messageTime=" + messageTime +
+                ", styleChat=" + styleChat +
+                '}';
+    }
 }

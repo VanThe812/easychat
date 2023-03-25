@@ -48,7 +48,7 @@ public class Constants {
         public static final String KEY_GROUP_MEMBER = "groupMember";
     public static final String KEY_GROUP_MEMBER_ID = "groupMemberId";
     public static final String KEY_GROUP_MEMBER_USER_ID = "userId";
-    public static final String KEY_GROUP_MEMBER_RECEIVER_ID = "receiverId";
+    public static final String KEY_GROUP_MEMBER_TIME_JOIN = "timeJoin";
     public static final String KEY_GROUP_MEMBER_CONVERSATION_ID = "conversationId";
     public static final String KEY_GROUP_MEMBER_STATUS = "status";
 

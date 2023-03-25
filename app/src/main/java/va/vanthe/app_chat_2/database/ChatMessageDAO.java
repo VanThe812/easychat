@@ -15,4 +15,7 @@ public interface ChatMessageDAO {
 
     @Query("SELECT * FROM ChatMessage WHERE conversationId = :conversationId ")
     List<ChatMessage> getChatMessage(String conversationId);
+
+    @Query("SELECT COUNT(*) FROM ChatMessage WHERE id = :chatMessageId")
+    int checkChatMessage(String chatMessageId);
 }

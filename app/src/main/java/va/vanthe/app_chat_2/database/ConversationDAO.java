@@ -19,4 +19,7 @@ public interface ConversationDAO {
 
     @Query("SELECT * FROM Conversation WHERE id = :conversationId ORDER BY messageTime ASC")
     Conversation getOneConversation(String conversationId);
+
+    @Query("SELECT COUNT(*) FROM Conversation WHERE id = :conversationId")
+    int checkConversation(String conversationId);
 }

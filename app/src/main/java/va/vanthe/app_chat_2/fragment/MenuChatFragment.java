@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,27 +20,32 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EventListener;
 import java.util.List;
-import java.util.logging.Handler;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import va.vanthe.app_chat_2.adapters.ConversionsAdapter;
 import va.vanthe.app_chat_2.adapters.UserSearchAdapter;
 import va.vanthe.app_chat_2.adapters.ViewPagerSearchAdapter;
 import va.vanthe.app_chat_2.database.ConversationDatabase;
 import va.vanthe.app_chat_2.database.GroupMemberDatabase;
+import va.vanthe.app_chat_2.database.UserDatabase;
 import va.vanthe.app_chat_2.databinding.LayoutFragmentChatBinding;
 import va.vanthe.app_chat_2.entity.Conversation;
 import va.vanthe.app_chat_2.entity.GroupMember;
-import va.vanthe.app_chat_2.entity.ChatMessage;
 import va.vanthe.app_chat_2.entity.User;
+import va.vanthe.app_chat_2.listeners.OnTaskCompleted;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
@@ -68,6 +72,7 @@ public class MenuChatFragment extends Fragment {
         init();
         loadUserDetails();
         setListeners();
+//        GroupMemberDatabase.getInstance(getContext()).groupMemberDAO().deleteAllGroupMember();
         getConversation();
         listenConversations();
 //        dataTest();
@@ -218,15 +223,16 @@ public class MenuChatFragment extends Fragment {
 
 
     private void getConversation() {
-        List<Conversation> conversationList = ConversationDatabase.getInstance(getContext()).conversationDAO().getConversation();
-        for (Conversation conversation : conversationList) {
-            mConversations.add(conversation);
-//            if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
-//
-//            } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
-//                Toast.makeText(getContext(), "Hii chat group", Toast.LENGTH_SHORT).show();
-//            }
-        }
+//        List<Conversation> conversationList = ConversationDatabase.getInstance(getContext()).conversationDAO().getConversation();
+//        for (Conversation conversation : conversationList) {
+//            Log.d("LogChangeConversation", "get...:" + conversation.toString());
+//            mConversations.add(conversation);
+////            if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
+////
+////            } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
+////                Toast.makeText(getCoGroupMember checkntext(), "Hii chat group", Toast.LENGTH_SHORT).show();
+////            }
+//        }
         Collections.sort(mConversations, (obj1, obj2) -> obj2.getMessageTime().compareTo(obj1.getMessageTime()));
         conversionsAdapter.notifyDataSetChanged();
         binding.conversionsRCV.smoothScrollToPosition(0);
@@ -237,6 +243,8 @@ public class MenuChatFragment extends Fragment {
     private void listenConversations() {
         database.collection(Constants.KEY_GROUP_MEMBER)
                 .whereEqualTo(Constants.KEY_GROUP_MEMBER_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
+                .orderBy(Constants.KEY_GROUP_MEMBER_TIME_JOIN)
+                .limit(10)
                 .addSnapshotListener(eventListenerConversation);
     }
     private final EventListener<QuerySnapshot> eventListenerConversation = (value, error) -> {
@@ -244,10 +252,121 @@ public class MenuChatFragment extends Fragment {
             return;
         }
         if(value != null) {
+            for (DocumentChange documentChange : value.getDocumentChanges()) {
+                if(documentChange.getType() == DocumentChange.Type.ADDED) { //nếu có thêm dữ liệu hoặc là khi vừa mở app
+                    DocumentSnapshot groupMemberSnapshot = documentChange.getDocument();
 
+
+                    //lấy conversation
+                    database.collection(Constants.KEY_CONVERSATION)
+                            .document(groupMemberSnapshot.getString(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID))
+                            .get()
+                            .addOnSuccessListener(conversationSnapshot -> {
+                                if (conversationSnapshot.exists()) {
+                                    int checkConversation = ConversationDatabase.getInstance(getContext()).conversationDAO().checkConversation(conversationSnapshot.getId());
+
+                                    Conversation conversation = conversationSnapshot.toObject(Conversation.class);
+                                    conversation.setId(conversationSnapshot.getId());
+
+                                    if (checkConversation == 0) {
+                                        ConversationDatabase.getInstance(getContext()).conversationDAO().insertConversation(conversation);
+
+                                        getGroupMembers(new OnTaskCompleted() {
+                                            @Override
+                                            public void onTaskCompleted() {
+                                                addConversationToList(conversation);
+                                            }
+                                        }, conversation.getId());
+
+                                    } else {
+                                        addConversationToList(conversation);
+                                    }
+                                }
+                            });
+
+
+                } else if(documentChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
+                    Log.d("LogChangeConversation", "MODIFIED");
+                }
+            }
         }
+    };
+    private void getGroupMembers(final OnTaskCompleted listener, String conversationId) {
+        database.collection(Constants.KEY_GROUP_MEMBER)
+                .whereEqualTo(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID, conversationId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot groupMemberSnapshots = task.getResult();
+                            if (!groupMemberSnapshots.isEmpty()) {
+                                for (QueryDocumentSnapshot groupMemberSnapshot : groupMemberSnapshots) {
+                                    GroupMember groupMember = groupMemberSnapshot.toObject(GroupMember.class);
+                                    groupMember.setId(groupMemberSnapshot.getId());
+                                    int checkGroupMember = GroupMemberDatabase.getInstance(getContext()).groupMemberDAO().checkGroupMember(groupMemberSnapshot.getId());
+                                    if (checkGroupMember == 0) {
+                                        GroupMemberDatabase.getInstance(getContext()).groupMemberDAO().insertGroupMember(groupMember);
+                                    }
+                                    AtomicInteger count = new AtomicInteger();
+                                    final int[] i = {0};
+                                    database.collection(Constants.KEY_USER)
+                                            .document(groupMember.getUserId())
+                                            .get()
+                                            .addOnSuccessListener(userSnapshot -> {
+                                                if (userSnapshot.exists()) {
+                                                    User user = userSnapshot.toObject(User.class);
+                                                    user.setId(userSnapshot.getId());
+                                                    int checkUser = UserDatabase.getInstance(getContext()).userDAO().checkUser(userSnapshot.getId());
+                                                    if (checkUser == 0) {
+                                                        UserDatabase.getInstance(getContext()).userDAO().insertUser(user);
+                                                    }
+                                                }
+                                                if (groupMemberSnapshot.getId() == groupMemberSnapshots.getDocuments().get(groupMemberSnapshots.size()-1).getId()) {
+                                                    // Tất cả các tác vụ bất đồng bộ đã hoàn thành, gọi interface
+                                                    listener.onTaskCompleted();
+                                                }
+                                            });
+                                }
+                            } else {
+                                // QuerySnapshot rỗng
+                            }
+                        } else {
+                            // Xử lý lỗi
+                        }
+                    }
+                });
     }
 
+    private void addConversationToList(Conversation conversation) {
+//        Conversation conversationNew = ConversationDatabase.getInstance(getContext()).conversationDAO().getOneConversation();
+        mConversations.add(conversation);
+        Log.d("LogChangeConversation", conversation.toString());
+        Collections.sort(mConversations, (obj1, obj2) -> obj2.getMessageTime().compareTo(obj1.getMessageTime()));
+        conversionsAdapter.notifyDataSetChanged();
+        binding.conversionsRCV.smoothScrollToPosition(0);
+    }
+
+    public String[] getDifference(String[] a, String[] b) {
+        ArrayList<String> result = new ArrayList<String>();
+        for (int i = 0; i < b.length; i++) {
+            boolean found = false;
+            for (int j = 0; j < a.length; j++) {
+                if (b[i].equals(a[j])) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                result.add(b[i]);
+            }
+        }
+        String[] output = new String[result.size()];
+        for (int i = 0; i < result.size(); i++) {
+            output[i] = result.get(i);
+        }
+        return output;
+    }
 
     private void loading(@NonNull Boolean isLoading) {
         if(isLoading) {

@@ -1,6 +1,7 @@
 package va.vanthe.app_chat_2.database;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -10,6 +11,9 @@ import va.vanthe.app_chat_2.entity.User;
 @Dao
 public interface GroupMemberDAO {
 
+    @Query("DELETE FROM GroupMember")
+    void deleteAllGroupMember();
+
     @Insert
     void insertGroupMember(GroupMember groupMember);
 
@@ -18,4 +22,7 @@ public interface GroupMemberDAO {
 
     @Query("SELECT * FROM groupmember where userId != :userId AND conversationId = :conversationId")
     GroupMember getGroupMember(String userId, String conversationId);
+
+    @Query("SELECT COUNT(*) FROM GroupMember WHERE id = :groupMemberId")
+    int checkGroupMember(String groupMemberId);
 }

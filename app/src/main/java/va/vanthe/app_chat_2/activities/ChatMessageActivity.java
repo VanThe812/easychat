@@ -16,8 +16,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
@@ -70,6 +75,7 @@ public class ChatMessageActivity extends AppCompatActivity {
         setListeners();
         getChatMessage();
 //        setDataTest();
+        listenChatMessage();
     }
 
 
@@ -163,7 +169,7 @@ public class ChatMessageActivity extends AppCompatActivity {
                 String textSend = binding.inputMessage.getText().toString().trim();
                 if (typeChat == Constants.KEY_TYPE_CHAT_SINGLE) {
                     if (statusNewChat) { // true la new chat
-
+                        Toast.makeText(ChatMessageActivity.this, "ngu", Toast.LENGTH_SHORT).show();
                         conversation.setCreateTime(new Date());
                         conversation.setNewMessage(textSend);
                         conversation.setSenderId(userChat.getId());
@@ -257,7 +263,6 @@ public class ChatMessageActivity extends AppCompatActivity {
                     chatMessage.setId(documentReference.getId());
                     ChatMessageDatabase.getInstance(getApplicationContext()).chatMessageDAO().insertChatMessage(chatMessage);
 
-                    Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show();
                     addOneMessageToBelow(chatMessage);
                 })
                 .addOnFailureListener(runnable -> {
@@ -267,11 +272,11 @@ public class ChatMessageActivity extends AppCompatActivity {
 
     private void getChatMessage() {
         int count = chatMessageList.size();
-        List<ChatMessage> chatMessages = ChatMessageDatabase.getInstance(this).chatMessageDAO().getChatMessage(conversation.getId());
-        for (ChatMessage chatMessage :
-                chatMessages) {
-            chatMessageList.add(chatMessage);
-        }
+//        List<ChatMessage> chatMessages = ChatMessageDatabase.getInstance(this).chatMessageDAO().getChatMessage(conversation.getId());
+//        for (ChatMessage chatMessage :
+//                chatMessages) {
+//            chatMessageList.add(chatMessage);
+//        }
 
         if (chatMessageList != null) {
 
@@ -289,6 +294,7 @@ public class ChatMessageActivity extends AppCompatActivity {
     private void addOneMessageToBelow(ChatMessage chatMessage) {
         chatMessageList.add(chatMessage);
         int count = chatMessageList.size();
+        Collections.sort(chatMessageList, (obj1, obj2) -> obj1.getDataTime().compareTo(obj2.getDataTime()));
         if(count == 0) {
             chatAdapter.notifyDataSetChanged();
         }else{
@@ -296,7 +302,40 @@ public class ChatMessageActivity extends AppCompatActivity {
             binding.chatRCV.smoothScrollToPosition(chatMessageList.size() - 1);
         }
     }
+    private void listenChatMessage() {
+        Log.d("LogChatMessage", "conversation.getId(): " + conversation.getId());
+        database.collection(Constants.KEY_CHAT_MESSAGE)
+                .whereEqualTo(Constants.KEY_CHAT_MESSAGE_CONVERSATION_ID, conversation.getId())
+                .orderBy(Constants.KEY_CHAT_MESSAGE_DATA_TIME, Query.Direction.DESCENDING)
+//                .limit(5)
+                .addSnapshotListener(eventListenerChatMessage);
+    }
+    private final EventListener<QuerySnapshot> eventListenerChatMessage = (value, error) -> {
+        if(error != null) {
+            return;
+        }
+        if(value != null) {
+            for (DocumentChange documentChange : value.getDocumentChanges()) {
+                if(documentChange.getType() == DocumentChange.Type.ADDED) { //nếu có thêm dữ liệu hoặc là khi vừa mở app
+                    DocumentSnapshot chatMessageSnapshot = documentChange.getDocument();
+                    ChatMessage chatMessage = chatMessageSnapshot.toObject(ChatMessage.class);
+                    chatMessage.setId(chatMessageSnapshot.getId());
 
+                    int checkChatMessage = ChatMessageDatabase.getInstance(this).chatMessageDAO().checkChatMessage(chatMessage.getId());
+
+                    if (checkChatMessage == 0) {
+                        ChatMessageDatabase.getInstance(this).chatMessageDAO().insertChatMessage(chatMessage);
+                    }
+
+                    Log.d("LogChatMessage", "check");
+                    addOneMessageToBelow(chatMessage);
+
+                } else if(documentChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
+                    Log.d("LogChatMessage", "MODIFIED");
+                }
+            }
+        }
+    };
     @NonNull
     private String getReadableDateTIme(Date date) {
         return new SimpleDateFormat("MMMM dd, YYYY - hh:mm a", Locale.getDefault()).format(date);

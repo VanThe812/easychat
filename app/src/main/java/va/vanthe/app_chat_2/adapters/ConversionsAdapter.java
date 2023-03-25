@@ -5,7 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Looper;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,40 +80,48 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
 
 
         }
-        void setData(Conversation conversation) {
+        void setData(@NonNull Conversation conversation) {
             if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
                 GroupMember groupMember = GroupMemberDatabase.getInstance(itemView.getContext()).groupMemberDAO().getGroupMember(userId, conversation.getId());
-                User user = UserDatabase.getInstance(itemView.getContext()).userDAO().getUser(groupMember.getUserId());
 
-                binding.textName.setText(user.getFirstName() + user.getLastName());
-                binding.imageProfile.setImageBitmap(getConverdionImage(user.getImage()));
-                binding.textRecentMessage.setText(conversation.getNewMessage());
+                if (groupMember != null) {
 
-                // Lấy ra TextView cần cập nhật thời gian
-                TextView textViewTimeAgo = binding.textTime;
-                // Lấy ra thời điểm cũ cần tính khoảng thời gian
-                Date dateOld = conversation.getMessageTime();
-                // Cập nhật thời gian lần đầu tiên
-                updateTime(textViewTimeAgo, dateOld);
-                // Tạm cmt vì lỗi khi mở activity khác đề vào sẽ dừng app
-//                Timer timer = new Timer();
-//                TimerTask timerTask = new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        updateTime(textViewTimeAgo, dateOld);
-//                    }
-//                };
-//                timer.schedule(timerTask, 60000, 60000); // Cập nhật sau 1 phút, lặp lại sau mỗi 1 phút
+                    User user = UserDatabase.getInstance(itemView.getContext()).userDAO().getUser(groupMember.getUserId());
 
-                binding.getRoot().setOnClickListener(view -> {
-                    Intent intent = new Intent(view.getContext(), ChatMessageActivity.class);
-                    intent.putExtra(Constants.KEY_USER, user);
-                    intent.putExtra(Constants.KEY_CONVERSATION, conversation);
-                    intent.putExtra(Constants.KEY_CONVERSATION_ID, conversation.getId());
-                    intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
-                    intent.putExtra(Constants.KEY_IS_NEW_CHAT, false);
-                    view.getContext().startActivity(intent);
-                });
+                    binding.textName.setText(user.getFirstName() + " " + user.getLastName());
+                    binding.imageProfile.setImageBitmap(getConverdionImage(user.getImage()));
+                    binding.textRecentMessage.setText(conversation.getNewMessage());
+
+                    // Lấy ra TextView cần cập nhật thời gian
+                    TextView textViewTimeAgo = binding.textTime;
+                    // Lấy ra thời điểm cũ cần tính khoảng thời gian
+                    Date dateOld = conversation.getMessageTime();
+                    // Cập nhật thời gian lần đầu tiên
+                    updateTime(textViewTimeAgo, dateOld);
+                    // Tạm cmt vì lỗi khi mở activity khác đề vào sẽ dừng app
+    //                Timer timer = new Timer();
+    //                TimerTask timerTask = new TimerTask() {
+    //                    @Override
+    //                    public void run() {
+    //                        updateTime(textViewTimeAgo, dateOld);
+    //                    }
+    //                };
+    //                timer.schedule(timerTask, 60000, 60000); // Cập nhật sau 1 phút, lặp lại sau mỗi 1 phút
+
+                    binding.getRoot().setOnClickListener(view -> {
+                        Intent intent = new Intent(view.getContext(), ChatMessageActivity.class);
+                        intent.putExtra(Constants.KEY_USER, user);
+                        intent.putExtra(Constants.KEY_CONVERSATION, conversation);
+                        intent.putExtra(Constants.KEY_CONVERSATION_ID, conversation.getId());
+                        intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
+                        intent.putExtra(Constants.KEY_IS_NEW_CHAT, false);
+                        view.getContext().startActivity(intent);
+                    });
+                }
+                else {
+                    binding.getRoot().setVisibility(View.GONE);
+                }
+
 
             } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
 

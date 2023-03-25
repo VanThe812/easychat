@@ -17,10 +17,13 @@ public interface UserDAO {
     @Query("SELECT * FROM user")
     List<User> getListUser();
 
-    @Query("SELECT * FROM user WHERE phoneNUmber= :phoneNumber")
-    List<User> checkUser(String phoneNumber);
+//    @Query("SELECT * FROM user WHERE phoneNUmber= :phoneNumber")
+//    List<User> checkUser(String phoneNumber);
 
     @Query("SELECT * FROM user WHERE id = :userId")
     User getUser(String userId);
+
+    @Query("SELECT COUNT(*) FROM User WHERE id = :userId")
+    int checkUser(String userId);
 
 }
