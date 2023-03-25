@@ -1,81 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:background="@color/white">
-
-    <com.makeramen.roundedimageview.RoundedImageView
-        android:layout_width="@dimen/_30sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:id="@+id/imageProfile"
-        android:layout_marginStart="@dimen/_16sdp"
-        android:layout_marginLeft="@dimen/_16sdp"
-        android:layout_marginTop="@dimen/_12sdp"
-        android:background="@drawable/bg_icon"
-        android:scaleType="centerCrop"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:riv_corner_radius="@dimen/_20sdp"/>
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imageCreateGroupChat"
-        android:layout_width="@dimen/_35sdp"
-        android:layout_height="@dimen/_35sdp"
-        android:layout_marginTop="@dimen/_12sdp"
-        android:layout_marginEnd="@dimen/_16sdp"
-        android:layout_marginRight="@dimen/_16sdp"
-        android:padding="@dimen/_6sdp"
-        android:src="@drawable/ic_edit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:tint="@color/black"/>
-
-    <TextView
-        android:id="@+id/textName"
-        android:text="@string/chat"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="1"
-        android:textColor="@color/black"
-        android:textSize="@dimen/_14sdp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/imageProfile"
-        app:layout_constraintEnd_toStartOf="@id/imageCreateGroupChat"
-        app:layout_constraintStart_toEndOf="@id/imageProfile"
-        app:layout_constraintTop_toTopOf="@id/imageProfile"/>
-    <View
-        android:id="@+id/focusableView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:visibility="visible"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="@id/imageProfile"
-        app:layout_constraintTop_toBottomOf="@id/imageProfile"
-        android:id="@+id/layout1">
-        <LinearLayout
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:layout_alignParentTop="true"
+        >
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:id="@+id/imageProfile"
+            android:layout_marginLeft="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:background="@drawable/bg_icon"
+            android:scaleType="centerCrop"
+            app:riv_corner_radius="@dimen/_20sdp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"/>
+        <TextView
+            android:id="@+id/textName"
+            android:text="@string/chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_gravity="center"
+
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14sdp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageCreateGroupChat"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_marginEnd="@dimen/_16sdp"
+            android:layout_marginRight="@dimen/_16sdp"
+            android:padding="@dimen/_6sdp"
+            android:src="@drawable/ic_edit"
+            android:tint="@color/black"
+            android:layout_weight="1"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout1">
+
+         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/_10sdp"
-            >
+            android:id="@+id/layout2">
             <EditText
                 android:drawableLeft="@drawable/ic_search_24"
                 android:id="@+id/inputSearch"
                 android:layout_width="match_parent"
-                android:layout_weight="1"
                 android:layout_height="@dimen/_28sdp"
                 android:background="@drawable/bg_input"
                 android:layout_marginRight="@dimen/_15sdp"
@@ -86,76 +78,59 @@
                 android:paddingEnd="@dimen/_16sdp"
                 android:textColor="@color/primary_text"
                 android:textSize="@dimen/_13sdp"
-                android:imeOptions="actionSearch"
+                android:focusable="false"
                 />
-            <TextView
-                android:layout_width="wrap_content"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/userChatRCV"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textviewCancel"
-                android:layout_gravity="center"
-                android:textColor="@color/blue"
-                android:textSize="@dimen/_14ssp"
-                android:paddingRight="@dimen/_5sdp"
-                android:layout_marginLeft="-15dp"
-                android:visibility="gone"
-                android:text="Cancel"/>
-        </LinearLayout>
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/viewpagerSearch"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            />
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/userChatRCV"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/_5sdp"
-            android:paddingBottom="@dimen/_5sdp"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:overScrollMode="never"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:paddingTop="@dimen/_5sdp"
+                android:paddingBottom="@dimen/_5sdp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:overScrollMode="never"
+                android:visibility="visible"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:layout_below="@id/inputSearch"
+                />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_content"
+                android:layout_below="@id/userChatRCV">
 
-            />
-    </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/conversionsRCV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:orientation="vertical"
+                    android:overScrollMode="never"
+                    android:scrollbars="vertical"
+                    android:paddingLeft="@dimen/_8sdp"
+                    android:paddingRight="@dimen/_8sdp"
+                    android:paddingBottom="@dimen/_15sdp"
+                    android:visibility="visible"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </RelativeLayout>
 
 
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:background="@drawable/bg_content" >
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/conversionsRCV"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:overScrollMode="never"
-            android:scrollbars="vertical"
-            android:paddingLeft="@dimen/_8sdp"
-            android:paddingRight="@dimen/_8sdp"
-            android:paddingBottom="@dimen/_15sdp"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            />
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
-            android:layout_gravity="center"/>
-    </FrameLayout>
+    </ScrollView>
 
 
 
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</RelativeLayout>

@@ -81,6 +81,7 @@ public class Conversation implements Serializable {
 
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> conversationMap = new HashMap<>();
+        conversationMap.put("conversationId", id);
         conversationMap.put("createTime", createTime);
         conversationMap.put("newMessage", newMessage);
         conversationMap.put("senderId", senderId);

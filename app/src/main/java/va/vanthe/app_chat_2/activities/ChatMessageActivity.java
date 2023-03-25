@@ -52,15 +52,10 @@ public class ChatMessageActivity extends AppCompatActivity {
     private ActivityChatMessageBinding binding;
     private FirebaseFirestore database;
     private PreferenceManager account;
-
     private Conversation conversation;
     private List<ChatMessage> chatMessageList;
     private ChatAdapter chatAdapter;
-
-    //
     private User userChat;
-    //
-//    private String conversationId;
     private int typeChat;
     private boolean statusNewChat;
 
@@ -73,8 +68,6 @@ public class ChatMessageActivity extends AppCompatActivity {
 
         init();
         setListeners();
-        getChatMessage();
-//        setDataTest();
         listenChatMessage();
     }
 
@@ -84,7 +77,7 @@ public class ChatMessageActivity extends AppCompatActivity {
         account = new PreferenceManager(getApplicationContext());
         conversation = new Conversation();
 
-        typeChat = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
+        typeChat = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE); // Lấy kiểu chat - mặc định sẽ là chat single
         if (typeChat == Constants.KEY_TYPE_CHAT_SINGLE) {
             userChat = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
             statusNewChat = getIntent().getBooleanExtra(Constants.KEY_IS_NEW_CHAT, false);
@@ -95,38 +88,34 @@ public class ChatMessageActivity extends AppCompatActivity {
 
             }
             else {
-//                conversation = (Conversation) getIntent().getParcelableExtra(Constants.KEY_CONVERSATION);
-            String conversationId = getIntent().getStringExtra(Constants.KEY_CONVERSATION_ID);
-            conversation = ConversationDatabase.getInstance(this).conversationDAO().getOneConversation(conversationId);
+                String conversationId = getIntent().getStringExtra(Constants.KEY_CONVERSATION_ID);
+                conversation = ConversationDatabase.getInstance(this).conversationDAO().getOneConversation(conversationId);
             }
 
+        } else if (typeChat == Constants.KEY_TYPE_CHAT_GROUP) {
+            //Xử lý các dữ liệu cần thiết khi là chat group
         }
-//        conversationId = getIntent().getStringExtra(Constants.KEY_CONVERSATION_ID);
 
         // set adapter rỗng cho RCV, sẽ thêm tin nhắn vào sau
         chatMessageList = new ArrayList<>();
-        chatAdapter = new ChatAdapter(chatMessageList,getBitmapFromEncodedString(userChat.getImage()), account.getString(Constants.KEY_ACCOUNT_USER_ID));
+        chatAdapter = new ChatAdapter(chatMessageList, account.getString(Constants.KEY_ACCOUNT_USER_ID));
         binding.chatRCV.setAdapter(chatAdapter);
+        chatAdapter.notifyDataSetChanged();
+        binding.chatRCV.setVisibility(View.VISIBLE);
+        binding.progressBar.setVisibility(View.GONE);
 
-    }
-
-    private void  loadUserAvatar(@NonNull User user) {
-        binding.textName.setText(user.getLastName());
-        byte[] bytes = Base64.decode(user.getImage(), Base64.DEFAULT);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        binding.imageProfile.setImageBitmap(bitmap);
-        binding.imageProfile2.setImageBitmap(bitmap);
     }
 
     private void setListeners() {
         binding.imageback.setOnClickListener(v -> {
             onBackPressed();
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+//            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
         binding.imageInfo.setOnClickListener(view -> {
             Intent intent = new Intent(getApplicationContext(), InfoChatActivity.class);
             startActivity(intent);
         });
+        // tùy chỉnh giao diện của inputMessage(co giãn khi có text)
         binding.inputMessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -163,20 +152,20 @@ public class ChatMessageActivity extends AppCompatActivity {
 
             binding.imageMore.setVisibility(View.GONE);
         });
+        //gửi tin nhắn
         binding.textviewSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String textSend = binding.inputMessage.getText().toString().trim();
                 if (typeChat == Constants.KEY_TYPE_CHAT_SINGLE) {
                     if (statusNewChat) { // true la new chat
-                        Toast.makeText(ChatMessageActivity.this, "ngu", Toast.LENGTH_SHORT).show();
                         conversation.setCreateTime(new Date());
                         conversation.setNewMessage(textSend);
                         conversation.setSenderId(userChat.getId());
                         conversation.setMessageTime(new Date());
                         conversation.setStyleChat(Constants.KEY_TYPE_CHAT_SINGLE);
 
-                        // chuyen quan map
+                        // Chuyển qua Hashmap
                         HashMap<String, Object> conversationMap = conversation.toHashMap();
 
                         database.collection(Constants.KEY_CONVERSATION)
@@ -261,36 +250,17 @@ public class ChatMessageActivity extends AppCompatActivity {
                 .add(message)
                 .addOnSuccessListener(documentReference -> {
                     chatMessage.setId(documentReference.getId());
-                    ChatMessageDatabase.getInstance(getApplicationContext()).chatMessageDAO().insertChatMessage(chatMessage);
+                    //ChatMessageDatabase.getInstance(getApplicationContext()).chatMessageDAO().insertChatMessage(chatMessage);
 
-                    addOneMessageToBelow(chatMessage);
+//                    addOneMessageToBelow(chatMessage);
+                    updateConversaion(chatMessage.getMessage());
                 })
                 .addOnFailureListener(runnable -> {
 
                 });
     }
 
-    private void getChatMessage() {
-        int count = chatMessageList.size();
-//        List<ChatMessage> chatMessages = ChatMessageDatabase.getInstance(this).chatMessageDAO().getChatMessage(conversation.getId());
-//        for (ChatMessage chatMessage :
-//                chatMessages) {
-//            chatMessageList.add(chatMessage);
-//        }
 
-        if (chatMessageList != null) {
-
-            Collections.sort(chatMessageList, (obj1, obj2) -> obj1.getDataTime().compareTo(obj2.getDataTime()));
-            if(count == 0) {
-                chatAdapter.notifyDataSetChanged();
-            }else{
-                chatAdapter.notifyItemRangeInserted(chatMessageList.size(), chatMessageList.size());
-                binding.chatRCV.smoothScrollToPosition(chatMessageList.size() - 1);
-            }
-            binding.chatRCV.setVisibility(View.VISIBLE);
-            binding.progressBar.setVisibility(View.GONE);
-        }
-    }
     private void addOneMessageToBelow(ChatMessage chatMessage) {
         chatMessageList.add(chatMessage);
         int count = chatMessageList.size();
@@ -302,11 +272,18 @@ public class ChatMessageActivity extends AppCompatActivity {
             binding.chatRCV.smoothScrollToPosition(chatMessageList.size() - 1);
         }
     }
+    private void updateConversaion(String message) {
+        DocumentReference conversationReference = database.collection(Constants.KEY_CONVERSATION).document(conversation.getId());
+        conversation.setMessageTime(new Date());
+        conversation.setNewMessage(message);
+        conversation.setSenderId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+
+        conversationReference.update(conversation.toHashMap());
+    }
     private void listenChatMessage() {
-        Log.d("LogChatMessage", "conversation.getId(): " + conversation.getId());
         database.collection(Constants.KEY_CHAT_MESSAGE)
                 .whereEqualTo(Constants.KEY_CHAT_MESSAGE_CONVERSATION_ID, conversation.getId())
-                .orderBy(Constants.KEY_CHAT_MESSAGE_DATA_TIME, Query.Direction.DESCENDING)
+//                .orderBy(Constants.KEY_CHAT_MESSAGE_DATA_TIME, Query.Direction.DESCENDING)
 //                .limit(5)
                 .addSnapshotListener(eventListenerChatMessage);
     }
@@ -320,12 +297,12 @@ public class ChatMessageActivity extends AppCompatActivity {
                     DocumentSnapshot chatMessageSnapshot = documentChange.getDocument();
                     ChatMessage chatMessage = chatMessageSnapshot.toObject(ChatMessage.class);
                     chatMessage.setId(chatMessageSnapshot.getId());
-
-                    int checkChatMessage = ChatMessageDatabase.getInstance(this).chatMessageDAO().checkChatMessage(chatMessage.getId());
-
-                    if (checkChatMessage == 0) {
-                        ChatMessageDatabase.getInstance(this).chatMessageDAO().insertChatMessage(chatMessage);
-                    }
+//
+//                    int checkChatMessage = ChatMessageDatabase.getInstance(this).chatMessageDAO().checkChatMessage(chatMessage.getId());
+//
+//                    if (checkChatMessage == 0) {
+//                        ChatMessageDatabase.getInstance(this).chatMessageDAO().insertChatMessage(chatMessage);
+//                    }
 
                     Log.d("LogChatMessage", "check");
                     addOneMessageToBelow(chatMessage);
@@ -336,6 +313,13 @@ public class ChatMessageActivity extends AppCompatActivity {
             }
         }
     };
+    private void  loadUserAvatar(@NonNull User user) {
+        binding.textName.setText(user.getLastName());
+        byte[] bytes = Base64.decode(user.getImage(), Base64.DEFAULT);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        binding.imageProfile.setImageBitmap(bitmap);
+        binding.imageProfile2.setImageBitmap(bitmap);
+    }
     @NonNull
     private String getReadableDateTIme(Date date) {
         return new SimpleDateFormat("MMMM dd, YYYY - hh:mm a", Locale.getDefault()).format(date);

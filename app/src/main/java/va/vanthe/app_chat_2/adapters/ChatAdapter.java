@@ -13,22 +13,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import va.vanthe.app_chat_2.database.UserDatabase;
 import va.vanthe.app_chat_2.databinding.ItemContainerReceivedMessageBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerSentMessageBinding;
 import va.vanthe.app_chat_2.entity.ChatMessage;
+import va.vanthe.app_chat_2.entity.User;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private final List<ChatMessage> chatMessages;
-    private final Bitmap receiverProfileImage;
+
     private final String senderId;
 
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
 
-    public ChatAdapter(List<ChatMessage> chatMessages, Bitmap receiverProfileImage, String senderId) {
+    public ChatAdapter(List<ChatMessage> chatMessages,String senderId) {
         this.chatMessages = chatMessages;
-        this.receiverProfileImage = receiverProfileImage;
         this.senderId = senderId;
     }
 
@@ -48,6 +49,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         if(getItemViewType(position) == VIEW_TYPE_SENT) {
             ((SentMessageViewHolder) holder).setData(chatMessages.get(position));
         }else {
+
             ((ReceivedMessageViewHolder) holder).setData(chatMessages.get(position));
         }
     }
@@ -91,8 +93,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
 
         void setData(ChatMessage chatMessage)  {
-            binding.textMessage.setText(chatMessage.getMessage());
-
+            User user = UserDatabase.getInstance(itemView.getContext()).userDAO().getUser(chatMessage.getSenderId());
+            if (user != null) {
+                binding.textMessage.setText(chatMessage.getMessage().trim());
+                binding.imageProfile.setImageBitmap(getUserImage(user.getImage()));
+            }
+            else {
+                Toast.makeText(itemView.getContext(), "Có lỗi xảy ra!!!", Toast.LENGTH_SHORT).show();
+            }
 
         }
         private Bitmap getUserImage(String encodedImage) {
@@ -100,5 +108,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         }
     }
+
 
 }

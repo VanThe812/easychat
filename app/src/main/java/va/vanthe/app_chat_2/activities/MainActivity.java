@@ -5,10 +5,13 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.util.Base64;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -69,6 +72,9 @@ public class MainActivity extends AppCompatActivity{
                     binding.viewPagerMenu.setCurrentItem(1);
                     break;
                 case R.id.action_setting:
+
+//                    Drawable d = new BitmapDrawable(getResources(), changeStringToBitmap(account.getString(Constants.KEY_ACCOUNT_IMAGE)));
+//                    item.setIcon(d);
                     hideSoftKeyboard();
                     binding.viewPagerMenu.setCurrentItem(2);
                     break;
@@ -98,7 +104,10 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
-
+    private Bitmap changeStringToBitmap(String encodedImage) {
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
