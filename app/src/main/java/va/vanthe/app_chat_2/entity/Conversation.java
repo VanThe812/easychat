@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 @Entity
@@ -20,15 +21,20 @@ public class Conversation implements Serializable {
     private String senderId;
     private Date messageTime;
     private int styleChat;
+    private String conversationName;
+    private String backgroundImage;
 
     public Conversation() {}
-    public Conversation(String id, Date createTime, String newMessage, String senderId, Date messageTime, int styleChat) {
+
+    public Conversation(@NonNull String id, Date createTime, String newMessage, String senderId, Date messageTime, int styleChat, String conversationName, String backgroundImage) {
         this.id = id;
         this.createTime = createTime;
         this.newMessage = newMessage;
         this.senderId = senderId;
         this.messageTime = messageTime;
         this.styleChat = styleChat;
+        this.conversationName = conversationName;
+        this.backgroundImage = backgroundImage;
     }
 
     public String getId() {
@@ -79,6 +85,22 @@ public class Conversation implements Serializable {
         this.styleChat = styleChat;
     }
 
+    public String getConversationName() {
+        return conversationName;
+    }
+
+    public void setConversationName(String conversationName) {
+        this.conversationName = conversationName;
+    }
+
+    public String getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(String backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> conversationMap = new HashMap<>();
         conversationMap.put("conversationId", id);
@@ -87,6 +109,8 @@ public class Conversation implements Serializable {
         conversationMap.put("senderId", senderId);
         conversationMap.put("messageTime", messageTime);
         conversationMap.put("styleChat", styleChat);
+        conversationMap.put("conversationName", conversationName);
+        conversationMap.put("backgroundImage", backgroundImage);
         return conversationMap;
     }
 
@@ -99,6 +123,20 @@ public class Conversation implements Serializable {
                 ", senderId='" + senderId + '\'' +
                 ", messageTime=" + messageTime +
                 ", styleChat=" + styleChat +
+                ", conversationName=" + conversationName +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Conversation that = (Conversation) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

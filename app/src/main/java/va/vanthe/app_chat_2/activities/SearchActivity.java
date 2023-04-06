@@ -91,19 +91,19 @@ public class SearchActivity extends AppCompatActivity implements UserListener {
                                                 User user = documents.get(0).toObject(User.class);
                                                 user.setId(documents.get(0).getId());
 
-                                                GroupMember groupMember = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().hasTextedUser(user.getId());
-                                                if (groupMember == null) {
-                                                    //chưa nhắn
-                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getApplicationContext(),user, true);
-
-                                                    binding.searchRCV.setAdapter(userSearchAdapter);
-                                                    binding.searchRCV.setVisibility(View.VISIBLE);
-                                                } else {
+//                                                GroupMember groupMember = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().hasTextedUser(user.getId());
+//                                                if (groupMember == null) {
+//                                                    //chưa nhắn
+//                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getApplicationContext(),user, true);
+//
+//                                                    binding.searchRCV.setAdapter(userSearchAdapter);
+//                                                    binding.searchRCV.setVisibility(View.VISIBLE);
+//                                                } else {
                                                     //da nhan
-                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getApplicationContext(),user, false);
+                                                UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getApplicationContext(),user);
 
-                                                    binding.searchRCV.setAdapter(userSearchAdapter);
-                                                    binding.searchRCV.setVisibility(View.VISIBLE);
+                                                binding.searchRCV.setAdapter(userSearchAdapter);
+                                                binding.searchRCV.setVisibility(View.VISIBLE);
 //                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(new UserSearchAdapter.IClickItemUserSearch() {
 //                                                        @Override
 //                                                        public void clickUser(User user, boolean isNewChat) {
@@ -113,7 +113,7 @@ public class SearchActivity extends AppCompatActivity implements UserListener {
 //
 //                                                    SearchFragment.binding.searchRCV.setAdapter(userSearchAdapter);
 //                                                    SearchFragment.binding.searchRCV.setVisibility(View.VISIBLE);
-                                                }
+//                                                }
                                             }
                                         }
                                     });

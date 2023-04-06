@@ -81,6 +81,7 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
 
         }
         void setData(@NonNull Conversation conversation) {
+            Log.e(ConversionsAdapter.class.toString(), conversation.getStyleChat() + "");
             if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
                 GroupMember groupMember = GroupMemberDatabase.getInstance(itemView.getContext()).groupMemberDAO().getGroupMember(userId, conversation.getId());
 
@@ -124,7 +125,21 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
 
 
             } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
-
+                binding.textRecentMessage.setText(conversation.getNewMessage());
+                binding.textName.setText(conversation.getConversationName());
+                if (conversation.getBackgroundImage() != null) {
+                    ///
+                    binding.imageProfile.setImageBitmap(getConverdionImage(conversation.getBackgroundImage()));
+                }
+                TextView textViewTimeAgo = binding.textTime;
+                Date dateOld = conversation.getMessageTime();
+                updateTime(textViewTimeAgo, dateOld);
+                binding.getRoot().setOnClickListener(view -> {
+                    Intent intent = new Intent(view.getContext(), ChatMessageActivity.class);
+                    intent.putExtra(Constants.KEY_CONVERSATION, conversation);
+                    intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_GROUP);
+                    view.getContext().startActivity(intent);
+                });
             }
         }
         private void updateTime(TextView textView, Date dateOld) {

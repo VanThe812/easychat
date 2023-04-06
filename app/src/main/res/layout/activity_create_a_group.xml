@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/bg_content_top"
+    tools:context=".activities.CreateAGroupActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/_15sdp">
+        <TextView
+            android:id="@+id/textCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textColor="@color/blue"
+            android:textSize="@dimen/_18ssp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            />
+        <TextView
+            android:id="@+id/textNewGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New group"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_20ssp"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            />
+        <TextView
+            android:id="@+id/textSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create"
+            android:textSize="@dimen/_18ssp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            />
+
+        <EditText
+            android:id="@+id/inputNameGroup"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_28sdp"
+            android:background="@drawable/bg_input_none"
+            android:hint="Group Name (Required)"
+            android:textColorHint="#aeaeae"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="no"
+            android:inputType="textEmailAddress"
+            android:paddingStart="@dimen/_5sdp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_13sdp"
+            android:layout_below="@id/textNewGroup"/>
+
+        <EditText
+            android:id="@+id/inputSearch"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_28sdp"
+            android:background="@drawable/bg_input"
+            android:hint="@string/search"
+            android:textColorHint="#C9C9C9"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="no"
+            android:inputType="textEmailAddress"
+            android:paddingStart="@dimen/_8sdp"
+            android:paddingEnd="@dimen/_16sdp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_13sdp"
+            android:drawableLeft="@drawable/ic_search_24"
+            android:drawablePadding="@dimen/_5sdp"
+            android:backgroundTint="@color/white"
+            android:drawableTint="@color/error"
+            android:layout_below="@id/inputNameGroup"/>
+        <TextView
+            android:id="@+id/textSuggested"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suggested"
+            android:textColor="#aeaeae"
+            android:textSize="@dimen/_15ssp"
+            android:textStyle="bold"
+            android:layout_below="@id/inputSearch"
+            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/usersRcv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:overScrollMode="never"
+            android:paddingTop="@dimen/_15sdp"
+            android:paddingLeft="@dimen/_10sdp"
+            android:paddingRight="@dimen/_10sdp"
+            android:paddingBottom="@dimen/_15sdp"
+            android:visibility="visible"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:layout_below="@id/textSuggested"/>
+
+<!--        <FrameLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_marginTop="@dimen/_3sdp"-->
+<!--            android:background="@drawable/bg_content"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/inputSearch">-->
+
+
+<!--            <ProgressBar-->
+<!--                android:id="@+id/progressBar"-->
+<!--                android:layout_width="@dimen/_25sdp"-->
+<!--                android:layout_height="@dimen/_25sdp"-->
+<!--                android:layout_gravity="center"/>-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/textErrorMessage"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:layout_marginStart="@dimen/_24sdp"-->
+<!--                android:layout_marginEnd="@dimen/_24sdp"-->
+<!--                android:gravity="center"-->
+<!--                android:textColor="@color/error"-->
+<!--                android:textSize="@dimen/_12sdp"-->
+<!--                android:visibility="gone" />-->
+
+<!--        </FrameLayout>-->
+
+    </RelativeLayout>
+
+
+</ScrollView>

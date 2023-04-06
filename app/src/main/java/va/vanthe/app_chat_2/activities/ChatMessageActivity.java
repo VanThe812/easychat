@@ -85,20 +85,27 @@ public class ChatMessageActivity extends AppCompatActivity {
             loadUserAvatar(userChat);
             if (statusNewChat) {
                 binding.layoutNewChat.setVisibility(View.VISIBLE);
-
             }
             else {
                 String conversationId = getIntent().getStringExtra(Constants.KEY_CONVERSATION_ID);
                 conversation = ConversationDatabase.getInstance(this).conversationDAO().getOneConversation(conversationId);
             }
 
-        } else if (typeChat == Constants.KEY_TYPE_CHAT_GROUP) {
+        }
+        else if (typeChat == Constants.KEY_TYPE_CHAT_GROUP) {
             //Xử lý các dữ liệu cần thiết khi là chat group
+            conversation = (Conversation) getIntent().getSerializableExtra(Constants.KEY_CONVERSATION);
+            if (conversation.getBackgroundImage() != null) {
+                byte[] bytes = Base64.decode(conversation.getBackgroundImage(), Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                binding.imageProfile.setImageBitmap(bitmap);
+            }
+            binding.textName.setText(conversation.getConversationName());
         }
 
         // set adapter rỗng cho RCV, sẽ thêm tin nhắn vào sau
         chatMessageList = new ArrayList<>();
-        chatAdapter = new ChatAdapter(chatMessageList, account.getString(Constants.KEY_ACCOUNT_USER_ID));
+        chatAdapter = new ChatAdapter(chatMessageList, account.getString(Constants.KEY_ACCOUNT_USER_ID), typeChat);
         binding.chatRCV.setAdapter(chatAdapter);
         chatAdapter.notifyDataSetChanged();
         binding.chatRCV.setVisibility(View.VISIBLE);
@@ -156,7 +163,14 @@ public class ChatMessageActivity extends AppCompatActivity {
         binding.textviewSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String textSend = binding.inputMessage.getText().toString().trim();
+                String textSend;
+                if (binding.inputMessage.getText().toString().trim().equals("")) {
+                    textSend = binding.textviewSend.getText().toString();
+                }
+                else {
+                    textSend = binding.inputMessage.getText().toString().trim();
+                }
+
                 if (typeChat == Constants.KEY_TYPE_CHAT_SINGLE) {
                     if (statusNewChat) { // true la new chat
                         conversation.setCreateTime(new Date());
@@ -167,6 +181,7 @@ public class ChatMessageActivity extends AppCompatActivity {
 
                         // Chuyển qua Hashmap
                         HashMap<String, Object> conversationMap = conversation.toHashMap();
+
 
                         database.collection(Constants.KEY_CONVERSATION)
                                 .add(conversationMap)
@@ -230,6 +245,9 @@ public class ChatMessageActivity extends AppCompatActivity {
                     sendMessage(textSend, conversation.getId());
                     }
                 }
+                else if(typeChat == Constants.KEY_TYPE_CHAT_GROUP) {
+                    sendMessage(textSend, conversation.getId());
+                }
 
             }
         });
@@ -284,7 +302,7 @@ public class ChatMessageActivity extends AppCompatActivity {
         database.collection(Constants.KEY_CHAT_MESSAGE)
                 .whereEqualTo(Constants.KEY_CHAT_MESSAGE_CONVERSATION_ID, conversation.getId())
 //                .orderBy(Constants.KEY_CHAT_MESSAGE_DATA_TIME, Query.Direction.DESCENDING)
-//                .limit(5)
+//                .limit(10)
                 .addSnapshotListener(eventListenerChatMessage);
     }
     private final EventListener<QuerySnapshot> eventListenerChatMessage = (value, error) -> {
@@ -304,7 +322,7 @@ public class ChatMessageActivity extends AppCompatActivity {
 //                        ChatMessageDatabase.getInstance(this).chatMessageDAO().insertChatMessage(chatMessage);
 //                    }
 
-                    Log.d("LogChatMessage", "check");
+
                     addOneMessageToBelow(chatMessage);
 
                 } else if(documentChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó

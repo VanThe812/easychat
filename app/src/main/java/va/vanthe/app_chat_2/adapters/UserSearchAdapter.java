@@ -26,20 +26,14 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
 
     public static Context mContext;
     public static User mUser;
-    public static boolean isNewChat;
     private IClickItemUserSearch iClickItemUserSearch;
 
     public interface IClickItemUserSearch {
         void clickUser(User user, boolean isNewChat);
     }
-//    public UserSearchAdapter(IClickItemUserSearch iClickItemUserSearch) {
-//        this.iClickItemUserSearch = iClickItemUserSearch;
-//        notifyDataSetChanged();
-//    }
-    public UserSearchAdapter(Context mContext, User user, boolean isNewChat) {
+    public UserSearchAdapter(Context mContext, User user) {
         this.mContext = mContext;
         this.mUser = user;
-        this.isNewChat = isNewChat;
         notifyDataSetChanged();
     }
 
@@ -83,7 +77,6 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
                 Intent intent = new Intent(mContext, ChatMessageActivity.class);
                 intent.putExtra(Constants.KEY_USER, user);
                 intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
-                intent.putExtra(Constants.KEY_IS_NEW_CHAT, isNewChat);
                 mContext.startActivity(intent);
             });
         }

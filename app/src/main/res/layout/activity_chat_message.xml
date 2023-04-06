@@ -62,7 +62,7 @@
         android:layout_marginStart="@dimen/_5sdp"
         android:layout_marginLeft="@dimen/_5sdp"
         android:layout_marginTop="@dimen/_8sdp"
-        android:background="@drawable/bg_icon"
+        android:background="@drawable/ic_telegram"
         android:scaleType="centerCrop"
         app:layout_constraintStart_toEndOf="@id/imageback"
         app:layout_constraintTop_toTopOf="parent"
@@ -97,6 +97,7 @@
         android:textColor="#808080"
         android:textStyle="bold"
         android:textSize="@dimen/_12sdp"
+        android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/textName"
         app:layout_constraintStart_toEndOf="@id/imageProfile"/>
     <View

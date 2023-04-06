@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import va.vanthe.app_chat_2.activities.CreateAGroupActivity;
 import va.vanthe.app_chat_2.activities.SearchActivity;
 import va.vanthe.app_chat_2.adapters.ConversionsAdapter;
 import va.vanthe.app_chat_2.database.ConversationDatabase;
@@ -91,7 +92,10 @@ public class MenuChatFragment extends Fragment {
             Intent intent = new Intent(getContext(), SearchActivity.class);
             startActivity(intent);
         });
-
+        binding.imageCreateGroupChat.setOnClickListener(v -> {
+            DialogFragment dialogFragment = new DialogFragment();
+            dialogFragment.show(getActivity().getSupportFragmentManager(), "my_dialog");
+        });
 
     }
 
@@ -113,64 +117,101 @@ public class MenuChatFragment extends Fragment {
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 if(documentChange.getType() == DocumentChange.Type.ADDED) { //nếu có thêm dữ liệu hoặc là khi vừa mở app
                     DocumentSnapshot groupMemberSnapshot = documentChange.getDocument();
-
-
+                    Log.e(MenuChatFragment.class.toString(), groupMemberSnapshot.toString());
                     database.collection(Constants.KEY_CONVERSATION)
-                            .whereEqualTo(Constants.KEY_CONVERSATION_ID, groupMemberSnapshot.getString(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID))
-                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            .document(groupMemberSnapshot.getString(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID))
+                            .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                 @Override
-                                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                                    if(error != null) {
+                                public void onEvent(DocumentSnapshot conversationSnapshot, FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(MenuChatFragment.class.toString(), "Lỗi khi lắng nghe sự thay đổi của bản ghi", e);
                                         return;
                                     }
-                                    if(value != null) {
-                                        for (DocumentChange conversationChange : value.getDocumentChanges()) {
-                                            if (conversationChange.getType() == DocumentChange.Type.ADDED) { //nếu có thêm dữ liệu hoặc là khi vừa mở app
-                                                DocumentSnapshot conversationSnapshot = conversationChange.getDocument();
 
-                                                int checkConversation = ConversationDatabase.getInstance(getContext()).conversationDAO().checkConversation(conversationSnapshot.getId());
+                                    if (conversationSnapshot != null && conversationSnapshot.exists()) {
+                                        Log.d(MenuChatFragment.class.toString(), "Dữ liệu của bản ghi đã thay đổi: " + conversationSnapshot.getData());
+//
+                                        int checkConversation = ConversationDatabase.getInstance(getContext()).conversationDAO().checkConversation(conversationSnapshot.getId());
+                                        Conversation conversation = conversationSnapshot.toObject(Conversation.class);
+                                        conversation.setId(conversationSnapshot.getId());
 
-                                                Conversation conversation = conversationSnapshot.toObject(Conversation.class);
-                                                conversation.setId(conversationSnapshot.getId());
+                                        if (checkConversation == 0) {
+                                            ConversationDatabase.getInstance(getContext()).conversationDAO().insertConversation(conversation);
 
-                                                if (checkConversation == 0) {
-                                                    ConversationDatabase.getInstance(getContext()).conversationDAO().insertConversation(conversation);
-
-                                                    getGroupMembers(new OnTaskCompleted() {
-                                                        @Override
-                                                        public void onTaskCompleted() {
-                                                            addOneConversationToList(conversation);
-                                                        }
-                                                    }, conversation.getId());
-
-                                                } else {
+                                            getGroupMembers(new OnTaskCompleted() {
+                                                @Override
+                                                public void onTaskCompleted() {
                                                     addOneConversationToList(conversation);
                                                 }
+                                            }, conversation.getId());
 
-                                            } else if(conversationChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
-
-                                                DocumentSnapshot conversationSnapshot = conversationChange.getDocument();
-                                                Conversation conversation = conversationSnapshot.toObject(Conversation.class);
-                                                conversation.setId(conversationSnapshot.getId());
-
-                                                for (int i = 0; i < mConversations.size(); i++) {
-                                                    if (conversation.getId().equals(mConversations.get(i).getId())) {
-
-                                                        mConversations.get(i).setMessageTime(conversation.getMessageTime());
-                                                        mConversations.get(i).setNewMessage(conversation.getNewMessage());
-                                                        mConversations.get(i).setStyleChat(conversation.getStyleChat());
-                                                        mConversations.get(i).setSenderId(conversation.getSenderId());
-
-                                                        Collections.sort(mConversations, (obj1, obj2) -> obj2.getMessageTime().compareTo(obj1.getMessageTime()));
-                                                        conversionsAdapter.notifyDataSetChanged();
-                                                        binding.conversionsRCV.smoothScrollToPosition(0);
-                                                    }
-                                                }
-                                            }
+                                        } else {
+                                            addOneConversationToList(conversation);
                                         }
+                                    } else {
+                                        Log.d(MenuChatFragment.class.toString(), "Bản ghi đã bị xóa");
                                     }
                                 }
                             });
+//                    database.collection(Constants.KEY_CONVERSATION)
+////                            .document(groupMemberSnapshot.getString(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID))
+//                            .whereEqualTo(Constants.KEY_CONVERSATION_ID, groupMemberSnapshot.getString(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID))
+//                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+//                                @Override
+//                                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+//                                    if(error != null) {
+//                                        return;
+//                                    }
+//                                    if(value != null) {
+//                                        for (DocumentChange conversationChange : value.getDocumentChanges()) {
+//                                            Log.e(MenuChatFragment.class.toString(), conversationChange.toString());
+//                                            if (conversationChange.getType() == DocumentChange.Type.ADDED) { //nếu có thêm dữ liệu hoặc là khi vừa mở app
+//                                                DocumentSnapshot conversationSnapshot = conversationChange.getDocument();
+//
+//                                                int checkConversation = ConversationDatabase.getInstance(getContext()).conversationDAO().checkConversation(conversationSnapshot.getId());
+//
+//                                                Conversation conversation = conversationSnapshot.toObject(Conversation.class);
+//                                                conversation.setId(conversationSnapshot.getId());
+//
+//                                                if (checkConversation == 0) {
+//                                                    ConversationDatabase.getInstance(getContext()).conversationDAO().insertConversation(conversation);
+//
+//                                                    getGroupMembers(new OnTaskCompleted() {
+//                                                        @Override
+//                                                        public void onTaskCompleted() {
+//                                                            addOneConversationToList(conversation);
+//                                                        }
+//                                                    }, conversation.getId());
+//
+//                                                } else {
+//                                                    addOneConversationToList(conversation);
+//                                                }
+//
+//                                            }
+//                                            else if(conversationChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
+//
+//                                                DocumentSnapshot conversationSnapshot = conversationChange.getDocument();
+//                                                Conversation conversation = conversationSnapshot.toObject(Conversation.class);
+//                                                conversation.setId(conversationSnapshot.getId());
+//
+//                                                for (int i = 0; i < mConversations.size(); i++) {
+//                                                    if (conversation.getId().equals(mConversations.get(i).getId())) {
+//
+//                                                        mConversations.get(i).setMessageTime(conversation.getMessageTime());
+//                                                        mConversations.get(i).setNewMessage(conversation.getNewMessage());
+//                                                        mConversations.get(i).setStyleChat(conversation.getStyleChat());
+//                                                        mConversations.get(i).setSenderId(conversation.getSenderId());
+//
+//                                                        Collections.sort(mConversations, (obj1, obj2) -> obj2.getMessageTime().compareTo(obj1.getMessageTime()));
+//                                                        conversionsAdapter.notifyDataSetChanged();
+//                                                        binding.conversionsRCV.smoothScrollToPosition(0);
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            });
 
                 } else if(documentChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
                     Log.d("MenuChatFragment", "MODIFIED");
@@ -226,7 +267,13 @@ public class MenuChatFragment extends Fragment {
     }
 
     private void addOneConversationToList(Conversation conversation) {
-        mConversations.add(conversation);
+
+        if (mConversations.contains(conversation)) {
+            mConversations.remove(conversation);
+            mConversations.add(conversation);
+        } else {
+            mConversations.add(conversation);
+        }
         Collections.sort(mConversations, (obj1, obj2) -> obj2.getMessageTime().compareTo(obj1.getMessageTime()));
         conversionsAdapter.notifyDataSetChanged();
         binding.conversionsRCV.smoothScrollToPosition(0);

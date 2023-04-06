@@ -14,4 +14,9 @@
     <color name="primary_text" >#212121</color>
     <color name="error" >#B00020</color>
     <color name="status">#12FF29</color>
+    <color name="trans">#00000000</color>
+    <color name="gray">#6c757d</color>
+    <color name="gray_500">#adb5bd</color>
+    <color name="gray_200">#dee2e6</color>
+    <color name="gray_100">#F1F1F1</color>
 </resources>
