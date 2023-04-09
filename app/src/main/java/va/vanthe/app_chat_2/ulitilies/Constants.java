@@ -40,9 +40,10 @@ public class Constants {
     public static final String KEY_CHAT_MESSAGE_DATA_TIME = "dataTime";
     public static final String KEY_CHAT_MESSAGE_CONVERSATION_ID = "conversationId";
     public static final String KEY_CHAT_MESSAGE_STYLE_MESSAGE = "styleMessage";
-    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_NORMAL = 1;
-    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_FILE = 2;
-    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_LOCATION = 3;
+    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT = 1;
+    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE = 2;
+    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_FILE = 3;
+    public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_LOCATION = 4;
 
     /// group_member: id, userId, conversationId, status
         public static final String KEY_GROUP_MEMBER = "groupMember";

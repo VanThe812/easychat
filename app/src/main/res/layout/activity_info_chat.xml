@@ -25,26 +25,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:tint="@color/colorPrimary"/>
-        <androidx.appcompat.widget.AppCompatImageView
-            android:visibility="invisible"
-            android:id="@+id/imageAddMemberGroup"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginEnd="@dimen/_16sdp"
-            android:layout_marginRight="@dimen/_16sdp"
-            android:background="@drawable/bg_icon"
-            android:padding="@dimen/_6sdp"
-            android:src="@drawable/ic_add_friend"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:tint="@color/black"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/textViewConversationName"
+            android:text="Conversation Name"
+            android:textSize="@dimen/_15ssp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginVertical="@dimen/_15ssp"
+            app:layout_constraintTop_toBottomOf="@id/imageProfile"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <com.makeramen.roundedimageview.RoundedImageView
             android:layout_width="@dimen/_90sdp"
             android:layout_height="@dimen/_90sdp"
             android:id="@+id/imageProfile"
             android:layout_marginTop="@dimen/_12sdp"
-            android:background="@drawable/bg_icon"
+            android:background="@drawable/ic_telegram"
             android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageBack"
@@ -78,13 +77,147 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             />
+
         <LinearLayout
             android:id="@+id/layout_custom"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="@dimen/_15sdp"
-            app:layout_constraintTop_toBottomOf="@id/textName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textName">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_8sdp"
+                android:padding="@dimen/_8sdp"
+                android:text="Customization"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_15ssp" />
+
+            <LinearLayout
+                android:id="@+id/buttonBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_content_top"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/_5sdp"
+                android:paddingTop="@dimen/_8ssp"
+                android:paddingBottom="@dimen/_8sdp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@drawable/ic_round"
+                    android:tint="@color/blue" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:text="Theme"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_18sdp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttonImoji"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/_5sdp"
+                android:paddingTop="@dimen/_8ssp"
+                android:paddingBottom="@dimen/_8sdp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@drawable/ic_emoji_hoangmang"
+                    android:tint="@color/blue" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:text="Quick reaction"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_18sdp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttonNickname"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/_5sdp"
+                android:paddingTop="@dimen/_8ssp"
+                android:paddingBottom="@dimen/_8sdp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@drawable/ic_text"
+                    android:tint="@color/blue" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:text="Nicknames"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_18sdp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buttonWordEffects"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_content_bottom"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/_5sdp"
+                android:paddingTop="@dimen/_8ssp"
+                android:paddingBottom="@dimen/_8sdp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@drawable/ic_pencil"
+                    android:tint="@color/blue" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:text="Word effects"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_18sdp" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_infoChat"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/_15sdp"
+            app:layout_constraintTop_toBottomOf="@id/layout_custom"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
             <TextView
@@ -92,124 +225,49 @@
                 android:padding="@dimen/_8sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Customization"
+                android:text="Info chat"
                 android:textSize="@dimen/_15ssp"
                 android:textColor="@color/black"
                 />
 
             <LinearLayout
-                android:id="@+id/buttonBackground"
+                android:id="@+id/buttonSeeGroupMember"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:background="@drawable/bg_content_top"
+                android:background="@drawable/bg_content"
                 android:paddingTop="@dimen/_8ssp"
                 android:paddingLeft="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageC"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_round"
+                    android:background="@drawable/ic_groups"
                     android:layout_margin="@dimen/_5sdp"
                     android:tint="@color/blue"/>
                 <TextView
+                    android:id="@+id/textC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Theme"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_18sdp"
-                    android:layout_marginTop="@dimen/_4sdp"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/buttonImoji"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:background="@color/white"
-                android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
-                android:paddingBottom="@dimen/_8sdp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="@dimen/_25sdp"
-                    android:layout_height="@dimen/_25sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_emoji_hoangmang"
-                    android:layout_margin="@dimen/_5sdp"
-                    android:tint="@color/blue"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Quick reaction"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_18sdp"
-                    android:layout_marginTop="@dimen/_4sdp"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/buttonNickname"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:background="@color/white"
-                android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
-                android:paddingBottom="@dimen/_8sdp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="@dimen/_25sdp"
-                    android:layout_height="@dimen/_25sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_text"
-                    android:layout_margin="@dimen/_5sdp"
-                    android:tint="@color/blue"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Nicknames"
+                    android:text="Create a chat group"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/buttonWordEffects"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:background="@drawable/bg_content_bottom"
-                android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
-                android:paddingBottom="@dimen/_8sdp">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="@dimen/_25sdp"
-                    android:layout_height="@dimen/_25sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_pencil"
-                    android:layout_margin="@dimen/_5sdp"
-                    android:tint="@color/blue"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Word effects"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_18sdp"
-                    android:layout_marginTop="@dimen/_4sdp"/>
-            </LinearLayout>
 
 
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/layout_moveAction"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="@dimen/_15sdp"
-            app:layout_constraintTop_toBottomOf="@id/layout_custom"
+            app:layout_constraintTop_toBottomOf="@id/layout_infoChat"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
             <TextView

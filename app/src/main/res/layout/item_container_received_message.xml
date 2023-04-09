@@ -36,7 +36,7 @@
         android:id="@+id/imageProfile"
         android:background="@drawable/bg_image"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="@id/textMessage"
+        app:layout_constraintBottom_toTopOf="@id/textStatus"
         app:layout_constraintStart_toStartOf="parent"
         app:riv_oval="true"/>
 
@@ -48,6 +48,7 @@
         android:layout_marginLeft="@dimen/_4sdp"
         android:background="@drawable/bg_received_message"
         android:text=""
+        android:visibility="visible"
         android:paddingHorizontal="@dimen/_6sdp"
         android:paddingVertical="@dimen/_5sdp"
         app:layout_constraintWidth_max="wrap"
@@ -63,9 +64,28 @@
         android:id="@+id/textStatus"
         android:textColor="@color/gray_500"
         android:textSize="@dimen/_8ssp"
-        android:text="Trạng thái"
+        android:text=""
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@id/textMessage"
-         app:layout_constraintTop_toBottomOf="@id/textMessage"/>
+        app:layout_constraintStart_toEndOf="@id/imageProfile"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <RelativeLayout
+        android:layout_width="@dimen/_150sdp"
+        android:layout_height="@dimen/_185sdp"
+        app:layout_constraintStart_toEndOf="@id/imageProfile"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/relativeLayoutImage"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/textStatus">
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageMessage"
+            android:background="@drawable/bg_image_message"
+            android:layout_marginHorizontal="@dimen/_5sdp"
+            android:scaleType="centerCrop"
+            app:riv_corner_radius="@dimen/_15sdp"
+            app:layout_constraintWidth_max="wrap"/>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

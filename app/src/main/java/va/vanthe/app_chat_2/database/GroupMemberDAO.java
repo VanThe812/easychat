@@ -23,6 +23,12 @@ public interface GroupMemberDAO {
     @Query("SELECT * FROM groupmember where userId != :userId AND conversationId = :conversationId")
     GroupMember getGroupMember(String userId, String conversationId);
 
+    @Query("SELECT * FROM groupmember where userId == :userId AND conversationId = :conversationId")
+    GroupMember getGroupMember2(String userId, String conversationId);
+
+//    @Query("SELECT * FROM groupmember where conversationId = :conversationId")
+//    GroupMember getGroupMember2(String conversationId);
+
     @Query("SELECT COUNT(*) FROM GroupMember WHERE id = :groupMemberId")
     int checkGroupMember(String groupMemberId);
 }

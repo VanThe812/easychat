@@ -17,6 +17,9 @@ public interface ConversationDAO {
     @Query("select * from Conversation")
     List<Conversation> getConversation();
 
+    @Query("select * from Conversation where styleChat = :styleChat")
+    List<Conversation> getConversationStyleChat(int styleChat);
+
     @Query("SELECT * FROM Conversation WHERE id = :conversationId ORDER BY messageTime ASC")
     Conversation getOneConversation(String conversationId);
 

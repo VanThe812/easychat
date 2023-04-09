@@ -76,8 +76,8 @@ public class SearchActivity extends AppCompatActivity implements UserListener {
                     binding.layoutSuggest.setVisibility(View.GONE);
                     binding.searchRCV.setVisibility(View.VISIBLE);
 
-                    if (textSearch.length() > 11) {
-                        if (textSearch.substring(0, 3).equals("+84")) {
+                    if (textSearch.length() > 11 && textSearch.substring(0, 3).equals("+84")) {
+                        if (!textSearch.equals(account.getString(Constants.KEY_ACCOUNT_PHONE_NUMBER))) {
                             database.collection(Constants.KEY_USER)
                                     .whereEqualTo(Constants.KEY_ACCOUNT_PHONE_NUMBER, textSearch)
                                     .get()
@@ -86,39 +86,26 @@ public class SearchActivity extends AppCompatActivity implements UserListener {
                                         public void onSuccess(QuerySnapshot documentSnapshots) {
                                             List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
                                             if (!documents.isEmpty()) {
-                                                // check đã nhắn tin bao giờ chưa
-
                                                 User user = documents.get(0).toObject(User.class);
                                                 user.setId(documents.get(0).getId());
 
-//                                                GroupMember groupMember = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().hasTextedUser(user.getId());
-//                                                if (groupMember == null) {
-//                                                    //chưa nhắn
-//                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getApplicationContext(),user, true);
-//
-//                                                    binding.searchRCV.setAdapter(userSearchAdapter);
-//                                                    binding.searchRCV.setVisibility(View.VISIBLE);
-//                                                } else {
-                                                    //da nhan
                                                 UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getApplicationContext(),user);
 
                                                 binding.searchRCV.setAdapter(userSearchAdapter);
                                                 binding.searchRCV.setVisibility(View.VISIBLE);
-//                                                    UserSearchAdapter userSearchAdapter = new UserSearchAdapter(new UserSearchAdapter.IClickItemUserSearch() {
-//                                                        @Override
-//                                                        public void clickUser(User user, boolean isNewChat) {
-//                                                            clickUserSearch(user, isNewChat);
-//                                                        }
-//                                                    });
-//
-//                                                    SearchFragment.binding.searchRCV.setAdapter(userSearchAdapter);
-//                                                    SearchFragment.binding.searchRCV.setVisibility(View.VISIBLE);
-//                                                }
                                             }
                                         }
                                     });
+
+                        } else {
+                            // la chinh ban than mk
                         }
+
                     }
+                    else {
+
+                    }
+
                 }
             }
         });

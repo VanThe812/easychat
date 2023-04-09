@@ -10,8 +10,10 @@ import com.google.j2objc.annotations.Property;
 import org.checkerframework.common.aliasing.qual.Unique;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 @Entity
 public class User implements Serializable {
@@ -127,6 +129,8 @@ public class User implements Serializable {
                 ", dateOfBrith='" + dateOfBrith + '\'' +
                 '}';
     }
+
+
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> userMap = new HashMap<>();
         userMap.put("firstName", firstName);
@@ -138,5 +142,25 @@ public class User implements Serializable {
         userMap.put("sex", sex);
         userMap.put("dateOfBrith", dateOfBrith);
         return userMap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+    public boolean isEmpty() {
+        if (Objects.isNull(id) || id.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

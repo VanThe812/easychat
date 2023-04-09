@@ -18,6 +18,7 @@ import java.util.List;
 import va.vanthe.app_chat_2.activities.ChatMessageActivity;
 import va.vanthe.app_chat_2.databinding.ItemContainerUserBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerUserSearchBinding;
+import va.vanthe.app_chat_2.entity.Conversation;
 import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.listeners.UserListener;
 import va.vanthe.app_chat_2.ulitilies.Constants;
@@ -74,6 +75,8 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
             binding.imageProfile.setImageBitmap(getUserImage(user.getImage()));
             binding.textPhoneNumber.setText(user.getPhoneNumber());
             binding.getRoot().setOnClickListener(v -> {
+//                Conversation conversation = new Conversation();
+//                conversation.set
                 Intent intent = new Intent(mContext, ChatMessageActivity.class);
                 intent.putExtra(Constants.KEY_USER, user);
                 intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);

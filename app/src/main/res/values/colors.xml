@@ -15,8 +15,8 @@
     <color name="error" >#B00020</color>
     <color name="status">#12FF29</color>
     <color name="trans">#00000000</color>
-    <color name="gray">#6c757d</color>
+    <color name="gray">#656565</color>
     <color name="gray_500">#adb5bd</color>
-    <color name="gray_200">#dee2e6</color>
-    <color name="gray_100">#F1F1F1</color>
+    <color name="gray_200">#e2e9f1</color>
+    <color name="gray_100">#E8F1F1F1</color>
 </resources>

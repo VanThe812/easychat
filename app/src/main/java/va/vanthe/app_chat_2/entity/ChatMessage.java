@@ -87,4 +87,16 @@ public class ChatMessage {
         chatMessageMap.put("styleMessage", styleMessage);
         return chatMessageMap;
     }
+
+    @Override
+    public String toString() {
+        return "ChatMessage{" +
+                "id='" + id + '\'' +
+                ", senderId='" + senderId + '\'' +
+                ", message='" + message + '\'' +
+                ", dataTime=" + dataTime +
+                ", conversationId='" + conversationId + '\'' +
+                ", styleMessage=" + styleMessage +
+                '}';
+    }
 }

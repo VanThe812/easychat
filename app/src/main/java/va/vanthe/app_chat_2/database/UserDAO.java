@@ -3,6 +3,7 @@ package va.vanthe.app_chat_2.database;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -13,6 +14,9 @@ public interface UserDAO {
 
     @Insert
     void insertUser(User user);
+
+    @Update
+    void updateUser(User user);
 
     @Query("SELECT * FROM user")
     List<User> getListUser();

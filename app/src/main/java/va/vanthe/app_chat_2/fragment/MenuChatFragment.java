@@ -117,7 +117,7 @@ public class MenuChatFragment extends Fragment {
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 if(documentChange.getType() == DocumentChange.Type.ADDED) { //nếu có thêm dữ liệu hoặc là khi vừa mở app
                     DocumentSnapshot groupMemberSnapshot = documentChange.getDocument();
-                    Log.e(MenuChatFragment.class.toString(), groupMemberSnapshot.toString());
+
                     database.collection(Constants.KEY_CONVERSATION)
                             .document(groupMemberSnapshot.getString(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID))
                             .addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -219,6 +219,7 @@ public class MenuChatFragment extends Fragment {
             }
         }
     };
+
     private void getGroupMembers(final OnTaskCompleted listener, String conversationId) {
         database.collection(Constants.KEY_GROUP_MEMBER)
                 .whereEqualTo(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID, conversationId)

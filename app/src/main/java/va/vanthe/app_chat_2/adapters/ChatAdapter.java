@@ -1,9 +1,11 @@
 package va.vanthe.app_chat_2.adapters;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +17,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +36,10 @@ import va.vanthe.app_chat_2.databinding.ItemContainerReceivedMessageBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerSentMessageBinding;
 import va.vanthe.app_chat_2.entity.ChatMessage;
 import va.vanthe.app_chat_2.entity.User;
+import va.vanthe.app_chat_2.fragment.DialogFragment;
+import va.vanthe.app_chat_2.fragment.DialogViewImageFragment;
 import va.vanthe.app_chat_2.ulitilies.Constants;
+import va.vanthe.app_chat_2.ulitilies.HelperFunction;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -37,12 +51,18 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
 
-    public ChatAdapter(List<ChatMessage> chatMessages,String senderId, int styleChat) {
+    public static OnItemClickListener onItemClickListener;
+
+    public ChatAdapter(List<ChatMessage> chatMessages,String senderId, int styleChat, OnItemClickListener onItemClickListener) {
         this.chatMessages = chatMessages;
         this.senderId = senderId;
         this.styleChat = styleChat;
+        this.onItemClickListener = onItemClickListener;
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(Uri uri);
+    }
 
     @NonNull
     @Override
@@ -102,24 +122,59 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             super(itemContainerSentMessageBinding.getRoot());
             binding = itemContainerSentMessageBinding;
         }
-        void setData(ChatMessage chatMessage, int textStatus) {
-            binding.textMessage.setText(chatMessage.getMessage());
-//            binding.textDateTime.setText(chatMessage.datatime);
+        void setData(ChatMessage chatMessage, int styleChat) {
+
             if (isEmoji(chatMessage.getMessage().trim())) {
                 binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
                 binding.textMessage.setTextSize(30);
             }
             binding.textTime.setText(getTimeAgo(chatMessage.getDataTime()));
-            binding.textStatus.setText("Đã xem");
-            binding.getRoot().setOnClickListener(view -> {
-                if (binding.textTime.getVisibility() == View.VISIBLE) {
-                    binding.textTime.setVisibility(View.GONE);
-                    binding.textStatus.setVisibility(View.GONE);
-                } else if (binding.textTime.getVisibility() == View.GONE) {
-                    binding.textTime.setVisibility(View.VISIBLE);
-                    binding.textStatus.setVisibility(View.VISIBLE);
-                }
-            });
+
+
+            if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT) {
+                binding.textMessage.setText(chatMessage.getMessage().trim());
+                binding.textMessage.setOnClickListener(view -> {
+                    if (binding.textTime.getVisibility() == View.VISIBLE) {
+                        binding.textTime.setVisibility(View.GONE);
+//                        binding.textStatus.setVisibility(View.GONE);
+                    } else if (binding.textTime.getVisibility() == View.GONE) {
+                        binding.textTime.setVisibility(View.VISIBLE);
+//                        binding.textStatus.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+            else if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE) {
+                    StorageReference storageRef = FirebaseStorage.getInstance().getReference()
+                        .child("images")
+                        .child("conversation")
+                        .child(chatMessage.getConversationId())
+                        .child(chatMessage.getMessage());
+
+                // Tải ảnh xuống và gán vào ImageView
+                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Sử dụng thư viện Picasso để tải ảnh từ URL về và gán vào ImageView
+                        Picasso.get()
+                                .load(uri)
+                                .into(binding.imageMessage);
+                        binding.imageMessage.setOnClickListener(view -> {
+                            onItemClickListener.onItemClick(uri);
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Xử lý khi có lỗi xảy ra
+                        Log.e(ChatAdapter.class.toString(), "Error getting image from Firebase Storage.", e);
+                    }
+                });
+
+
+                binding.relativeLayoutImage.setVisibility(View.VISIBLE);
+                binding.textMessage.setVisibility(View.GONE);
+            }
+
         }
         void setTimeVisible(Date datetime) {
             binding.textTime.setText(getTimeAgo(datetime));
@@ -136,44 +191,97 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             binding = itemContainerReceivedMessageBinding;
         }
 
-        void setData(ChatMessage chatMessage, int styleChat)  {
+        void setData(ChatMessage chatMessage, int styleChat) {
             User user = UserDatabase.getInstance(itemView.getContext()).userDAO().getUser(chatMessage.getSenderId());
-            if (user != null) {
-                binding.textMessage.setText(chatMessage.getMessage().trim());
+            if (user.isEmpty()) {
+                FirebaseFirestore database = FirebaseFirestore.getInstance();
+                database.collection(Constants.KEY_USER)
+                        .document(chatMessage.getSenderId())
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                User sender = documentSnapshot.toObject(User.class);
+                                sender.setId(documentSnapshot.getId());
+                                if (user.getId().isEmpty()) {
+                                    UserDatabase.getInstance(itemView.getContext()).userDAO().insertUser(sender);
+                                } else {
+                                    UserDatabase.getInstance(itemView.getContext()).userDAO().updateUser(sender);
+                                }
 
-                if (isEmoji(chatMessage.getMessage().trim())) {
-                    binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
-                    binding.textMessage.setTextSize(30);
-                }
-                if (styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
-                    binding.textName.setText(user.getLastName());
-                }
-                binding.textTime.setText(getTimeAgo(chatMessage.getDataTime()));
-                binding.textStatus.setText("Đã xem");
-                binding.getRoot().setOnClickListener(view -> {
+
+                                binding.textName.setText(sender.getLastName());
+                                binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(sender.getImage()));
+                            }
+                        });
+            }
+            if (isEmoji(chatMessage.getMessage().trim())) {
+                binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
+                binding.textMessage.setTextSize(30);
+            }
+            if (styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
+                binding.textName.setText(user.getLastName());
+                binding.textName.setVisibility(View.VISIBLE);
+            }
+            binding.textTime.setText(getTimeAgo(chatMessage.getDataTime()));
+//                binding.textStatus.setText("Đã xem");
+
+
+
+            if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT) {
+                binding.textMessage.setText(chatMessage.getMessage().trim());
+                binding.textMessage.setOnClickListener(view -> {
                     if (binding.textTime.getVisibility() == View.VISIBLE) {
                         binding.textTime.setVisibility(View.GONE);
-                        binding.textStatus.setVisibility(View.GONE);
+//                            binding.textStatus.setVisibility(View.GONE);
                     } else if (binding.textTime.getVisibility() == View.GONE) {
                         binding.textTime.setVisibility(View.VISIBLE);
-                        binding.textStatus.setVisibility(View.VISIBLE);
+//                            binding.textStatus.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+            else if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE) {
+
+               StorageReference storageRef = FirebaseStorage.getInstance().getReference()
+                        .child("images")
+                        .child("conversation")
+                        .child(chatMessage.getConversationId())
+                        .child(chatMessage.getMessage());
+
+                // Tải ảnh xuống và gán vào ImageView
+                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Sử dụng thư viện Picasso để tải ảnh từ URL về và gán vào ImageView
+                        Picasso.get()
+                                .load(uri)
+                                .into(binding.imageMessage);
+                        binding.imageMessage.setOnClickListener(view -> {
+                            onItemClickListener.onItemClick(uri);
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Xử lý khi có lỗi xảy ra
+                        Log.e(ChatAdapter.class.toString(), "Error getting image from Firebase Storage.", e);
                     }
                 });
 
-                binding.imageProfile.setImageBitmap(getUserImage(user.getImage()));
+                binding.relativeLayoutImage.setVisibility(View.VISIBLE);
+                binding.textMessage.setVisibility(View.GONE);
             }
-            else {
-                Toast.makeText(itemView.getContext(), "Có lỗi xảy ra!!!", Toast.LENGTH_SHORT).show();
-            }
+            try {
+                binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(user.getImage()));
+            } catch (Exception e) {}
+
+           
+
 
         }
         void setTimeVisible(Date datetime) {
             binding.textTime.setText(getTimeAgo(datetime));
             binding.textTime.setVisibility(View.VISIBLE);
-        }
-        private Bitmap getUserImage(String encodedImage) {
-            byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
-            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         }
     }
     public static boolean isEmoji(String str) {

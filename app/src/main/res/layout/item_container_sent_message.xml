@@ -43,5 +43,23 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/textMessage"
         app:layout_constraintEnd_toEndOf="parent"/>
+    <RelativeLayout
+        android:layout_width="@dimen/_150sdp"
+        android:layout_height="@dimen/_185sdp"
+        android:visibility="gone"
+        android:id="@+id/relativeLayoutImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textTime">
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageMessage"
+            android:background="@drawable/bg_image_message"
+            android:layout_marginHorizontal="@dimen/_5sdp"
+            android:scaleType="centerCrop"
 
+            app:riv_corner_radius="@dimen/_15sdp"
+            app:layout_constraintWidth_max="wrap"/>
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
