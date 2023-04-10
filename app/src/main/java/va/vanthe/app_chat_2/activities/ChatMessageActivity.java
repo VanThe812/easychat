@@ -75,10 +75,10 @@ public class ChatMessageActivity extends AppCompatActivity {
     private ActivityChatMessageBinding binding;
     private FirebaseFirestore database;
     private PreferenceManager account;
-    private Conversation mConversation;
+    private Conversation mConversation = new Conversation();
     private List<ChatMessage> chatMessageList;
     private ChatAdapter chatAdapter;
-    private User userChat;
+    private User userChat = new User();
     private int styleChat;
     private boolean statusNewChat;
     private FirebaseStorage storage;
@@ -117,35 +117,41 @@ public class ChatMessageActivity extends AppCompatActivity {
 
             List<Conversation> conversations = ConversationDatabase.getInstance(getApplicationContext()).conversationDAO().getConversationStyleChat(Constants.KEY_TYPE_CHAT_SINGLE);
 
-            int i = 0;
-            do {
-                Conversation conversation = conversations.get(i);
-                //
-                GroupMember groupMember = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().getGroupMember2(userChat.getId(), conversation.getId());
-                if (groupMember == null) {
-                    Toast.makeText(this, "Chua nhan", Toast.LENGTH_SHORT).show();
-                    statusNewChat = true;
-                    binding.layoutNewChat.setVisibility(View.VISIBLE);
+            if (conversations.isEmpty()) {
+                Toast.makeText(this, "Chua nhan", Toast.LENGTH_SHORT).show();
+                statusNewChat = true;
+                binding.layoutNewChat.setVisibility(View.VISIBLE);
+            }else {
+                int i = 0;
+                do {
+                    Conversation conversation = conversations.get(i);
+                    //
+                    GroupMember groupMember = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().getGroupMember2(userChat.getId(), conversation.getId());
+                    if (groupMember == null) {
+                        Toast.makeText(this, "Chua nhan", Toast.LENGTH_SHORT).show();
+                        statusNewChat = true;
+                        binding.layoutNewChat.setVisibility(View.VISIBLE);
 
-                } else {
-                    Toast.makeText(this, "Da Nhan", Toast.LENGTH_SHORT).show();
-                    statusNewChat = false;
-                    mConversation = conversation;
-                }
-                //
-                i++;
-            } while (i < conversations.size());
+                    } else {
+                        Toast.makeText(this, "Da Nhan", Toast.LENGTH_SHORT).show();
+                        statusNewChat = false;
+                        mConversation = conversation;
+                        binding.imageInfo.setVisibility(View.VISIBLE);
+                    }
+                    //
+                    i++;
+                } while (i < conversations.size());
+            }
+            loadUserAvatar(userChat);
 
 
 
-        } else {
+        }
+        else {
             // từ bên giao diện chính gửi qua
-
+            binding.imageInfo.setVisibility(View.VISIBLE);
             if (styleChat == Constants.KEY_TYPE_CHAT_SINGLE) {
-
                 loadUserAvatar(userChat);
-
-
             }
             else if (styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
                 //Xử lý các dữ liệu cần thiết khi là chat group
@@ -185,7 +191,6 @@ public class ChatMessageActivity extends AppCompatActivity {
     private void setListeners() {
         binding.imageback.setOnClickListener(v -> {
             onBackPressed();
-//            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
         binding.imageInfo.setOnClickListener(view -> {
             Intent intent = new Intent(getApplicationContext(), InfoChatActivity.class);
@@ -243,6 +248,7 @@ public class ChatMessageActivity extends AppCompatActivity {
 
                 if (styleChat == Constants.KEY_TYPE_CHAT_SINGLE) {
                     if (statusNewChat) { // true la new chat
+                        mConversation = new Conversation();
                         mConversation.setCreateTime(new Date());
                         mConversation.setNewMessage(textSend);
                         mConversation.setSenderId(userChat.getId());
@@ -297,7 +303,10 @@ public class ChatMessageActivity extends AppCompatActivity {
                                                     GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().insertGroupMember(groupMember2);
 
                                                     //Thêm user đó và Room
-                                                    UserDatabase.getInstance(getApplicationContext()).userDAO().insertUser(userChat);
+                                                    if (UserDatabase.getInstance(getApplicationContext()).userDAO().checkUser(userChat.getId()) == 0) {
+                                                        UserDatabase.getInstance(getApplicationContext()).userDAO().insertUser(userChat);
+                                                    }
+
 
                                                     sendMessage(textSend, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT);
                                                 }
@@ -384,7 +393,7 @@ public class ChatMessageActivity extends AppCompatActivity {
                 .addOnSuccessListener(documentReference -> {
                     chatMessage.setId(documentReference.getId());
 //                    addOneMessageToBelow(chatMessage);
-                    updateConversaion(chatMessage.getMessage());
+                    updateConversation(chatMessage);
                 })
                 .addOnFailureListener(runnable -> {
 
@@ -442,10 +451,13 @@ public class ChatMessageActivity extends AppCompatActivity {
             binding.chatRCV.smoothScrollToPosition(chatMessageList.size() - 1);
         }
     }
-    private void updateConversaion(String message) {
+    private void updateConversation(ChatMessage chatMessage) {
         DocumentReference conversationReference = database.collection(Constants.KEY_CONVERSATION).document(mConversation.getId());
         mConversation.setMessageTime(new Date());
-        mConversation.setNewMessage(message);
+        if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT)
+            mConversation.setNewMessage(chatMessage.getMessage());
+        else if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE)
+            mConversation.setNewMessage(account.getString(Constants.KEY_ACCOUNT_LAST_NAME) + " đã gửi 1 ảnh");
         mConversation.setSenderId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
 
         conversationReference.update(mConversation.toHashMap());

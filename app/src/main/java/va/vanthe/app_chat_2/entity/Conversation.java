@@ -23,10 +23,12 @@ public class Conversation implements Serializable {
     private int styleChat;
     private String conversationName;
     private String backgroundImage;
+    private String quickEmotions;
+    private int theme;
 
     public Conversation() {}
 
-    public Conversation(@NonNull String id, Date createTime, String newMessage, String senderId, Date messageTime, int styleChat, String conversationName, String backgroundImage) {
+    public Conversation(@NonNull String id, Date createTime, String newMessage, String senderId, Date messageTime, int styleChat, String conversationName, String backgroundImage, String quickEmotions, int theme) {
         this.id = id;
         this.createTime = createTime;
         this.newMessage = newMessage;
@@ -35,6 +37,8 @@ public class Conversation implements Serializable {
         this.styleChat = styleChat;
         this.conversationName = conversationName;
         this.backgroundImage = backgroundImage;
+        this.quickEmotions = quickEmotions;
+        this.theme = theme;
     }
 
     public String getId() {
@@ -101,6 +105,22 @@ public class Conversation implements Serializable {
         this.backgroundImage = backgroundImage;
     }
 
+    public String getQuickEmotions() {
+        return quickEmotions;
+    }
+
+    public void setQuickEmotions(String quickEmotions) {
+        this.quickEmotions = quickEmotions;
+    }
+
+    public int getTheme() {
+        return theme;
+    }
+
+    public void setTheme(int theme) {
+        this.theme = theme;
+    }
+
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> conversationMap = new HashMap<>();
         conversationMap.put("conversationId", id);
@@ -111,6 +131,8 @@ public class Conversation implements Serializable {
         conversationMap.put("styleChat", styleChat);
         conversationMap.put("conversationName", conversationName);
         conversationMap.put("backgroundImage", backgroundImage);
+        conversationMap.put("quickEmotions", quickEmotions);
+        conversationMap.put("theme", theme);
         return conversationMap;
     }
 
@@ -124,6 +146,8 @@ public class Conversation implements Serializable {
                 ", messageTime=" + messageTime +
                 ", styleChat=" + styleChat +
                 ", conversationName=" + conversationName +
+                ", quickEmotions=" + quickEmotions +
+                ", theme=" + theme +
                 '}';
     }
 

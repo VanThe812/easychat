@@ -24,6 +24,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -78,12 +79,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(getItemViewType(position) == VIEW_TYPE_SENT) {
             ((SentMessageViewHolder) holder).setData(chatMessages.get(position), styleChat);
-
-
         }else {
-
             ((ReceivedMessageViewHolder) holder).setData(chatMessages.get(position), styleChat);
-
         }
         //kiểm tra khoảng thời gian từ tin nhắn trước tới tin nhắn này là bao nhiêu,
         //nếu lớn hơn 10p sẽ hiện ra màn hình thời gian chính xác tin nhắn này dc nhắn: VD 14:00
@@ -124,7 +121,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
         void setData(ChatMessage chatMessage, int styleChat) {
 
-            if (isEmoji(chatMessage.getMessage().trim())) {
+            if (HelperFunction.isEmoji(chatMessage.getMessage().trim())) {
                 binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
                 binding.textMessage.setTextSize(30);
             }
@@ -158,6 +155,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                         Picasso.get()
                                 .load(uri)
                                 .into(binding.imageMessage);
+//                        Glide.with(itemView.getContext())
+//                                .load(uri)
+//                                .into(binding.imageMessage);
                         binding.imageMessage.setOnClickListener(view -> {
                             onItemClickListener.onItemClick(uri);
                         });
@@ -215,7 +215,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                             }
                         });
             }
-            if (isEmoji(chatMessage.getMessage().trim())) {
+            if (HelperFunction.isEmoji(chatMessage.getMessage().trim())) {
                 binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
                 binding.textMessage.setTextSize(30);
             }
@@ -284,24 +284,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             binding.textTime.setVisibility(View.VISIBLE);
         }
     }
-    public static boolean isEmoji(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            if (Character.isHighSurrogate(str.charAt(i))) {
-                if (i < str.length() - 1 && Character.isLowSurrogate(str.charAt(i + 1))) {
-                    int codepoint = Character.toCodePoint(str.charAt(i), str.charAt(i + 1));
-                    if (codepoint >= 0x1F000 && codepoint <= 0x1F9FF) {
-                        return true;
-                    }
-                }
-            } else {
-                int type = Character.getType(str.charAt(i));
-                if (type == Character.SURROGATE || type == Character.OTHER_SYMBOL) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+
     public static String getTimeAgo(Date dateOld) {
         Date now = new Date();
 

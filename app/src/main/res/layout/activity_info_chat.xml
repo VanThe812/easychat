@@ -51,7 +51,7 @@
             app:riv_corner_radius="@dimen/_50sdp"/>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:visibility="invisible"
+            android:visibility="visible"
             android:id="@+id/imageChangeImage"
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_25sdp"
@@ -120,14 +120,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_4sdp"
-                    android:text="Theme"
+                    android:text="@string/theme"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/buttonImoji"
+                android:id="@+id/buttonQuickEmotions"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/white"
@@ -141,14 +141,14 @@
                     android:layout_height="@dimen/_25sdp"
                     android:layout_margin="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_emoji_hoangmang"
+                    android:background="@drawable/ic_emoji"
                     android:tint="@color/blue" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_4sdp"
-                    android:text="Quick reaction"
+                    android:text="@string/quick_emotions"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp" />
 
@@ -169,7 +169,7 @@
                     android:layout_height="@dimen/_25sdp"
                     android:layout_margin="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_text"
+                    android:background="@drawable/ic_nickname"
                     android:tint="@color/blue" />
 
                 <TextView
@@ -196,7 +196,7 @@
                     android:layout_height="@dimen/_25sdp"
                     android:layout_margin="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_pencil"
+                    android:background="@drawable/ic_effect"
                     android:tint="@color/blue" />
 
                 <TextView
@@ -241,7 +241,7 @@
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/imageC"
+                    android:id="@+id/imageSeeGroupMember"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_marginTop="@dimen/_5sdp"
@@ -249,10 +249,10 @@
                     android:layout_margin="@dimen/_5sdp"
                     android:tint="@color/blue"/>
                 <TextView
-                    android:id="@+id/textC"
+                    android:id="@+id/textSeeGroupMember"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Create a chat group"
+                    android:text="@string/see_group_members"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
@@ -308,7 +308,7 @@
                     android:layout_marginTop="@dimen/_4sdp"/>
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/button"
+                android:id="@+id/buttonSearchInConversation"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
@@ -318,7 +318,7 @@
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/image"
+                    android:id="@+id/imageSearchInConversation"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_marginTop="@dimen/_5sdp"
@@ -326,7 +326,7 @@
                     android:layout_margin="@dimen/_5sdp"
                     android:tint="@color/blue"/>
                 <TextView
-                    android:id="@+id/text"
+                    android:id="@+id/textSearchInConversation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Search in conversation"
@@ -397,7 +397,7 @@
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_no_cigarette"
+                    android:background="@drawable/ic_restrict"
                     android:layout_margin="@dimen/_5sdp"
                     android:tint="@color/blue"/>
                 <TextView
@@ -431,7 +431,7 @@
                     android:id="@+id/text3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Block"
+                    android:text="@string/block"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
@@ -459,7 +459,7 @@
                     android:id="@+id/textDelete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Delete chat"
+                    android:text="@string/delete_chat"
                     android:textColor="@color/error"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
