@@ -25,4 +25,6 @@
     <string name="delete_chat">Delete chat</string>
     <string name="block">Block</string>
     <string name="theme">Theme</string>
+    <string name="channel_name">Channel 1</string>
+    <string name="channel_description">This is my channel</string>
 </resources>

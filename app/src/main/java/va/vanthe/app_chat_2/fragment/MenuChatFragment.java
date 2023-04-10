@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -12,10 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,9 +34,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import va.vanthe.app_chat_2.MyApplication;
+import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.activities.CreateAGroupActivity;
 import va.vanthe.app_chat_2.activities.SearchActivity;
 import va.vanthe.app_chat_2.adapters.ConversionsAdapter;
@@ -66,6 +73,9 @@ public class MenuChatFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = LayoutFragmentChatBinding.inflate(inflater, container, false);
 
+        binding.imageProfile.setOnClickListener(view -> {
+            sendCustomNotification();
+        });
 
         init();
         loadUserDetails();
@@ -74,6 +84,56 @@ public class MenuChatFragment extends Fragment {
         return binding.getRoot();
 
     }
+
+    private void sendCustomNotification() {
+//        Bitmap bitmapImage = BitmapFactory.decodeResource(getResources(), R.drawable.test);
+        // Cài âm thanh thông báo
+        Uri sound = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.messaging);
+
+        RemoteViews notificationLayout = new RemoteViews(getActivity().getPackageName(), R.layout.layout_custom_natification);
+        notificationLayout.setTextViewText(R.id.textViewTitleCustomNotification, "Title custom notification");
+        notificationLayout.setTextViewText(R.id.textViewMessageCustomNotification, "Văn Thế đã gửi một hình ảnh");
+//        notificationLayout.setImageViewBitmap(R.id.imageMessageImage, bitmapImage);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), MyApplication.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_camera)
+                .setSound(sound)
+                .setCustomContentView(notificationLayout);
+
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+        notificationManager.notify(getNotificationId(), builder.build());
+
+    }
+
+//    private void sendNotification() {
+//        Bitmap bitmapIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notifications);
+//        Bitmap bitmapImage = BitmapFactory.decodeResource(getResources(), R.drawable.test);
+//
+//        // Cài âm thanh thông báo
+//        Uri sound = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.messaging);
+//
+//
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), MyApplication.CHANNEL_ID)
+//                .setContentTitle("Hội chị em")
+//                .setContentText("Văn Thế đã gửi 1 ảnh")
+//                .setSmallIcon(R.drawable.ic_baseline_all_inclusive_24)
+//                .setLargeIcon(bitmapImage)
+//                .setSound(sound)
+////                .setStyle(new NotificationCompat.BigTextStyle().bigText(CONTENT_PUSH_NOTIFICATION))
+//                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmapImage).bigLargeIcon(null))
+//                .setColor(getResources().getColor(R.color.purple_200));
+//
+//
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//        notificationManager.notify(getNotificationId(), builder.build());
+//
+//    }
+    private int getNotificationId() {
+        return (int) new Date().getTime();
+    }
+
+
 
     private void init() {
         account = new PreferenceManager(getActivity().getApplicationContext());
