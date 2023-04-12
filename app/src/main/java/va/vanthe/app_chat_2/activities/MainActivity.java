@@ -16,13 +16,17 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.databinding.ActivityMainBinding;
 import va.vanthe.app_chat_2.adapters.ViewPagerMenuAdapter;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
 
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity{
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity{
 
         init();
         checkLogin();
+        getToken();
         setListeners();
     }
     private void init() {
@@ -110,6 +115,22 @@ public class MainActivity extends AppCompatActivity{
     }
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+    private void getToken() {
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(this::updateToken);
+    }
+    private void updateToken(String token) {
+        account.putString(Constants.KEY_FCM_TOKEN, token);
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        try {
+            DocumentReference documentReference = database.collection(Constants.KEY_USER).
+                    document(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+            documentReference.update(Constants.KEY_FCM_TOKEN, token)
+                    .addOnFailureListener(e -> showToast("Unable to update token"));
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
     }
 
     private void hideSoftKeyboard() {

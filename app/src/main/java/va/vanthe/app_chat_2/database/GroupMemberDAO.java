@@ -5,6 +5,8 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
+import java.util.List;
+
 import va.vanthe.app_chat_2.entity.GroupMember;
 import va.vanthe.app_chat_2.entity.User;
 
@@ -22,6 +24,9 @@ public interface GroupMemberDAO {
 
     @Query("SELECT * FROM groupmember where userId != :userId AND conversationId = :conversationId")
     GroupMember getGroupMember(String userId, String conversationId);
+
+    @Query("SELECT * FROM groupmember where userId != :userId AND conversationId = :conversationId")
+    List<GroupMember> getListGroupMember(String userId, String conversationId);
 
     @Query("SELECT * FROM groupmember where userId == :userId AND conversationId = :conversationId")
     GroupMember getGroupMember2(String userId, String conversationId);

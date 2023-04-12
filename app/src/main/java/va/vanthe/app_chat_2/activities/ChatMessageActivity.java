@@ -3,7 +3,6 @@ package va.vanthe.app_chat_2.activities;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
@@ -30,20 +29,14 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
-import org.checkerframework.checker.units.qual.m;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,11 +44,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.adapters.ChatAdapter;
-import va.vanthe.app_chat_2.database.ChatMessageDatabase;
 import va.vanthe.app_chat_2.database.ConversationDatabase;
 import va.vanthe.app_chat_2.database.GroupMemberDatabase;
 import va.vanthe.app_chat_2.database.UserDatabase;
@@ -65,27 +60,31 @@ import va.vanthe.app_chat_2.entity.Conversation;
 import va.vanthe.app_chat_2.entity.GroupMember;
 import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.fragment.DialogViewImageFragment;
+import va.vanthe.app_chat_2.network.ApiClient;
+import va.vanthe.app_chat_2.network.ApiService;
 import va.vanthe.app_chat_2.ulitilies.Constants;
-import va.vanthe.app_chat_2.ulitilies.EntityToHashMapConverter;
-import va.vanthe.app_chat_2.ulitilies.ImageTypeDetector;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
-public class ChatMessageActivity extends AppCompatActivity {
+public class ChatMessageActivity extends BaseActivity {
 
     private ActivityChatMessageBinding binding;
     private FirebaseFirestore database;
+    private FirebaseStorage storage;
     private PreferenceManager account;
+
     private Conversation mConversation = new Conversation();
     private List<ChatMessage> chatMessageList;
     private ChatAdapter chatAdapter;
+
     private User userChat = new User();
     private int styleChat;
     private boolean statusNewChat;
-    private FirebaseStorage storage;
 
+    //
+    private Boolean isReceiverAvailable = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChatMessageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -94,24 +93,18 @@ public class ChatMessageActivity extends AppCompatActivity {
         setListeners();
         listenChatMessage();
 
-//        try {
-//            Map<String, Object> entityMap = EntityToHashMapConverter.toHashMap(user);
-//            HashMap<String, Object> userMap = new HashMap<>(entityMap);
-//            Log.e("Data: ", userMap.toString());
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        }
     }
 
 
 
     private void init() {
         database = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
-        account = new PreferenceManager(getApplicationContext());
+        storage  = FirebaseStorage.getInstance();
+        account  = new PreferenceManager(getApplicationContext());
+
         mConversation = (Conversation) getIntent().getSerializableExtra(Constants.KEY_CONVERSATION);
-        userChat = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
-        styleChat = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
+        userChat      = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
+        styleChat     = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
 
         if(mConversation == null) {
 
@@ -394,11 +387,61 @@ public class ChatMessageActivity extends AppCompatActivity {
                     chatMessage.setId(documentReference.getId());
 //                    addOneMessageToBelow(chatMessage);
                     updateConversation(chatMessage);
+                    List<GroupMember> groupMemberList = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().getListGroupMember(account.getString(Constants.KEY_ACCOUNT_USER_ID), mConversation.getId());
+                    for (GroupMember groupMember : groupMemberList) {
+                        User user = UserDatabase.getInstance(getApplicationContext()).userDAO().getUser(groupMember.getUserId());
+                        if (user.getFcmToken()==null) {
+                            database.collection(Constants.KEY_USER)
+                                    .document(user.getId())
+                                    .get()
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot userSnapshot) {
+                                            if (userSnapshot.exists()) {
+                                                User user = userSnapshot.toObject(User.class);
+                                                UserDatabase.getInstance(getApplicationContext()).userDAO().updateUser(user);
+                                                return;
+                                            }
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d(ChatMessageActivity.class.toString(), "get failed with ", e);
+                                        }
+                                    });
+                        }
+                        try {
+
+                            JSONArray tokens = new JSONArray();
+                            Log.e("FCM_TOKEN", user.getFcmToken());
+                            tokens.put(user.getFcmToken());
+
+                            JSONObject data = new JSONObject();
+                            data.put(Constants.KEY_ACCOUNT_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID)); //người dùng hiện tại
+                            data.put(Constants.KEY_CONVERSATION_ID, mConversation.getId()); //cuội hội thoại đang ở
+//                            data.put(Constants.KEY_FCM_TOKEN, account.getString(Constants.KEY_FCM_TOKEN)); //thông
+                            data.put(Constants.KEY_CHAT_MESSAGE_MESSAGE, chatMessage.getMessage()); // tin nhắn mới
+                            data.put(Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE, chatMessage.getStyleMessage()); // kiểu tin nhắn
+
+//                            Gson gson = new Gson();
+//                            data.put(Constants.KEY_CONVERSATION, gson.toJson(mConversation));
+
+                            JSONObject body = new JSONObject();
+                            body.put(Constants.REMOTE_MSG_DATA, data);
+                            body.put(Constants.REMOTE_MSG_REGISTRATION, tokens);
+
+                            sendNotification(body.toString());
+                        } catch (Exception e) {
+                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.e("FCM_E", e.getMessage());
+                        }
+                    }
                 })
                 .addOnFailureListener(runnable -> {
 
                 });
-        
+
 
     }
 
@@ -471,6 +514,74 @@ public class ChatMessageActivity extends AppCompatActivity {
         binding.imageProfile2.setImageBitmap(bitmap);
     }
 
+    private void listenAvailabilityOfReceiver() {
+        if (styleChat == Constants.KEY_TYPE_CHAT_SINGLE) {
+            database.collection(Constants.KEY_USER).document(userChat.getId())
+                    .addSnapshotListener(ChatMessageActivity.this, (value, error) -> {
+                        if (error != null) {
+                            return;
+                        }
+                        if (value != null) {
+                            if (value.getLong(Constants.KEY_AVAILABILITY) != null) {
+                                int availability = Objects.requireNonNull(
+                                        value.getLong(Constants.KEY_AVAILABILITY)
+                                ).intValue();
+                                isReceiverAvailable = availability == 1;
+                            }
+                            userChat.setFcmToken(value.getString(Constants.KEY_FCM_TOKEN));
+                        }
+                        if (isReceiverAvailable) {
+                            binding.textStatus.setVisibility(View.VISIBLE);
+                            binding.textStatus.setText(R.string.online);
+                            binding.imageStatusOnline.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.textStatus.setVisibility(View.INVISIBLE);
+                            binding.imageStatusOnline.setVisibility(View.GONE);
+                        }
 
+                    });
+        } else if (styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
+            /////
+        }
 
+    }
+
+    private void sendNotification(String bodyString) {
+        ApiClient.getClient().create(ApiService.class).sendMessage(
+                Constants.getRemoteMsgHeaders(),
+                bodyString
+        ).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call,@NonNull Response<String> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        if (response.body() != null) {
+                            JSONObject responseJson = new JSONObject(response.body());
+                            JSONArray results = responseJson.getJSONArray("results");
+                            if (responseJson.getInt("failure") == 1) {
+                                JSONObject error = (JSONObject) results.get(0);
+                                Toast.makeText(ChatMessageActivity.this, error.getString("error"), Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(ChatMessageActivity.this, "Notification send successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ChatMessageActivity.this, "Error: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call,@NonNull Throwable t) {
+                Toast.makeText(ChatMessageActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        listenAvailabilityOfReceiver();
+    }
 }

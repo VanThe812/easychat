@@ -36,14 +36,14 @@ import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.HelperFunction;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
-public class InfoChatActivity extends AppCompatActivity {
+public class InfoChatActivity extends BaseActivity {
 
     private ActivityInfoChatBinding binding;
     private Conversation mConversation = new Conversation();
     private PreferenceManager account;
     private FirebaseFirestore database;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityInfoChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

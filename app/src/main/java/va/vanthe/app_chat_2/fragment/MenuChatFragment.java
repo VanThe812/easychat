@@ -1,6 +1,8 @@
 package va.vanthe.app_chat_2.fragment;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -40,8 +42,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import va.vanthe.app_chat_2.MyApplication;
 import va.vanthe.app_chat_2.R;
+import va.vanthe.app_chat_2.activities.ChatMessageActivity;
 import va.vanthe.app_chat_2.activities.CreateAGroupActivity;
 import va.vanthe.app_chat_2.activities.SearchActivity;
+import va.vanthe.app_chat_2.activities.test;
 import va.vanthe.app_chat_2.adapters.ConversionsAdapter;
 import va.vanthe.app_chat_2.database.ConversationDatabase;
 import va.vanthe.app_chat_2.database.GroupMemberDatabase;
@@ -73,9 +77,9 @@ public class MenuChatFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = LayoutFragmentChatBinding.inflate(inflater, container, false);
 
-        binding.imageProfile.setOnClickListener(view -> {
-            sendCustomNotification();
-        });
+//        binding.imageProfile.setOnClickListener(view -> {
+//            sendCustomNotification();
+//        });
 
         init();
         loadUserDetails();
@@ -86,19 +90,39 @@ public class MenuChatFragment extends Fragment {
     }
 
     private void sendCustomNotification() {
-//        Bitmap bitmapImage = BitmapFactory.decodeResource(getResources(), R.drawable.test);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 2; //giảm kích thước ảnh xuống còn 1/2
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        options.inJustDecodeBounds = false;
+        options.inDither = true;
+        options.inTempStorage = new byte[16 * 1024];
+        Bitmap bitmapImage = BitmapFactory.decodeResource(getResources(), R.drawable.test, options);
         // Cài âm thanh thông báo
         Uri sound = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.messaging);
+
+        // Create an Intent for the activity you want to start
+        Intent resultIntent = new Intent(getContext(), test.class);
+        resultIntent.putExtra("hii", "xin chao");
+        // Create the TaskStackBuilder and add the intent, which inflates the back stack
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
+        stackBuilder.addNextIntentWithParentStack(resultIntent);
+        // Get the PendingIntent containing the entire back stack
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(getNotificationId(),
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
 
         RemoteViews notificationLayout = new RemoteViews(getActivity().getPackageName(), R.layout.layout_custom_natification);
         notificationLayout.setTextViewText(R.id.textViewTitleCustomNotification, "Title custom notification");
         notificationLayout.setTextViewText(R.id.textViewMessageCustomNotification, "Văn Thế đã gửi một hình ảnh");
-//        notificationLayout.setImageViewBitmap(R.id.imageMessageImage, bitmapImage);
+        notificationLayout.setImageViewBitmap(R.id.imageMessageImage, bitmapImage);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), MyApplication.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_camera)
                 .setSound(sound)
-                .setCustomContentView(notificationLayout);
+                .setCustomContentView(notificationLayout)
+                .setContentIntent(resultPendingIntent)
+                .setAutoCancel(true);
 
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
@@ -106,29 +130,6 @@ public class MenuChatFragment extends Fragment {
 
     }
 
-//    private void sendNotification() {
-//        Bitmap bitmapIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notifications);
-//        Bitmap bitmapImage = BitmapFactory.decodeResource(getResources(), R.drawable.test);
-//
-//        // Cài âm thanh thông báo
-//        Uri sound = Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.messaging);
-//
-//
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), MyApplication.CHANNEL_ID)
-//                .setContentTitle("Hội chị em")
-//                .setContentText("Văn Thế đã gửi 1 ảnh")
-//                .setSmallIcon(R.drawable.ic_baseline_all_inclusive_24)
-//                .setLargeIcon(bitmapImage)
-//                .setSound(sound)
-////                .setStyle(new NotificationCompat.BigTextStyle().bigText(CONTENT_PUSH_NOTIFICATION))
-//                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmapImage).bigLargeIcon(null))
-//                .setColor(getResources().getColor(R.color.purple_200));
-//
-//
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-//        notificationManager.notify(getNotificationId(), builder.build());
-//
-//    }
     private int getNotificationId() {
         return (int) new Date().getTime();
     }

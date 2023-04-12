@@ -2,21 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="64dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
     android:background="@color/teal_200">
     <ImageView
-        android:id="@+id/image_custom_notification"
+        android:id="@+id/imageAvatar"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_centerVertical="true"
-        android:src="@mipmap/ic_launcher"/>
+        android:src="@drawable/ic_telegram"/>
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@id/image_custom_notification"
+        android:layout_toEndOf="@id/imageAvatar"
         android:layout_toStartOf="@id/imageMessageImage"
         android:orientation="vertical"
        >
@@ -35,10 +36,9 @@
     </LinearLayout>
     <ImageView
         android:id="@+id/imageMessageImage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
-        android:src="@mipmap/ic_launcher"
         style=""/>
 </RelativeLayout>

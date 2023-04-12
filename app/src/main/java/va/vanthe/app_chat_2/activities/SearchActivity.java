@@ -27,14 +27,14 @@ import va.vanthe.app_chat_2.listeners.UserListener;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
-public class SearchActivity extends AppCompatActivity implements UserListener {
+public class SearchActivity extends BaseActivity implements UserListener {
 
     private ActivitySearchBinding binding;
     private PreferenceManager account;
     private FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySearchBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

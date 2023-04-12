@@ -7,13 +7,13 @@ import android.view.View;
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.databinding.ActivityCreateAGroupBinding;
 
-public class CreateAGroupActivity extends AppCompatActivity {
+public class CreateAGroupActivity extends BaseActivity {
 
 
     private ActivityCreateAGroupBinding binding;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityCreateAGroupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

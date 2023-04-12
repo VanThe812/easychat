@@ -29,10 +29,11 @@ public class User implements Serializable {
     private String phoneNumber;
     private boolean sex;
     private String dateOfBrith;
+    private String fcmToken;
 
     public User() {}
 
-    public User(String id, String firstName, String lastName, String password, String image, String email, @Unique String phoneNumber, boolean sex, String dateOfBrith) {
+    public User(@NonNull String id, String firstName, String lastName, String password, String image, String email, @Unique String phoneNumber, boolean sex, String dateOfBrith, String fcmToken) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -42,6 +43,7 @@ public class User implements Serializable {
         this.phoneNumber = phoneNumber;
         this.sex = sex;
         this.dateOfBrith = dateOfBrith;
+        this.fcmToken = fcmToken;
     }
 
     public String getId() {
@@ -114,6 +116,14 @@ public class User implements Serializable {
 
     public void setDateOfBrith(String dateOfBrith) {
         this.dateOfBrith = dateOfBrith;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     @Override

@@ -27,4 +27,6 @@
     <string name="theme">Theme</string>
     <string name="channel_name">Channel 1</string>
     <string name="channel_description">This is my channel</string>
+    <string name="online">Online</string>
+<!--    <string name=""-->
 </resources>
