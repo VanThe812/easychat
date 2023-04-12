@@ -47,6 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="List Friends"
+            android:id="@+id/textFriend"
             android:textSize="@dimen/_15ssp"
             android:textColor="@color/black"
             />
@@ -60,5 +61,15 @@
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             />
+
     </LinearLayout>
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewpagerAddFriend"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+       app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
