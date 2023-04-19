@@ -5,4 +5,11 @@
     <corners
         android:topLeftRadius="@dimen/_15sdp"
         android:topRightRadius="@dimen/_15sdp" />
+    <gradient
+        android:type="radial"
+        android:gradientRadius="0dp"
+        android:centerX="50%"
+        android:centerY="50%"
+        android:startColor="@color/trans"
+        android:endColor="@color/white"/>
 </shape>

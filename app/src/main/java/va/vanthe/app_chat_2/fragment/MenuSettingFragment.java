@@ -47,6 +47,9 @@ public class MenuSettingFragment extends Fragment {
         binding.buttonLogout.setOnClickListener(view -> {
             signOut();
         });
+        binding.imageProfile.setOnClickListener(view -> {
+
+        });
     }
     private void signOut() {
         showToast("Signing out...");

@@ -3,6 +3,7 @@ package va.vanthe.app_chat_2.activities;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
@@ -31,12 +32,19 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
+import com.yalantis.ucrop.util.FileUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,6 +114,7 @@ public class ChatMessageActivity extends BaseActivity {
         userChat      = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
         styleChat     = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
 
+
         if(mConversation == null) {
 
             List<Conversation> conversations = ConversationDatabase.getInstance(getApplicationContext()).conversationDAO().getConversationStyleChat(Constants.KEY_TYPE_CHAT_SINGLE);
@@ -149,15 +158,62 @@ public class ChatMessageActivity extends BaseActivity {
             else if (styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
                 //Xử lý các dữ liệu cần thiết khi là chat group
 //                conversation = (Conversation) getIntent().getSerializableExtra(Constants.KEY_CONVERSATION);
-                if (mConversation.getBackgroundImage() != null) {
-                    byte[] bytes = Base64.decode(mConversation.getBackgroundImage(), Base64.DEFAULT);
+                if (mConversation.getConversationAvatar() != null) {
+                    byte[] bytes = Base64.decode(mConversation.getConversationAvatar(), Base64.DEFAULT);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                     binding.imageProfile.setImageBitmap(bitmap);
                 }
                 binding.textName.setText(mConversation.getConversationName());
             }
 
+            if (mConversation.getQuickEmotions() != null) {
+                binding.textviewSend.setText(mConversation.getQuickEmotions());
+            } else {
+                binding.textviewSend.setText("\uD83C\uDF49");
+            }
 
+            if (mConversation.getConversationBackground() != null) {
+                File file = new File(getFilesDir(), mConversation.getConversationBackground());
+                if (file.exists()) {
+                    // File tồn tại trong thư mục của ứng dụng
+                    Picasso.get()
+                            .load(file)
+                            .into(binding.imageBackground);
+                }
+                else {
+                    // File không tồn tại trong thư mục của ứng dụng
+                    StorageReference storageRef = FirebaseStorage.getInstance().getReference()
+                            .child("images")
+                            .child("background")
+                            .child(mConversation.getConversationBackground());
+                    File storageDir = getApplicationContext().getExternalFilesDir(null);
+                    File localFile = new File(storageDir, mConversation.getConversationBackground());
+                    storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            // File tải về thành công
+                            Picasso.get()
+                                    .load(localFile)
+                                    .into(binding.imageBackground);
+                            File destinationFile = new File(getFilesDir(), mConversation.getConversationBackground());
+
+//                      // Sao chép tập tin vào thư mục của ứng dụng
+                            try {
+                                FileUtils.copyFile(localFile.getPath(), destinationFile.getPath());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Xử lý khi có lỗi xảy ra
+                            exception.printStackTrace();
+                        }
+                    });
+
+                }
+            }
         }
 
         // set adapter rỗng cho RCV, sẽ thêm tin nhắn vào sau
@@ -217,7 +273,11 @@ public class ChatMessageActivity extends BaseActivity {
                 } else { // ngược lại, đang rỗng
                     binding.textviewMore.setVisibility(View.VISIBLE);
                     binding.textviewSend.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
-                    binding.textviewSend.setText("\uD83C\uDF49");
+                    if (mConversation != null) {
+                        binding.textviewSend.setText(mConversation.getQuickEmotions());
+                    } else {
+                        binding.textviewSend.setText("\uD83C\uDF49");
+                    }
                 }
             }
         });
@@ -247,7 +307,7 @@ public class ChatMessageActivity extends BaseActivity {
                         mConversation.setSenderId(userChat.getId());
                         mConversation.setMessageTime(new Date());
                         mConversation.setStyleChat(Constants.KEY_TYPE_CHAT_SINGLE);
-
+                        mConversation.setQuickEmotions("\uD83C\uDF49");
                         // Chuyển qua Hashmap
                         HashMap<String, Object> conversationMap = mConversation.toHashMap();
 
@@ -336,31 +396,40 @@ public class ChatMessageActivity extends BaseActivity {
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
+//                if(result.getResultCode() == RESULT_OK) {
+//                    if(result.getData() != null) {
+//                        Uri imageUri = result.getData().getData();
+//                        ContentResolver cR = getContentResolver();
+//                        MimeTypeMap mime = MimeTypeMap.getSingleton();
+//                        StorageReference storageRef = storage.getReference();
+//
+//                        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+//                        String fileName = String.format("%s_%s.%s", account.getString(Constants.KEY_ACCOUNT_USER_ID), timestamp, mime.getExtensionFromMimeType(cR.getType(imageUri)));
+//                        String path = String.format("images/conversation/%s/%s", mConversation.getId(), fileName);
+//                        StorageReference imagesRef = storageRef.child(path);
+//                        imagesRef.putFile(imageUri)
+//                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                                    @Override
+//                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                                        // Upload successful
+//                                        sendMessage(fileName, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE);
+//                                    }
+//                                })
+//                                .addOnFailureListener(new OnFailureListener() {
+//                                    @Override
+//                                    public void onFailure(@NonNull Exception e) {
+//                                        // Upload failed
+//                                    }
+//                                });
+//                    }
+//                }
                 if(result.getResultCode() == RESULT_OK) {
                     if(result.getData() != null) {
                         Uri imageUri = result.getData().getData();
-                        ContentResolver cR = getContentResolver();
-                        MimeTypeMap mime = MimeTypeMap.getSingleton();
-                        StorageReference storageRef = storage.getReference();
-
-                        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-                        String fileName = String.format("%s_%s.%s", account.getString(Constants.KEY_ACCOUNT_USER_ID), timestamp, mime.getExtensionFromMimeType(cR.getType(imageUri)));
-                        String path = String.format("images/conversation/%s/%s", mConversation.getId(), fileName);
-                        StorageReference imagesRef = storageRef.child(path);
-                        imagesRef.putFile(imageUri)
-                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        // Upload successful
-                                        sendMessage(fileName, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        // Upload failed
-                                    }
-                                });
+                        Intent intent = new Intent(ChatMessageActivity.this, EditImageActivity.class);
+                        intent.putExtra("DATA", imageUri.toString());
+                        intent.putExtra("style", Constants.KEY_REQUEST_CODE_IMAGE_MESSAGE);
+                        startActivityForResult(intent, Constants.KEY_REQUEST_CODE_IMAGE_MESSAGE);
                     }
                 }
             }
@@ -424,9 +493,6 @@ public class ChatMessageActivity extends BaseActivity {
                             data.put(Constants.KEY_CHAT_MESSAGE_MESSAGE, chatMessage.getMessage()); // tin nhắn mới
                             data.put(Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE, chatMessage.getStyleMessage()); // kiểu tin nhắn
 
-//                            Gson gson = new Gson();
-//                            data.put(Constants.KEY_CONVERSATION, gson.toJson(mConversation));
-
                             JSONObject body = new JSONObject();
                             body.put(Constants.REMOTE_MSG_DATA, data);
                             body.put(Constants.REMOTE_MSG_REGISTRATION, tokens);
@@ -460,24 +526,25 @@ public class ChatMessageActivity extends BaseActivity {
             return;
         }
         if(value != null) {
+            int count = chatMessageList.size();
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 if(documentChange.getType() == DocumentChange.Type.ADDED) { //nếu có thêm dữ liệu hoặc là khi vừa mở app
                     DocumentSnapshot chatMessageSnapshot = documentChange.getDocument();
                     ChatMessage chatMessage = chatMessageSnapshot.toObject(ChatMessage.class);
                     chatMessage.setId(chatMessageSnapshot.getId());
-//
-//                    int checkChatMessage = ChatMessageDatabase.getInstance(this).chatMessageDAO().checkChatMessage(chatMessage.getId());
-//
-//                    if (checkChatMessage == 0) {
-//                        ChatMessageDatabase.getInstance(this).chatMessageDAO().insertChatMessage(chatMessage);
-//                    }
 
-
-                    addOneMessageToBelow(chatMessage);
+                    chatMessageList.add(chatMessage);
 
                 } else if(documentChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
                     Log.d("LogChatMessage", "MODIFIED");
                 }
+            }
+            Collections.sort(chatMessageList, (obj1, obj2) -> obj1.getDataTime().compareTo(obj2.getDataTime()));
+            if(count == 0) {
+                chatAdapter.notifyDataSetChanged();
+            }else{
+                chatAdapter.notifyItemRangeInserted(chatMessageList.size(), chatMessageList.size());
+                binding.chatRCV.smoothScrollToPosition(chatMessageList.size() - 1);
             }
         }
     };
@@ -560,16 +627,16 @@ public class ChatMessageActivity extends BaseActivity {
                             JSONArray results = responseJson.getJSONArray("results");
                             if (responseJson.getInt("failure") == 1) {
                                 JSONObject error = (JSONObject) results.get(0);
-                                Toast.makeText(ChatMessageActivity.this, error.getString("error"), Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(ChatMessageActivity.this, error.getString("error"), Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Toast.makeText(ChatMessageActivity.this, "Notification send successfully", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ChatMessageActivity.this, "Notification send successfully", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(ChatMessageActivity.this, "Error: " + response.code(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ChatMessageActivity.this, "Error: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -579,6 +646,41 @@ public class ChatMessageActivity extends BaseActivity {
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == -1 && requestCode == Constants.KEY_REQUEST_CODE_IMAGE_MESSAGE) {
+            String result = data.getStringExtra("RESULT");
+            Uri imageUri = null;
+            if (result != null) {
+                imageUri = Uri.parse(result);
+            }
+            ContentResolver cR = getContentResolver();
+            MimeTypeMap mime = MimeTypeMap.getSingleton();
+            StorageReference storageRef = storage.getReference();
+
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            String fileName = String.format("%s_%s.%s", account.getString(Constants.KEY_ACCOUNT_USER_ID), timestamp, mime.getExtensionFromMimeType(cR.getType(imageUri)));
+            String path = String.format("images/conversation/%s/%s", mConversation.getId(), fileName);
+            StorageReference imagesRef = storageRef.child(path);
+            imagesRef.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Upload successful
+                            sendMessage(fileName, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Upload failed
+                        }
+                    });
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

@@ -127,9 +127,9 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
             } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
                 binding.textRecentMessage.setText(conversation.getNewMessage());
                 binding.textName.setText(conversation.getConversationName());
-                if (conversation.getBackgroundImage() != null) {
+                if (conversation.getConversationAvatar() != null) {
                     ///
-                    binding.imageProfile.setImageBitmap(getConverdionImage(conversation.getBackgroundImage()));
+                    binding.imageProfile.setImageBitmap(getConverdionImage(conversation.getConversationAvatar()));
                 }
                 TextView textViewTimeAgo = binding.textTime;
                 Date dateOld = conversation.getMessageTime();

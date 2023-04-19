@@ -11,8 +11,10 @@ import org.checkerframework.common.aliasing.qual.Unique;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -173,4 +175,5 @@ public class User implements Serializable {
             return true;
         }
     }
+
 }

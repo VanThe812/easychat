@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="@dimen/_4sdp"
+    android:layout_marginVertical="@dimen/_8sdp">
+    <TextView
+        android:id="@+id/textViewMessageNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:background="@drawable/bg_content"
+        android:paddingVertical="@dimen/_2sdp"
+        android:paddingHorizontal="@dimen/_5sdp"
+        android:textColor="@color/black"
+        android:layout_centerInParent="true"/>
+
+</RelativeLayout>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/bg_content_top">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_20sdp">
+<!--        <View-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="5in"-->
+<!--            tools:ignore="InOrMmUsage" />-->
+        <TextView
+            android:id="@+id/textViewChooseQuickEmotions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/choose_quick_emotions"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_centerHorizontal="true"
+            />
+        <TextView
+            android:id="@+id/textViewYourEmotion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewChooseQuickEmotions"
+            android:textStyle="bold"
+            android:textColor="@color/gray_500"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:textSize="@dimen/_12sdp"
+            android:text="@string/your_emotion"/>
+
+<!--        <EditText-->
+<!--            android:id="@+id/inputEmoji"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="@dimen/_28sdp"-->
+<!--            android:layout_below="@id/textViewYourEmotion"-->
+<!--            android:background="@drawable/bg_input"-->
+<!--            android:hint="@string/emoji"-->
+<!--            android:inputType="text"-->
+<!--            android:paddingStart="@dimen/_8sdp"-->
+<!--            android:paddingEnd="@dimen/_16sdp"-->
+<!--            android:textColor="@color/primary_text"-->
+<!--            android:textSize="@dimen/_13sdp"-->
+<!--            />-->
+<!--        <Button-->
+<!--            android:id="@+id/buttonSaveEmoji"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@+id/inputEmoji"-->
+<!--            android:text="@string/save"/>-->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/emojiRCV"
+            android:layout_below="@id/textViewYourEmotion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:overScrollMode="never"
+            android:visibility="visible"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+
+            />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_50sdp"
+            android:layout_below="@id/emojiRCV"/>
+    </RelativeLayout>
+
+
+
+</ScrollView>

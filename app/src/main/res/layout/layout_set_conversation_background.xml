@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/bg_content_top">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_20sdp">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="5in"
+            tools:ignore="InOrMmUsage" />
+        <TextView
+            android:id="@+id/textViewChooseTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/choose_a_theme"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_centerHorizontal="true"
+            />
+        <TextView
+            android:id="@+id/textViewConversationName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewChooseTheme"
+            android:textStyle="bold"
+            android:textColor="@color/gray_500"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:textSize="@dimen/_12sdp"
+            android:text="@string/conversation_background"/>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/imageViewBackground"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_150sdp"
+            android:layout_below="@id/textViewConversationName"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:background="@drawable/bg_image_message"
+            android:contentDescription="@string/conversation_background"
+            android:scaleType="centerCrop"
+            app:riv_corner_radius="@dimen/_15sdp"/>
+        <TextView
+            android:id="@+id/textViewClickToChangeThePicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/click_to_change_the_picture"
+            android:padding="@dimen/_10sdp"
+            style="@style/Border"
+            android:layout_toEndOf="@id/imageViewBackground"
+            android:layout_below="@id/textViewConversationName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/_10sdp"/>
+    </RelativeLayout>
+
+
+
+</ScrollView>

@@ -13,6 +13,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -45,6 +47,7 @@ public class MainActivity extends BaseActivity {
         checkLogin();
         getToken();
         setListeners();
+
     }
     private void init() {
         account = new PreferenceManager(getApplicationContext());
@@ -87,25 +90,25 @@ public class MainActivity extends BaseActivity {
             return  true;
         });
 
-        binding.viewPagerMenu.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                binding.viewPagerMenu.setOnTouchListener((view, motionEvent) -> {
-                    binding.viewPagerMenu.setCurrentItem(0);
-                    return true;
-                });
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+//        binding.viewPagerMenu.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//
+//            }
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//                binding.viewPagerMenu.setOnTouchListener((view, motionEvent) -> {
+//                    binding.viewPagerMenu.setCurrentItem(0);
+//                    return true;
+//                });
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//
+//            }
+//        });
 
     }
 

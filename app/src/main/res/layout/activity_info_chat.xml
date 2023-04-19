@@ -136,13 +136,17 @@
                 android:paddingTop="@dimen/_8ssp"
                 android:paddingBottom="@dimen/_8sdp">
 
-                <androidx.appcompat.widget.AppCompatImageView
+                <TextView
+                    android:id="@+id/textViewEmoji"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
+                    android:layout_gravity="center"
                     android:layout_margin="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:background="@drawable/ic_emoji"
-                    android:tint="@color/blue" />
+                    android:text="🍉"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_20sdp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -383,7 +387,7 @@
                 android:textColor="@color/black"
                 />
             <LinearLayout
-                android:id="@+id/button2"
+                android:id="@+id/buttonRestrict"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
@@ -393,7 +397,7 @@
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/image2"
+                    android:id="@+id/imageRestrict"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_marginTop="@dimen/_5sdp"
@@ -401,7 +405,7 @@
                     android:layout_margin="@dimen/_5sdp"
                     android:tint="@color/blue"/>
                 <TextView
-                    android:id="@+id/text2"
+                    android:id="@+id/textRestrict"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Restrict"
@@ -410,7 +414,7 @@
                     android:layout_marginTop="@dimen/_4sdp"/>
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/button3"
+                android:id="@+id/buttonBlock"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
@@ -420,7 +424,7 @@
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/image3"
+                    android:id="@+id/imageBlock"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_marginTop="@dimen/_5sdp"
@@ -428,7 +432,7 @@
                     android:layout_margin="@dimen/_5sdp"
                     android:tint="@color/blue"/>
                 <TextView
-                    android:id="@+id/text3"
+                    android:id="@+id/textBlock"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/block"
@@ -460,6 +464,34 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/delete_chat"
+                    android:textColor="@color/error"
+                    android:textSize="@dimen/_18sdp"
+                    android:layout_marginTop="@dimen/_4sdp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/buttonLeaveConversation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_content"
+                android:paddingTop="@dimen/_8ssp"
+                android:paddingLeft="@dimen/_5sdp"
+                android:paddingBottom="@dimen/_8sdp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageLeaveConversation"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@drawable/ic_leave"
+                    android:backgroundTint="@color/error"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:tint="@color/blue"/>
+                <TextView
+                    android:id="@+id/textLeaveConversation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/leave_the_conversation"
                     android:textColor="@color/error"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>

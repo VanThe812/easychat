@@ -66,7 +66,7 @@
         app:layout_constraintEnd_toStartOf="@id/imageStatusView"
         app:layout_constraintStart_toEndOf="@id/imageProfile" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8sdp"
@@ -80,11 +80,13 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Tin nhắn test"
+            android:text="Tin nhắn test Tin nhắn te test sdsdc sxczv sdsdffsd wsdfsd sdfsd sd "
             android:textColor="#80000000"
             android:textSize="@dimen/_12sdp"
+            android:maxWidth="@dimen/_200sdp"
             />
         <TextView
+            android:id="@+id/textViewDot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -92,6 +94,7 @@
             android:text="·"
             android:textColor="#80000000"
             android:textSize="@dimen/_12sdp"
+            android:layout_toEndOf="@id/textRecentMessage"
             />
         <TextView
             android:id="@+id/textTime"
@@ -102,8 +105,9 @@
             android:text="14:32"
             android:textColor="#80000000"
             android:textSize="@dimen/_12sdp"
+            android:layout_toEndOf="@id/textViewDot"
             />
-    </LinearLayout>
+    </RelativeLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageStatusView"

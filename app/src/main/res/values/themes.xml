@@ -13,4 +13,8 @@
     <style name="Theme.App_Chat_2.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.App_Chat_2.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Border">
+        <item name="android:background">@drawable/border</item>
+    </style>
 </resources>

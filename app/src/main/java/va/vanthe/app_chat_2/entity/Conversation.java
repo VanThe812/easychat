@@ -22,13 +22,14 @@ public class Conversation implements Serializable {
     private Date messageTime;
     private int styleChat;
     private String conversationName;
-    private String backgroundImage;
+    private String conversationBackground;
+    private String conversationColor;
+    private String conversationAvatar;
     private String quickEmotions;
-    private int theme;
 
     public Conversation() {}
 
-    public Conversation(@NonNull String id, Date createTime, String newMessage, String senderId, Date messageTime, int styleChat, String conversationName, String backgroundImage, String quickEmotions, int theme) {
+    public Conversation(@NonNull String id, Date createTime, String newMessage, String senderId, Date messageTime, int styleChat, String conversationName, String conversationBackground, String conversationColor, String conversationAvatar, String quickEmotions) {
         this.id = id;
         this.createTime = createTime;
         this.newMessage = newMessage;
@@ -36,17 +37,19 @@ public class Conversation implements Serializable {
         this.messageTime = messageTime;
         this.styleChat = styleChat;
         this.conversationName = conversationName;
-        this.backgroundImage = backgroundImage;
+        this.conversationBackground = conversationBackground;
+        this.conversationColor = conversationColor;
+        this.conversationAvatar = conversationAvatar;
         this.quickEmotions = quickEmotions;
-        this.theme = theme;
     }
 
+    @NonNull
     public String getId() {
         return id;
     }
 
-    public void setId(String conversationId) {
-        this.id = conversationId;
+    public void setId(@NonNull String id) {
+        this.id = id;
     }
 
     public Date getCreateTime() {
@@ -97,12 +100,28 @@ public class Conversation implements Serializable {
         this.conversationName = conversationName;
     }
 
-    public String getBackgroundImage() {
-        return backgroundImage;
+    public String getConversationBackground() {
+        return conversationBackground;
     }
 
-    public void setBackgroundImage(String backgroundImage) {
-        this.backgroundImage = backgroundImage;
+    public void setConversationBackground(String conversationBackground) {
+        this.conversationBackground = conversationBackground;
+    }
+
+    public String getConversationColor() {
+        return conversationColor;
+    }
+
+    public void setConversationColor(String conversationColor) {
+        this.conversationColor = conversationColor;
+    }
+
+    public String getConversationAvatar() {
+        return conversationAvatar;
+    }
+
+    public void setConversationAvatar(String conversationAvatar) {
+        this.conversationAvatar = conversationAvatar;
     }
 
     public String getQuickEmotions() {
@@ -111,14 +130,6 @@ public class Conversation implements Serializable {
 
     public void setQuickEmotions(String quickEmotions) {
         this.quickEmotions = quickEmotions;
-    }
-
-    public int getTheme() {
-        return theme;
-    }
-
-    public void setTheme(int theme) {
-        this.theme = theme;
     }
 
     public HashMap<String, Object> toHashMap() {
@@ -130,9 +141,10 @@ public class Conversation implements Serializable {
         conversationMap.put("messageTime", messageTime);
         conversationMap.put("styleChat", styleChat);
         conversationMap.put("conversationName", conversationName);
-        conversationMap.put("backgroundImage", backgroundImage);
+        conversationMap.put("conversationBackground", conversationBackground);
+        conversationMap.put("conversationColor", conversationColor);
+        conversationMap.put("conversationAvatar", conversationAvatar);
         conversationMap.put("quickEmotions", quickEmotions);
-        conversationMap.put("theme", theme);
         return conversationMap;
     }
 
@@ -145,9 +157,11 @@ public class Conversation implements Serializable {
                 ", senderId='" + senderId + '\'' +
                 ", messageTime=" + messageTime +
                 ", styleChat=" + styleChat +
-                ", conversationName=" + conversationName +
-                ", quickEmotions=" + quickEmotions +
-                ", theme=" + theme +
+                ", conversationName='" + conversationName + '\'' +
+                ", conversationBackground='" + conversationBackground + '\'' +
+                ", conversationColor='" + conversationColor + '\'' +
+                ", conversationAvatar='" + conversationAvatar + '\'' +
+                ", quickEmotions='" + quickEmotions + '\'' +
                 '}';
     }
 

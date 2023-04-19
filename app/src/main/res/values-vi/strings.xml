@@ -28,4 +28,17 @@
     <string name="channel_name">Channel 1</string>
     <string name="channel_description">This is my channel</string>
     <string name="online">Online</string>
+    <string name="conversation_background">Nền cuộc trò chuyện</string>
+    <string name="choose_a_theme">Chọn chủ đề</string>
+    <string name="click_to_change_the_picture">Nhấp để thay đổi hình ảnh</string>
+    <string name="change_avatar_successfully">Thay đổi ảnh đại diện thành công</string>
+    <string name="choose_quick_emotions">Chọn cảm xúc nhanh 😜</string>
+    <string name="your_emotion">Your emotion</string>
+    <string name="emoji">Emoji</string>
+    <string name="save">Save</string>
+    <string name="changed_wallpaper_successfully">Đã thay đổi hình nền thành công</string>
+    <string name="emotion_set_to">Đã đặt cảm xúc thành </string>
+    <string name="successful_emotional_change">Thay đổ cảm xúc thành công</string>
+    <string name="changed_wallpaper">Đã thay đổi hình nền</string>
+    <string name="leave_the_conversation">Dời khỏi cuộc hội thoại </string>
 </resources>

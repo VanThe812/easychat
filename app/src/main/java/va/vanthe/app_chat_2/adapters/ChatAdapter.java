@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -33,6 +34,7 @@ import java.util.List;
 
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.database.UserDatabase;
+import va.vanthe.app_chat_2.databinding.ItemChatNotificationBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerReceivedMessageBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerSentMessageBinding;
 import va.vanthe.app_chat_2.entity.ChatMessage;
@@ -70,17 +72,22 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if(viewType == VIEW_TYPE_SENT) {
             return new SentMessageViewHolder(ItemContainerSentMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        }else {
+        }else if(viewType == VIEW_TYPE_RECEIVED){
             return new ReceivedMessageViewHolder(ItemContainerReceivedMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        } else if(viewType == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
+            return new NotificationViewHolder(ItemChatNotificationBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
+        return null;
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(getItemViewType(position) == VIEW_TYPE_SENT) {
             ((SentMessageViewHolder) holder).setData(chatMessages.get(position), styleChat);
-        }else {
+        }else if(getItemViewType(position) == VIEW_TYPE_RECEIVED){
             ((ReceivedMessageViewHolder) holder).setData(chatMessages.get(position), styleChat);
+        } else if(getItemViewType(position) == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
+            ((NotificationViewHolder) holder).setData(chatMessages.get(position));
         }
         //kiểm tra khoảng thời gian từ tin nhắn trước tới tin nhắn này là bao nhiêu,
         //nếu lớn hơn 10p sẽ hiện ra màn hình thời gian chính xác tin nhắn này dc nhắn: VD 14:00
@@ -89,10 +96,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             if (!isCalculateTime(chatMessages.get(position).getDataTime(), chatMessages.get(position-1).getDataTime(), 10)) {
                 if(getItemViewType(position) == VIEW_TYPE_SENT) {
                     ((SentMessageViewHolder) holder).setTimeVisible(chatMessages.get(position).getDataTime());
-                } else {
+                } else if(getItemViewType(position) == VIEW_TYPE_RECEIVED){
                     ((ReceivedMessageViewHolder) holder).setTimeVisible(chatMessages.get(position).getDataTime());
                 }
-
             }
         }
     }
@@ -104,6 +110,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public int getItemViewType(int position) {
+        if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
+            return chatMessages.get(position).getStyleMessage();
+        }
         if(chatMessages.get(position).getSenderId().equals(senderId)) {
             return VIEW_TYPE_SENT;
         }else {
@@ -121,31 +130,44 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
         void setData(ChatMessage chatMessage, int styleChat) {
 
-            if (HelperFunction.isEmoji(chatMessage.getMessage().trim())) {
-                binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
-                binding.textMessage.setTextSize(30);
-            }
+
             binding.textTime.setText(getTimeAgo(chatMessage.getDataTime()));
 
 
             if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT) {
+                binding.textMessage.setVisibility(View.VISIBLE);
+                binding.relativeLayoutImage.setVisibility(View.GONE);
+
                 binding.textMessage.setText(chatMessage.getMessage().trim());
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) binding.textMessage.getLayoutParams();
+                layoutParams.width = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+                layoutParams.matchConstraintMaxWidth = 550;
+                binding.textMessage.setLayoutParams(layoutParams);
                 binding.textMessage.setOnClickListener(view -> {
                     if (binding.textTime.getVisibility() == View.VISIBLE) {
                         binding.textTime.setVisibility(View.GONE);
-//                        binding.textStatus.setVisibility(View.GONE);
                     } else if (binding.textTime.getVisibility() == View.GONE) {
                         binding.textTime.setVisibility(View.VISIBLE);
-//                        binding.textStatus.setVisibility(View.VISIBLE);
                     }
                 });
+                if (HelperFunction.isEmoji(chatMessage.getMessage().trim())) {
+                    binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
+                    binding.textMessage.setTextSize(30);
+                } else {
+                    binding.textMessage.setBackgroundResource(R.drawable.bg_sent_message);
+                    binding.textMessage.setTextSize(18);
+                }
             }
+
             else if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE) {
-                    StorageReference storageRef = FirebaseStorage.getInstance().getReference()
-                        .child("images")
-                        .child("conversation")
-                        .child(chatMessage.getConversationId())
-                        .child(chatMessage.getMessage());
+                binding.relativeLayoutImage.setVisibility(View.VISIBLE);
+                binding.textMessage.setVisibility(View.GONE);
+
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference()
+                    .child("images")
+                    .child("conversation")
+                    .child(chatMessage.getConversationId())
+                    .child(chatMessage.getMessage());
 
                 // Tải ảnh xuống và gán vào ImageView
                 storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -155,9 +177,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                         Picasso.get()
                                 .load(uri)
                                 .into(binding.imageMessage);
-//                        Glide.with(itemView.getContext())
-//                                .load(uri)
-//                                .into(binding.imageMessage);
                         binding.imageMessage.setOnClickListener(view -> {
                             onItemClickListener.onItemClick(uri);
                         });
@@ -171,8 +190,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 });
 
 
-                binding.relativeLayoutImage.setVisibility(View.VISIBLE);
-                binding.textMessage.setVisibility(View.GONE);
+
             }
 
         }
@@ -215,34 +233,41 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                             }
                         });
             }
-            if (HelperFunction.isEmoji(chatMessage.getMessage().trim())) {
-                binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
-                binding.textMessage.setTextSize(30);
-            }
+
             if (styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
                 binding.textName.setText(user.getLastName());
                 binding.textName.setVisibility(View.VISIBLE);
             }
             binding.textTime.setText(getTimeAgo(chatMessage.getDataTime()));
-//                binding.textStatus.setText("Đã xem");
-
-
 
             if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT) {
+                binding.textMessage.setVisibility(View.VISIBLE);
+                binding.relativeLayoutImage.setVisibility(View.GONE);
+
                 binding.textMessage.setText(chatMessage.getMessage().trim());
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) binding.textMessage.getLayoutParams();
+                layoutParams.width = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+                layoutParams.matchConstraintMaxWidth = 550;
+                binding.textMessage.setLayoutParams(layoutParams);
                 binding.textMessage.setOnClickListener(view -> {
                     if (binding.textTime.getVisibility() == View.VISIBLE) {
                         binding.textTime.setVisibility(View.GONE);
-//                            binding.textStatus.setVisibility(View.GONE);
                     } else if (binding.textTime.getVisibility() == View.GONE) {
                         binding.textTime.setVisibility(View.VISIBLE);
-//                            binding.textStatus.setVisibility(View.VISIBLE);
                     }
                 });
+                if (HelperFunction.isEmoji(chatMessage.getMessage().trim())) {
+                    binding.textMessage.setBackgroundResource(R.drawable.bg_trans);
+                    binding.textMessage.setTextSize(30);
+                } else {
+                    binding.textMessage.setBackgroundResource(R.drawable.bg_received_message);
+                    binding.textMessage.setTextSize(18);
+                }
             }
             else if (chatMessage.getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE) {
-
-               StorageReference storageRef = FirebaseStorage.getInstance().getReference()
+                binding.relativeLayoutImage.setVisibility(View.VISIBLE);
+                binding.textMessage.setVisibility(View.GONE);
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference()
                         .child("images")
                         .child("conversation")
                         .child(chatMessage.getConversationId())
@@ -268,8 +293,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                     }
                 });
 
-                binding.relativeLayoutImage.setVisibility(View.VISIBLE);
-                binding.textMessage.setVisibility(View.GONE);
+
             }
             try {
                 binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(user.getImage()));
@@ -289,14 +313,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         Date now = new Date();
 
         long seconds = (now.getTime() - dateOld.getTime()) / 1000;
-//        if (seconds < 60) {
-//            return seconds + " giây trước";
-//        }
-//
+
         long minutes = seconds / 60;
-//        if (minutes < 60) {
-//            return minutes + " phút trước";
-//        }
 
         long hours = minutes / 60;
         if (hours < 24 && isSameDay(dateOld, now)) {
@@ -319,5 +337,20 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }else{
             return false;
         }
+    }
+
+    static class NotificationViewHolder extends RecyclerView.ViewHolder {
+
+        private final ItemChatNotificationBinding binding;
+
+        NotificationViewHolder(ItemChatNotificationBinding itemChatNotificationBinding) {
+            super(itemChatNotificationBinding.getRoot());
+            binding = itemChatNotificationBinding;
+        }
+
+        void setData(ChatMessage chatMessage) {
+            binding.textViewMessageNotification.setText(chatMessage.getMessage());
+        }
+
     }
 }

@@ -78,17 +78,20 @@ public class MessagingService extends FirebaseMessagingService {
             notificationLayout.setTextViewText(R.id.textViewTitleCustomNotification, user.getLastName());
             notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(user.getImage()));
         } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
+            notificationLayout.setTextViewText(R.id.textViewNameSender, user.getLastName() + ": ");
             notificationLayout.setTextViewText(R.id.textViewTitleCustomNotification, conversation.getConversationName());
-            notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(conversation.getBackgroundImage()));
+            if (conversation.getConversationAvatar() != null)
+                notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(conversation.getConversationAvatar()));
         }
         // config messaging notification
         if (styleMessage == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT) {
             notificationLayout.setTextViewText(R.id.textViewMessageCustomNotification, message);
         } else if (styleMessage == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE) {
             notificationLayout.setTextViewText(R.id.textViewMessageCustomNotification, "Đã gửi 1 ảnh");
-            if (conversation.getBackgroundImage() != null) {
-                notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(conversation.getBackgroundImage()));
+            if (conversation.getConversationAvatar() != null) {
+                notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(conversation.getConversationAvatar()));
             }
+            Log.e("getBytes", message);
             StorageReference storageRef = FirebaseStorage.getInstance().getReference()
                     .child("images")
                     .child("conversation")

@@ -24,12 +24,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:background="@drawable/bg_received_message"
+        android:background="@drawable/bg_sent_message"
         android:paddingHorizontal="@dimen/_6sdp"
-        android:paddingVertical="@dimen/_5sdp"
+        android:paddingVertical="@dimen/_4sdp"
         app:layout_constraintWidth_max="wrap"
         android:textSize="@dimen/_14ssp"
         app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/textTime"
         app:layout_constraintWidth_percent="0.8" />
 

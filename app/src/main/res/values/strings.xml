@@ -28,5 +28,18 @@
     <string name="channel_name">Channel 1</string>
     <string name="channel_description">This is my channel</string>
     <string name="online">Online</string>
-<!--    <string name=""-->
+    <string name="conversation_background">Conversation background</string>
+    <string name="choose_a_theme">Choose a theme</string>
+    <string name="click_to_change_the_picture">Click to change the picture</string>
+    <string name="change_avatar_successfully">Change avatar successfully</string>
+    <string name="choose_quick_emotions">Choose quick Emotions 😜</string>
+    <string name="your_emotion">Your emotion</string>
+    <string name="emoji">Emoji</string>
+    <string name="save">Save</string>
+    <string name="changed_wallpaper_successfully">Changed wallpaper successfully</string>
+    <string name="emotion_set_to">Emotion set to </string>
+    <string name="successful_emotional_change">Successful emotional change</string>
+    <string name="changed_wallpaper">Changed wallpaper</string>
+    <string name="leave_the_conversation">Leave the conversation</string>
+    <!--    <string name=""-->
 </resources>

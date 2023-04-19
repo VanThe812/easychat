@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,8 +41,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import va.vanthe.app_chat_2.MyApplication;
 import va.vanthe.app_chat_2.R;
-import va.vanthe.app_chat_2.activities.ChatMessageActivity;
-import va.vanthe.app_chat_2.activities.CreateAGroupActivity;
 import va.vanthe.app_chat_2.activities.SearchActivity;
 import va.vanthe.app_chat_2.activities.test;
 import va.vanthe.app_chat_2.adapters.ConversionsAdapter;

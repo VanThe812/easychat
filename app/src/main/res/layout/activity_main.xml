@@ -7,7 +7,6 @@
     android:animateLayoutChanges="true"
     android:background="@color/white"
     tools:context=".activities.MainActivity">
-
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager_menu"
         android:layout_width="match_parent"
