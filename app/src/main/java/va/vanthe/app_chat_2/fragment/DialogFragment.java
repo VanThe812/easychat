@@ -150,6 +150,7 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
                 conversation.setMessageTime(new Date());
                 conversation.setStyleChat(Constants.KEY_TYPE_CHAT_GROUP);
                 conversation.setConversationName(binding.inputNameGroup.getText().toString().trim());
+                conversation.setQuickEmotions("\uD83C\uDF49");
                 HashMap<String, Object> conversationMap = conversation.toHashMap();
 
                 database.collection(Constants.KEY_CONVERSATION)
