@@ -149,8 +149,10 @@ public class InfoChatActivity extends BaseActivity {
     private void onClickButtonBackground() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_set_conversation_background, null);
+        // để hiện dialog tính theo k/C từ dưới lên trên. 2000dp
         bottomSheetDialog.setContentView(bottomSheetView);
         BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from((View) bottomSheetView.getParent());
+
         bottomSheetBehavior.setPeekHeight(2000);
         bottomSheetDialog.show();
 

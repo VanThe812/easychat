@@ -77,6 +77,9 @@ public class Constants {
     public static final String KEY_FRIEND_USER_ID = "userId";
     public static final String KEY_FRIEND_USER_FRIEND_ID = "userFriendId";
     public static final String KEY_FRIEND_STATUS = "status";
+    public static final int KEY_FRIEND_STATUS_DAKETBAN = 2;
+    public static final int KEY_FRIEND_STATUS_DAGUILOIMOI = 1;
+    public static final int KEY_FRIEND_STATUS_NHANLOIMOI = 0;
     public static final String KEY_FRIEND_TIME_STAMP = "timeStamp";
 
     public static final String KEY_FCM_TOKEN = "fcmToken";

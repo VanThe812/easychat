@@ -72,6 +72,13 @@ public class HelperFunction {
             ex.printStackTrace();
         }
     }
+    public static String convertPhoneNumber(String phoneNumber) {
+        if (phoneNumber != null && phoneNumber.length() > 1 && phoneNumber.charAt(0) == '0') {
+            return "+84" + phoneNumber.substring(1);
+        } else {
+            return phoneNumber;
+        }
+    }
 //    public static void sendCustomNotification(AppCompatActivity appCompatActivity, Uri sound, Bitmap bitmapImage, ) {
 //        // Cài âm thanh thông báo
 ////        Uri sound = Uri.parse("android.resource://" + appCompatActivity.getActivity().getPackageName() + "/" + R.raw.messaging);
