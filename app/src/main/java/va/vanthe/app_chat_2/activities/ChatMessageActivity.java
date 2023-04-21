@@ -76,19 +76,18 @@ import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 public class ChatMessageActivity extends BaseActivity {
 
     private ActivityChatMessageBinding binding;
-    private FirebaseFirestore database;
-    private FirebaseStorage storage;
+    private final FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private PreferenceManager account;
 
     private Conversation mConversation = new Conversation();
-    private List<ChatMessage> chatMessageList;
+    private List<ChatMessage> chatMessageList = new ArrayList<>();
     private ChatAdapter chatAdapter;
 
     private User userChat = new User();
     private int styleChat;
     private boolean statusNewChat;
 
-    //
     private Boolean isReceiverAvailable = false;
 
     @Override
@@ -106,16 +105,21 @@ public class ChatMessageActivity extends BaseActivity {
 
 
     private void init() {
-        database = FirebaseFirestore.getInstance();
-        storage  = FirebaseStorage.getInstance();
         account  = new PreferenceManager(getApplicationContext());
 
-        mConversation = (Conversation) getIntent().getSerializableExtra(Constants.KEY_CONVERSATION);
-        userChat      = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
-        styleChat     = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
+        try {
+            mConversation = (Conversation) getIntent().getSerializableExtra(Constants.KEY_CONVERSATION);
+            userChat      = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
+            styleChat     = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            onBackPressed();
+        }
 
 
         if(mConversation == null) {
+//            database.collection(Constants.KEY_GROUP_MEMBER)
+//                    .whereIn(Constants.KEY_GROUP_MEMBER_USER_ID, )
 
             List<Conversation> conversations = ConversationDatabase.getInstance(getApplicationContext()).conversationDAO().getConversationStyleChat(Constants.KEY_TYPE_CHAT_SINGLE);
 
@@ -238,7 +242,7 @@ public class ChatMessageActivity extends BaseActivity {
 
 
     private void setListeners() {
-        binding.imageback.setOnClickListener(v -> {
+        binding.imageBack.setOnClickListener(v -> {
             onBackPressed();
         });
         binding.imageInfo.setOnClickListener(view -> {

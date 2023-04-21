@@ -1,14 +1,18 @@
 package va.vanthe.app_chat_2.ulitilies;
 
+import android.app.Activity;
 import android.app.Application;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -56,6 +60,17 @@ public class HelperFunction {
             }
         }
         return true;
+    }
+    public static void showToast(String message, Context context) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+    public static void hideSoftKeyboard(Activity activity) {
+        try {
+            InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
     }
 //    public static void sendCustomNotification(AppCompatActivity appCompatActivity, Uri sound, Bitmap bitmapImage, ) {
 //        // Cài âm thanh thông báo

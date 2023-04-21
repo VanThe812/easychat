@@ -7,7 +7,7 @@
     android:clipToPadding="false"
     android:overScrollMode="never"
     android:scrollbars="none"
-    android:background="@color/maunen"
+    android:background="@color/gray_100"
     tools:context=".activities.InfoChatActivity">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,7 +18,6 @@
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_25sdp"
             android:layout_marginStart="@dimen/_5sdp"
-            android:layout_marginLeft="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_5sdp"
             android:background="@drawable/ic_back"
             android:padding="@dimen/_6sdp"
@@ -29,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:id="@+id/textViewConversationName"
-            android:text="Conversation Name"
+            android:text="@string/conversation_name"
             android:textSize="@dimen/_15ssp"
             android:textColor="@color/black"
             android:textStyle="bold"
@@ -92,9 +91,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_8sdp"
                 android:padding="@dimen/_8sdp"
-                android:text="Customization"
+                android:text="@string/customization"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_15ssp" />
 
@@ -104,7 +103,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_content_top"
                 android:orientation="horizontal"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingTop="@dimen/_8ssp"
                 android:paddingBottom="@dimen/_8sdp">
 
@@ -112,7 +111,6 @@
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_margin="@dimen/_5sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:background="@drawable/ic_round"
                     android:tint="@color/blue" />
 
@@ -132,7 +130,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/white"
                 android:orientation="horizontal"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingTop="@dimen/_8ssp"
                 android:paddingBottom="@dimen/_8sdp">
 
@@ -142,8 +140,7 @@
                     android:layout_height="@dimen/_25sdp"
                     android:layout_gravity="center"
                     android:layout_margin="@dimen/_5sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:text="🍉"
+                    android:text="@string/text_detail"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_20sdp"
                     android:textStyle="bold" />
@@ -164,7 +161,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/white"
                 android:orientation="horizontal"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingTop="@dimen/_8ssp"
                 android:paddingBottom="@dimen/_8sdp">
 
@@ -172,7 +169,6 @@
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_margin="@dimen/_5sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:background="@drawable/ic_nickname"
                     android:tint="@color/blue" />
 
@@ -180,7 +176,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_4sdp"
-                    android:text="Nicknames"
+                    android:text="@string/nicknames"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp" />
             </LinearLayout>
@@ -191,7 +187,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_content_bottom"
                 android:orientation="horizontal"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingTop="@dimen/_8ssp"
                 android:paddingBottom="@dimen/_8sdp">
 
@@ -199,7 +195,6 @@
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_margin="@dimen/_5sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:background="@drawable/ic_effect"
                     android:tint="@color/blue" />
 
@@ -207,7 +202,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_4sdp"
-                    android:text="Word effects"
+                    android:text="@string/word_effects"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp" />
             </LinearLayout>
@@ -225,11 +220,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
             <TextView
-                android:layout_marginLeft="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_8sdp"
                 android:padding="@dimen/_8sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Info chat"
+                android:text="@string/info_chat"
                 android:textSize="@dimen/_15ssp"
                 android:textColor="@color/black"
                 />
@@ -241,7 +236,7 @@
                 android:orientation="horizontal"
                 android:background="@drawable/bg_content"
                 android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -275,11 +270,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
             <TextView
-                android:layout_marginLeft="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_8sdp"
                 android:padding="@dimen/_8sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Move action"
+                android:text="@string/move_action"
                 android:textSize="@dimen/_15ssp"
                 android:textColor="@color/black"
                 />
@@ -291,7 +286,7 @@
                 android:orientation="horizontal"
                 android:background="@drawable/bg_content_top"
                 android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -306,7 +301,7 @@
                     android:id="@+id/textCreateGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Create a chat group"
+                    android:text="@string/create_a_chat_group"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
@@ -318,7 +313,7 @@
                 android:orientation="horizontal"
                 android:background="@color/white"
                 android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -333,7 +328,7 @@
                     android:id="@+id/textSearchInConversation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Search in conversation"
+                    android:text="@string/search_in_conversation"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
@@ -345,14 +340,13 @@
                 android:orientation="horizontal"
                 android:background="@drawable/bg_content_bottom"
                 android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/image1"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:background="@drawable/ic_notifications"
                     android:layout_margin="@dimen/_5sdp"
                     android:tint="@color/blue"/>
@@ -360,7 +354,7 @@
                     android:id="@+id/text1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Notification and sounds"
+                    android:text="@string/notification_and_sounds"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
@@ -378,11 +372,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
             <TextView
-                android:layout_marginLeft="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_8sdp"
                 android:padding="@dimen/_8sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Privacy and support"
+                android:text="@string/privacy_and_support"
                 android:textSize="@dimen/_15ssp"
                 android:textColor="@color/black"
                 />
@@ -393,7 +387,7 @@
                 android:orientation="horizontal"
                 android:background="@drawable/bg_content_top"
                 android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -408,7 +402,7 @@
                     android:id="@+id/textRestrict"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Restrict"
+                    android:text="@string/restrict"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_18sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
@@ -420,7 +414,7 @@
                 android:orientation="horizontal"
                 android:background="@color/white"
                 android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -447,14 +441,13 @@
                 android:orientation="horizontal"
                 android:background="@drawable/bg_content_bottom"
                 android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imageDelete"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:background="@drawable/ic_delete"
                     android:backgroundTint="@color/error"
                     android:layout_margin="@dimen/_5sdp"
@@ -475,7 +468,7 @@
                 android:orientation="horizontal"
                 android:background="@drawable/bg_content"
                 android:paddingTop="@dimen/_8ssp"
-                android:paddingLeft="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_8sdp">
 
                 <androidx.appcompat.widget.AppCompatImageView

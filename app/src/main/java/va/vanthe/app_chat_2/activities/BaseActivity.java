@@ -1,7 +1,6 @@
 package va.vanthe.app_chat_2.activities;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;

@@ -71,6 +71,14 @@ public class Constants {
 
     public static final String KEY_IMAGE = "image";
 
+    // Friend
+    public static final String KEY_FRIEND = "friend";
+    public static final String KEY_FRIEND_ID = "friendId";
+    public static final String KEY_FRIEND_USER_ID = "userId";
+    public static final String KEY_FRIEND_USER_FRIEND_ID = "userFriendId";
+    public static final String KEY_FRIEND_STATUS = "status";
+    public static final String KEY_FRIEND_TIME_STAMP = "timeStamp";
+
     public static final String KEY_FCM_TOKEN = "fcmToken";
 
     public static final String KEY_STATUS_LANGUAGE = "statusLanguage";

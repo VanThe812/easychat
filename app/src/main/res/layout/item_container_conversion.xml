@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/_8sdp">
@@ -29,6 +29,7 @@
         app:layout_constraintBottom_toBottomOf="@id/imageProfile"
         app:layout_constraintEnd_toEndOf="@id/imageProfile"/>
     <TextView
+        android:id="@+id/textViewStatusOffline"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:background="@drawable/bg_status"
@@ -38,8 +39,7 @@
         android:paddingRight="@dimen/_2sdp"
         app:layout_constraintBottom_toBottomOf="@id/imageProfile"
         app:layout_constraintEnd_toEndOf="@id/imageProfile"
-        android:visibility="gone"
-        android:text="25 phút">
+        android:visibility="gone">
 
     </TextView>
 
@@ -59,7 +59,7 @@
         android:layout_marginEnd="@dimen/_8sdp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Van The"
+        android:text="@string/app_name"
         android:textColor="@color/primary_text"
         android:textSize="@dimen/_13ssp"
         app:layout_constraintBottom_toTopOf="@id/viewSupporter"
@@ -80,7 +80,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Tin nhắn test Tin nhắn te test sdsdc sxczv sdsdffsd wsdfsd sdfsd sd "
+            android:text="@string/welcome_to_easy_chat"
             android:textColor="#80000000"
             android:textSize="@dimen/_12sdp"
             android:maxWidth="@dimen/_200sdp"
@@ -95,14 +95,14 @@
             android:textColor="#80000000"
             android:textSize="@dimen/_12sdp"
             android:layout_toEndOf="@id/textRecentMessage"
-            />
+            tools:ignore="HardcodedText" />
         <TextView
             android:id="@+id/textTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="14:32"
+            android:text="@string/time_detail"
             android:textColor="#80000000"
             android:textSize="@dimen/_12sdp"
             android:layout_toEndOf="@id/textViewDot"
@@ -119,10 +119,4 @@
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"/>
-    <!--
-     ic_dot_view
-     ic_danhan
-     ic_dagui
-     image
-     -->
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import va.vanthe.app_chat_2.databinding.LayoutAboutTheAppBinding;
-import va.vanthe.app_chat_2.models.AboutTheApp;
+import va.vanthe.app_chat_2.entity.AboutTheApp;
 
 public class AboutTheAppAdapter extends RecyclerView.Adapter<AboutTheAppAdapter.AboutTheAppViewHolder>{
 

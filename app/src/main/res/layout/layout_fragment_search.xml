@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
         <LinearLayout
             android:id="@+id/layout_recent"
             android:layout_width="0dp"
@@ -19,7 +19,7 @@
                 android:padding="@dimen/_8sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Recent searches"
+                android:text="@string/recent_searches"
                 android:textSize="@dimen/_15ssp"
                 android:textColor="@color/black"
                 />
@@ -47,7 +47,7 @@
                 android:padding="@dimen/_8sdp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Suggested"
+                android:text="@string/suggested"
                 android:textSize="@dimen/_15ssp"
                 android:textColor="@color/black"
                 />

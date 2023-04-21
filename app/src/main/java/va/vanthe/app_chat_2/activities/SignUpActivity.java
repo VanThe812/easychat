@@ -5,14 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -25,19 +19,18 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 
 import va.vanthe.app_chat_2.databinding.ActivitySignupBinding;
+import va.vanthe.app_chat_2.ulitilies.HelperFunction;
 
 public class SignUpActivity extends AppCompatActivity {
 
     private ActivitySignupBinding binding;
-
-    private String encodedImage;
-    private FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     private FirebaseAuth mAuth;
-    public static final String TAG = "SentOTP";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +46,7 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
     private void setListeners() {
-        binding.loginUser.setOnClickListener(view -> {
-            startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
-        });
+        binding.loginUser.setOnClickListener(view -> startActivity(new Intent(SignUpActivity.this, SignInActivity.class)));
 
         binding.buttonSignUp.setOnClickListener(view -> {
             if (isValidSignUpDetails()) {
@@ -67,16 +58,16 @@ public class SignUpActivity extends AppCompatActivity {
     @NonNull
     private Boolean isValidSignUpDetails() {
         if(binding.inputPhoneNumber.getText().toString().isEmpty()) {
-            showToast("Enter phone number");
+            HelperFunction.showToast(getString(R.string.enter_phone_number), getApplicationContext());
             return false;
         }else if(binding.inputPassword.getText().toString().trim().isEmpty()) {
-            showToast("Enter password");
+            HelperFunction.showToast(getString(R.string.enter_password), getApplicationContext());
             return false;
         }else if(binding.inputRePassword.getText().toString().trim().isEmpty()) {
-            showToast("Confirm your password");
+            HelperFunction.showToast(getString(R.string.confirm_password), getApplicationContext());
             return false;
         }else if(!binding.inputPassword.getText().toString().equals(binding.inputRePassword.getText().toString())) {
-            showToast("Password & confirm password must be same");
+            HelperFunction.showToast(getString(R.string.password_and_confirm_password_must_be_same), getApplicationContext());
             return false;
         }else {
             return true;
@@ -85,7 +76,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private CompletableFuture<Boolean> checkIfAccountExists(String phoneNumber) {
 
-        // Tạo một CompletableFuture để trả về kết quả kiểm tra
+        /* Tạo một CompletableFuture để trả về kết quả kiểm tra */
         CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         // Thực hiện truy vấn để kiểm tra xem có tài khoản nào chứa email này hay không
@@ -115,13 +106,10 @@ public class SignUpActivity extends AppCompatActivity {
         future.thenAccept(accountExists -> {
             if (accountExists) {
                 // Account exists
-                Log.d("checkAcc", "Account exists");
-                showToast("Account already exists");
                 loading(false);
                 binding.inputPhoneNumber.findFocus();
             } else {
                 // Account does not exist
-                Log.d("checkAcc", "Account does not exists");
                 // Send OTP
                 mAuth.setLanguageCode("vi");
                 PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
@@ -131,22 +119,17 @@ public class SignUpActivity extends AppCompatActivity {
                         .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                             @Override
                             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                                Log.d(TAG, "onVerificationCompleted:" + phoneAuthCredential);
                                 signInWithPhoneAuthCredential(phoneAuthCredential);
                             }
 
                             @Override
                             public void onVerificationFailed(@NonNull FirebaseException e) {
-                                // This callback is invoked in an invalid request for verification is made,
-                                // for instance if the the phone number format is not valid.
-                                Log.w(TAG, "onVerificationFailed", e);
-                                Toast.makeText(SignUpActivity.this, "Verification Failed", Toast.LENGTH_SHORT).show();
+                                HelperFunction.showToast(getString(R.string.verification_failed), getApplicationContext());
                             }
 
                             @Override
                             public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                                 super.onCodeSent(verificationId, forceResendingToken);
-                                Log.d(TAG, "onCodeSent" + verificationId);
 
                                 Intent intent = new Intent(SignUpActivity.this, VerificationCodeOTPActivity.class);
                                 intent.putExtra("mVerificationId", verificationId);
@@ -167,30 +150,15 @@ public class SignUpActivity extends AppCompatActivity {
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
 
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.e(TAG, "signInWithCredential:success");
-//                            FirebaseUser user = task.getResult().getUser();
-                            // Update UI
-
-                            // CHuyển người dùng tới Activity Information
-                            Toast.makeText(SignUpActivity.this, "Sign Up Success", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Sign in failed, display a message and update the UI
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                // The verification code entered was invalid
-                                Toast.makeText(SignUpActivity.this, "The verification code entered was invalid", Toast.LENGTH_SHORT).show();
-                            }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        HelperFunction.showToast(getString(R.string.sign_up_success), getApplicationContext());
+                    } else {
+                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                            HelperFunction.showToast(getString(R.string.the_verification_code_entered_was_invalid), getApplicationContext());
                         }
                     }
                 });
-    }
-    private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
     private void loading(@NonNull Boolean isLoading) {
         if(isLoading) {

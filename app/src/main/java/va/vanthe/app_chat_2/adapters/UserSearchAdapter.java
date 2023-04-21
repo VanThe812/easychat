@@ -75,8 +75,6 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
             binding.imageProfile.setImageBitmap(getUserImage(user.getImage()));
             binding.textPhoneNumber.setText(user.getPhoneNumber());
             binding.getRoot().setOnClickListener(v -> {
-//                Conversation conversation = new Conversation();
-//                conversation.set
                 Intent intent = new Intent(mContext, ChatMessageActivity.class);
                 intent.putExtra(Constants.KEY_USER, user);
                 intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);

@@ -1,4 +1,4 @@
-package va.vanthe.app_chat_2.models;
+package va.vanthe.app_chat_2.entity;
 
 public class AboutTheApp {
     public String title;

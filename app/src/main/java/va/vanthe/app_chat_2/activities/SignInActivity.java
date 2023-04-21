@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -16,13 +14,14 @@ import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.databinding.ActivitySigninBinding;
 import va.vanthe.app_chat_2.dataencrypt.SHA256Encryptor;
 import va.vanthe.app_chat_2.ulitilies.Constants;
+import va.vanthe.app_chat_2.ulitilies.HelperFunction;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
 public class SignInActivity extends AppCompatActivity {
 
     private ActivitySigninBinding binding;
-    private PreferenceManager account; //Bảng tài khoản trong db của máy
-    private FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private PreferenceManager account;
+    private final FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +39,10 @@ public class SignInActivity extends AppCompatActivity {
 
     private void setListeners() {
 
-        binding.registerUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(SignInActivity.this,SignUpActivity.class);
-                startActivity(i);
-                finish();
-
-            }
+        binding.registerUser.setOnClickListener(view -> {
+            Intent i = new Intent(SignInActivity.this,SignUpActivity.class);
+            startActivity(i);
+            finish();
         });
         binding.buttonSignIn.setOnClickListener(view -> {
             if (isValidSignInDetails()) {
@@ -58,10 +53,10 @@ public class SignInActivity extends AppCompatActivity {
     @NonNull
     private Boolean isValidSignInDetails() {
         if(binding.inputPhoneNumber.getText().toString().isEmpty()) {
-            showToast("Enter phone number");
+            HelperFunction.showToast(getString(R.string.enter_phone_number), getApplicationContext());
             return false;
         }else if(binding.inputPassword.getText().toString().trim().isEmpty()) {
-            showToast("Enter password");
+            HelperFunction.showToast(getString(R.string.enter_password), getApplicationContext());
             return false;
         }else {
             return true;
@@ -94,14 +89,11 @@ public class SignInActivity extends AppCompatActivity {
                         startActivity(intent);
                     }else{
                         loading(false);
-                        showToast("Unable to sign in");
+                        HelperFunction.showToast(getString(R.string.unable_to_sign_in), getApplicationContext());
                     }
                 });
     }
 
-    private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
     private void loading(@NonNull Boolean isLoading) {
         if(isLoading) {
             binding.buttonSignIn.setVisibility(View.INVISIBLE);

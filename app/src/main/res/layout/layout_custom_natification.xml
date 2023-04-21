@@ -4,13 +4,14 @@
     android:layout_height="64dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
-    android:background="@color/teal_200">
+    android:background="@color/gray_100">
     <ImageView
         android:id="@+id/imageAvatar"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_telegram"/>
+        android:src="@drawable/ic_telegram"
+        android:contentDescription="@string/avatar_conversation"/>
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
@@ -47,11 +48,12 @@
         </LinearLayout>
 
     </LinearLayout>
-    <ImageView
+    <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/imageMessageImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
-        style=""/>
+        app:riv_corner_radius="@dimen/_15sdp"
+        android:contentDescription="@string/image_message"/>
 </RelativeLayout>

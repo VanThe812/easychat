@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
@@ -13,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/friend"
-        android:id="@+id/textf"
+        android:id="@+id/textFriend"
         android:textColor="@color/black"
         android:textSize="@dimen/_14sdp"
         android:textStyle="bold"
@@ -27,7 +26,6 @@
         android:layout_height="@dimen/_30sdp"
         android:layout_marginTop="@dimen/_12sdp"
         android:layout_marginEnd="@dimen/_16sdp"
-        android:layout_marginRight="@dimen/_16sdp"
         android:padding="@dimen/_6sdp"
         android:src="@drawable/ic_add_friend"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,12 +39,12 @@
         android:padding="@dimen/_15sdp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textf">
+        app:layout_constraintTop_toBottomOf="@id/textFriend">
         <TextView
             android:padding="@dimen/_8sdp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="List Friends"
+            android:text="@string/list_friends"
             android:textSize="@dimen/_15ssp"
             android:textColor="@color/black"
             />
@@ -57,7 +55,7 @@
             android:clipToPadding="false"
             android:orientation="vertical"
             android:overScrollMode="never"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             />
     </LinearLayout>

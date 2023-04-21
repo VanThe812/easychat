@@ -12,7 +12,7 @@ import java.util.List;
 
 import va.vanthe.app_chat_2.adapters.AboutTheAppAdapter;
 import va.vanthe.app_chat_2.databinding.ActivityBeginBinding;
-import va.vanthe.app_chat_2.models.AboutTheApp;
+import va.vanthe.app_chat_2.entity.AboutTheApp;
 
 public class BeginActivity extends AppCompatActivity {
 
@@ -24,9 +24,9 @@ public class BeginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         List<AboutTheApp> data = new ArrayList<>();
-        data.add(new AboutTheApp("Trang giới thiệu 1", false));
-        data.add(new AboutTheApp("Trang giới thiệu 2", false));
-        data.add(new AboutTheApp("Trang giới thiệu 3", false));
+        data.add(new AboutTheApp("About page 1", false));
+        data.add(new AboutTheApp("About page 2", false));
+        data.add(new AboutTheApp("About page 3", false));
 
 
         AboutTheAppAdapter adapter = new AboutTheAppAdapter(data);

@@ -31,7 +31,7 @@
         android:layout_marginEnd="@dimen/_8sdp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Text test"
+        android:text="@string/app_name"
         android:gravity="center_vertical"
         android:textColor="@color/primary_text"
         android:textSize="@dimen/_13ssp"
@@ -49,14 +49,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginRight="-20dp"
-        />
+        android:layout_marginEnd="-20dp"/>
     <View
         android:layout_width="0dp"
         android:layout_height="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/textName"
-
         android:background="@color/gray"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

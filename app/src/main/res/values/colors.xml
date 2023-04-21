@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0099ff</color>
-    <color name="maunen">#30C8BEB1</color>
+    <color name="colorPrimary">#297dea</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="pink">#F68989</color>
-    <color name="blue">#0099ff</color>
-    <color name="primary_text" >#212121</color>
-    <color name="error" >#B00020</color>
-    <color name="status">#12FF29</color>
+    <color name="black">#010101</color>
+    <color name="white">#FFFFFF</color>
+    <color name="blue">#297dea</color>
+    <color name="primary_text" >#1a1a1a</color>
+    <color name="error" >#ff3d33</color>
+    <color name="status">#40c255</color>
     <color name="trans">#00000000</color>
-    <color name="gray">#656565</color>
-    <color name="gray_500">#adb5bd</color>
+    <color name="gray">#7b7b7b</color>
+    <color name="gray_700">#a4aab3</color>
+    <color name="gray_500">#bdbdbd</color>
     <color name="gray_200">#e2e9f1</color>
-    <color name="gray_100">#E8F1F1F1</color>
+    <color name="gray_100">#efefef</color>
+    <color name="black_100">#10000000</color>
 </resources>

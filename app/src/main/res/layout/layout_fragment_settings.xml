@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/maunen">
+    android:background="@color/gray_100">
     <TextView
         android:id="@+id/text"
-        android:text="Settings"
+        android:text="@string/settings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8sdp"
@@ -27,7 +26,6 @@
         android:id="@+id/imageProfile"
         android:layout_width="@dimen/_90sdp"
         android:layout_height="@dimen/_90sdp"
-        android:layout_marginTop="@dimen/_15sdp"
         android:background="@drawable/bg_icon"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,7 +41,6 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:text="Họ và tên"
         android:textColor="@color/black"
         android:textSize="@dimen/_20sdp"
         android:textStyle="bold"
@@ -68,7 +65,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/bg_content_top"
             android:orientation="horizontal"
-            android:paddingLeft="@dimen/_5sdp"
+            android:paddingHorizontal="@dimen/_5sdp"
             android:paddingTop="@dimen/_8ssp"
             android:paddingBottom="@dimen/_8sdp">
 
@@ -76,7 +73,6 @@
                 android:layout_width="@dimen/_25sdp"
                 android:layout_height="@dimen/_25sdp"
                 android:layout_margin="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/ic_night"
                 android:tint="@color/blue" />
 
@@ -85,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_4sdp"
-                android:text="Dark mode"
+                android:text="@string/light_and_dark_mode"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sdp" />
         </LinearLayout>
@@ -95,7 +91,7 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:orientation="horizontal"
-            android:paddingLeft="@dimen/_5sdp"
+            android:paddingHorizontal="@dimen/_5sdp"
             android:paddingTop="@dimen/_8ssp"
             android:paddingBottom="@dimen/_8sdp">
 
@@ -103,7 +99,6 @@
                 android:layout_width="@dimen/_25sdp"
                 android:layout_height="@dimen/_25sdp"
                 android:layout_margin="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/ic_status"
                 android:tint="@color/blue" />
 
@@ -112,7 +107,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_4sdp"
-                android:text="Active status"
+                android:text="@string/active_status"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sdp" />
         </LinearLayout>
@@ -122,7 +117,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_content_bottom"
             android:orientation="horizontal"
-            android:paddingLeft="@dimen/_5sdp"
+            android:paddingHorizontal="@dimen/_5sdp"
             android:paddingTop="@dimen/_8ssp"
             android:paddingBottom="@dimen/_8sdp">
 
@@ -130,7 +125,6 @@
                 android:layout_width="@dimen/_25sdp"
                 android:layout_height="@dimen/_25sdp"
                 android:layout_margin="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/ic_password"
                 android:tint="@color/blue" />
 
@@ -139,7 +133,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_4sdp"
-                android:text="Change password"
+                android:text="@string/change_password"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sdp" />
         </LinearLayout>
@@ -165,7 +159,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/bg_content_top"
             android:orientation="horizontal"
-            android:paddingLeft="@dimen/_5sdp"
+            android:paddingHorizontal="@dimen/_5sdp"
             android:paddingTop="@dimen/_8ssp"
             android:paddingBottom="@dimen/_8sdp">
 
@@ -173,7 +167,6 @@
                 android:layout_width="@dimen/_25sdp"
                 android:layout_height="@dimen/_25sdp"
                 android:layout_margin="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/ic_language"
                 android:tint="@color/blue" />
 
@@ -182,7 +175,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_4sdp"
-                android:text="Language"
+                android:text="@string/language"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sdp" />
         </LinearLayout>
@@ -193,7 +186,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/bg_content_bottom"
             android:orientation="horizontal"
-            android:paddingLeft="@dimen/_5sdp"
+            android:paddingHorizontal="@dimen/_5sdp"
             android:paddingTop="@dimen/_8ssp"
             android:paddingBottom="@dimen/_8sdp">
 
@@ -201,7 +194,6 @@
                 android:layout_width="@dimen/_25sdp"
                 android:layout_height="@dimen/_25sdp"
                 android:layout_margin="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/ic_logout"
                 android:backgroundTint="@color/error"
                 android:tint="@color/blue" />
@@ -211,7 +203,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_4sdp"
-                android:text="Log out"
+                android:text="@string/log_out"
                 android:textColor="@color/error"
                 android:textSize="@dimen/_18ssp" />
         </LinearLayout>

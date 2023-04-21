@@ -18,18 +18,19 @@
 
         <EditText
             android:id="@+id/inputSearch"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/bg_input"
-            android:drawableLeft="@drawable/ic_search_24"
+            android:drawableStart="@drawable/ic_search_24"
             android:hint="@string/search"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:padding="@dimen/_5sdp"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/_13sdp"
-            tools:ignore="TouchTargetSizeCheck" />
+            tools:ignore="TouchTargetSizeCheck"
+            android:autofillHints="username"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,8 +38,8 @@
             android:layout_gravity="center"
             android:textColor="@color/blue"
             android:textSize="@dimen/_14ssp"
-            android:layout_marginLeft="@dimen/_5sdp"
-            android:text="Cancel"/>
+            android:layout_marginStart="@dimen/_5sdp"
+            android:text="@string/cancel"/>
 
 
     </LinearLayout>
@@ -50,24 +51,21 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_40sdp"
-            >
+            android:layout_marginTop="@dimen/_40sdp">
             <LinearLayout
                 android:id="@+id/layout_recent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="@dimen/_15sdp"
-                android:layout_alignParentTop="true"
-                >
+                android:layout_alignParentTop="true">
                 <TextView
                     android:padding="@dimen/_8sdp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Recent searches"
+                    android:text="@string/recent_searches"
                     android:textSize="@dimen/_15ssp"
-                    android:textColor="@color/black"
-                    />
+                    android:textColor="@color/black"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recentSearchRCV"
                     android:layout_width="match_parent"
@@ -76,8 +74,7 @@
                     android:orientation="vertical"
                     android:overScrollMode="never"
                     android:visibility="visible"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/layout_suggest"
@@ -90,10 +87,9 @@
                     android:padding="@dimen/_8sdp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Suggested"
+                    android:text="@string/suggested"
                     android:textSize="@dimen/_15ssp"
-                    android:textColor="@color/black"
-                    />
+                    android:textColor="@color/black"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/suggestRCV"
                     android:layout_width="match_parent"
@@ -102,8 +98,7 @@
                     android:orientation="vertical"
                     android:overScrollMode="never"
                     android:visibility="visible"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
             </LinearLayout>
             <androidx.recyclerview.widget.RecyclerView
                 android:padding="@dimen/_15sdp"
@@ -114,9 +109,7 @@
                 android:orientation="vertical"
                 android:overScrollMode="never"
                 android:visibility="visible"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-
-                />
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
         </RelativeLayout>
 
 

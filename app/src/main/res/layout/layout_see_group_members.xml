@@ -18,11 +18,13 @@
         android:id="@+id/textViewMembers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Thành viên"
+        android:text="@string/members"
         android:textColor="@color/black"
         android:textSize="@dimen/_15sdp"
         android:textStyle="bold"
-        android:layout_centerHorizontal="true"/>
+        android:gravity="center"
+        android:layout_toEndOf="@id/imageBack"
+        android:layout_toStartOf="@id/imageAddMember"/>
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageAddMember"
         android:layout_width="@dimen/_25sdp"

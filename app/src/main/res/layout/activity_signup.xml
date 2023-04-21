@@ -39,7 +39,8 @@
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="@+id/topView"
             app:layout_constraintTop_toTopOf="@+id/topView"
-            app:srcCompat="@drawable/ic_person" />
+            app:srcCompat="@drawable/ic_person"
+            android:contentDescription="@string/app_name"/>
 
         <TextView
             android:id="@+id/topText"
@@ -47,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="48dp"
-            android:text="@string/welcome_to_vanthe_s_chat_app"
+            android:text="@string/welcome_to_easy_chat"
             android:textColor="@color/white"
             android:textSize="30sp"
             android:textStyle="bold"
@@ -62,14 +63,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
-            android:background="@drawable/bg_input_boder"
+            android:background="@drawable/bg_input_border"
             android:drawableStart="@drawable/ic_phone"
             android:hint="(+84)"
-            android:inputType="textEmailAddress"
+            android:inputType="phone"
             android:padding="@dimen/_16sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view2" />
+            app:layout_constraintTop_toBottomOf="@+id/view2"
+            tools:ignore="HardcodedText"
+            android:autofillHints="phone"/>
 
         <EditText
             android:id="@+id/inputPassword"
@@ -78,15 +81,16 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
-            android:background="@drawable/bg_input_boder"
+            android:background="@drawable/bg_input_border"
             android:drawableStart="@drawable/ic_lock"
             android:ems="10"
-            android:hint="Password"
+            android:hint="@string/password"
             android:inputType="textPassword"
             android:padding="@dimen/_16sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/inputPhoneNumber" />
+            app:layout_constraintTop_toBottomOf="@+id/inputPhoneNumber"
+            android:autofillHints="password"/>
         <EditText
             android:id="@+id/inputRePassword"
             android:layout_width="0dp"
@@ -94,10 +98,11 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
-            android:background="@drawable/bg_input_boder"
+            android:background="@drawable/bg_input_border"
             android:drawableStart="@drawable/ic_lock"
             android:ems="10"
-            android:hint="Confirm Password"
+            android:hint="@string/confirm_password"
+            android:autofillHints="password"
             android:inputType="textPassword"
             android:padding="@dimen/_16sdp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -118,7 +123,7 @@
                 android:id="@+id/buttonSignUp"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
-                android:text="Registration"
+                android:text="@string/registration"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
                 android:textColor="@color/white"
@@ -134,28 +139,6 @@
                 android:visibility="invisible"/>
         </FrameLayout>
 
-
-<!--        <TextView-->
-<!--            android:id="@+id/forgotPassword"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:text="FORGOT PASSWORD"-->
-<!--            android:textColor="@color/colorPrimary"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textSize="@dimen/_16ssp"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/buttonSignIn" />-->
-<!--        <TextView-->
-<!--            android:id="@+id/textOR"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="@dimen/_24sdp"-->
-<!--            android:text="OR"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/buttonSignUp"/>-->
         <LinearLayout
             android:id="@+id/linearlayout_login"
             android:orientation="horizontal"
@@ -171,7 +154,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Login Account"
+            android:text="@string/login_account"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold"
             android:textSize="@dimen/_16ssp"
