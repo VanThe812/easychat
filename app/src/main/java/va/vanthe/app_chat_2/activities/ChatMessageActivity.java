@@ -84,9 +84,7 @@ public class ChatMessageActivity extends BaseActivity {
     private List<ChatMessage> chatMessageList = new ArrayList<>();
     private ChatAdapter chatAdapter;
 
-    private User userChat = new User();
-    private int styleChat;
-    private boolean statusNewChat;
+    private User userChat = new User(); // dành cho chat đơn
 
     private Boolean isReceiverAvailable = false;
 
@@ -110,119 +108,78 @@ public class ChatMessageActivity extends BaseActivity {
         try {
             mConversation = (Conversation) getIntent().getSerializableExtra(Constants.KEY_CONVERSATION);
             userChat      = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
-            styleChat     = getIntent().getIntExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
         } catch (Exception e) {
             e.printStackTrace();
             onBackPressed();
         }
-
-
-        if(mConversation == null) {
-//            database.collection(Constants.KEY_GROUP_MEMBER)
-//                    .whereIn(Constants.KEY_GROUP_MEMBER_USER_ID, )
-
-            List<Conversation> conversations = ConversationDatabase.getInstance(getApplicationContext()).conversationDAO().getConversationStyleChat(Constants.KEY_TYPE_CHAT_SINGLE);
-
-            if (conversations.isEmpty()) {
-                Toast.makeText(this, "Chua nhan", Toast.LENGTH_SHORT).show();
-                statusNewChat = true;
-                binding.layoutNewChat.setVisibility(View.VISIBLE);
-            }else {
-                int i = 0;
-                do {
-                    Conversation conversation = conversations.get(i);
-                    //
-                    GroupMember groupMember = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().getGroupMember2(userChat.getId(), conversation.getId());
-                    if (groupMember == null) {
-                        Toast.makeText(this, "Chua nhan", Toast.LENGTH_SHORT).show();
-                        statusNewChat = true;
-                        binding.layoutNewChat.setVisibility(View.VISIBLE);
-
-                    } else {
-                        Toast.makeText(this, "Da Nhan", Toast.LENGTH_SHORT).show();
-                        statusNewChat = false;
-                        mConversation = conversation;
-                        binding.imageInfo.setVisibility(View.VISIBLE);
-                    }
-                    //
-                    i++;
-                } while (i < conversations.size());
-            }
-            loadUserAvatar(userChat);
-
-
-
+        // Avatar
+        if (mConversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
+            StorageReference imagesRef = storage.getReference()
+                    .child("user")
+                    .child("avatar")
+                    .child(userChat.getImage());
+            imagesRef.getDownloadUrl()
+                    .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                    .addOnFailureListener(Throwable::printStackTrace);
+            binding.textName.setText(userChat.getLastName());
         }
-        else {
-            // từ bên giao diện chính gửi qua
-            binding.imageInfo.setVisibility(View.VISIBLE);
-            if (styleChat == Constants.KEY_TYPE_CHAT_SINGLE) {
-                loadUserAvatar(userChat);
+        else if (mConversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
+            if (mConversation.getConversationAvatar() != null) {
+                StorageReference imagesRef = storage.getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(mConversation.getConversationAvatar());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                        .addOnFailureListener(Throwable::printStackTrace);
             }
-            else if (styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
-                //Xử lý các dữ liệu cần thiết khi là chat group
-//                conversation = (Conversation) getIntent().getSerializableExtra(Constants.KEY_CONVERSATION);
-                if (mConversation.getConversationAvatar() != null) {
-                    byte[] bytes = Base64.decode(mConversation.getConversationAvatar(), Base64.DEFAULT);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    binding.imageProfile.setImageBitmap(bitmap);
-                }
-                binding.textName.setText(mConversation.getConversationName());
-            }
+            binding.textName.setText(mConversation.getConversationName());
+        }
 
-            if (mConversation.getQuickEmotions() != null) {
-                binding.textviewSend.setText(mConversation.getQuickEmotions());
-            } else {
-                binding.textviewSend.setText("\uD83C\uDF49");
-            }
+        // Quick Emoji
+        if (mConversation.getQuickEmotions() != null) {
+            binding.textviewSend.setText(mConversation.getQuickEmotions());
+        } else {
+            binding.textviewSend.setText(getString(R.string.text_detail));
+        }
 
-            if (mConversation.getConversationBackground() != null) {
-                File file = new File(getFilesDir(), mConversation.getConversationBackground());
-                if (file.exists()) {
-                    // File tồn tại trong thư mục của ứng dụng
+        // Background
+        if (mConversation.getConversationBackground() != null) {
+            File file = new File(getFilesDir(), mConversation.getConversationBackground());
+            if (file.exists()) {
+                // File tồn tại trong thư mục của ứng dụng
+                Picasso.get().load(file).into(binding.imageBackground);
+            }
+            else {
+                // File không tồn tại trong thư mục của ứng dụng
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference()
+                        .child("images")
+                        .child("background")
+                        .child(mConversation.getConversationBackground());
+
+                File storageDir = getApplicationContext().getExternalFilesDir(null);
+                File localFile = new File(storageDir, mConversation.getConversationBackground());
+
+                storageRef.getFile(localFile).addOnSuccessListener(taskSnapshot -> {
                     Picasso.get()
-                            .load(file)
+                            .load(localFile)
                             .into(binding.imageBackground);
-                }
-                else {
-                    // File không tồn tại trong thư mục của ứng dụng
-                    StorageReference storageRef = FirebaseStorage.getInstance().getReference()
-                            .child("images")
-                            .child("background")
-                            .child(mConversation.getConversationBackground());
-                    File storageDir = getApplicationContext().getExternalFilesDir(null);
-                    File localFile = new File(storageDir, mConversation.getConversationBackground());
-                    storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            // File tải về thành công
-                            Picasso.get()
-                                    .load(localFile)
-                                    .into(binding.imageBackground);
-                            File destinationFile = new File(getFilesDir(), mConversation.getConversationBackground());
+                    File destinationFile = new File(getFilesDir(), mConversation.getConversationBackground());
 
-//                      // Sao chép tập tin vào thư mục của ứng dụng
-                            try {
-                                FileUtils.copyFile(localFile.getPath(), destinationFile.getPath());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Xử lý khi có lỗi xảy ra
-                            exception.printStackTrace();
-                        }
-                    });
+                    try {
+                        FileUtils.copyFile(localFile.getPath(), destinationFile.getPath());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).addOnFailureListener(Throwable::printStackTrace);
 
-                }
             }
         }
+
 
         // set adapter rỗng cho RCV, sẽ thêm tin nhắn vào sau
         chatMessageList = new ArrayList<>();
-        chatAdapter = new ChatAdapter(chatMessageList, account.getString(Constants.KEY_ACCOUNT_USER_ID), styleChat, new ChatAdapter.OnItemClickListener() {
+        chatAdapter = new ChatAdapter(chatMessageList, account.getString(Constants.KEY_ACCOUNT_USER_ID), mConversation.getStyleChat(), new ChatAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Uri uri) {
                 Bundle args = new Bundle();
@@ -245,34 +202,27 @@ public class ChatMessageActivity extends BaseActivity {
         binding.imageBack.setOnClickListener(v -> {
             onBackPressed();
         });
-        binding.imageInfo.setOnClickListener(view -> {
-            Intent intent = new Intent(getApplicationContext(), InfoChatActivity.class);
-            startActivity(intent);
-        });
+
         // tùy chỉnh giao diện của inputMessage(co giãn khi có text)
         binding.inputMessage.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void afterTextChanged(Editable editable) {
                 String mess = editable.toString().trim();
-                if (!mess.matches("")) { // có text nhập vào
+                if (!mess.equals("")) { // có text nhập vào
                     binding.textviewMore.setVisibility(View.GONE);
                     //
                     Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_send);
+                    //
                     Drawable wrappedDrawable = DrawableCompat.wrap(drawable);
                     DrawableCompat.setTint(wrappedDrawable, ContextCompat.getColor(getApplicationContext(), R.color.blue));
                     binding.textviewSend.setText("");
+                    //
                     binding.textviewSend.setCompoundDrawablesRelativeWithIntrinsicBounds(wrappedDrawable, null, null, null);
-
+//                    binding.textviewSend.set
 
                 } else { // ngược lại, đang rỗng
                     binding.textviewMore.setVisibility(View.VISIBLE);
@@ -302,131 +252,21 @@ public class ChatMessageActivity extends BaseActivity {
                 else {
                     textSend = binding.inputMessage.getText().toString().trim();
                 }
-
-                if (styleChat == Constants.KEY_TYPE_CHAT_SINGLE) {
-                    if (statusNewChat) { // true la new chat
-                        mConversation = new Conversation();
-                        mConversation.setCreateTime(new Date());
-                        mConversation.setNewMessage(textSend);
-                        mConversation.setSenderId(userChat.getId());
-                        mConversation.setMessageTime(new Date());
-                        mConversation.setStyleChat(Constants.KEY_TYPE_CHAT_SINGLE);
-                        mConversation.setQuickEmotions("\uD83C\uDF49");
-                        // Chuyển qua Hashmap
-                        HashMap<String, Object> conversationMap = mConversation.toHashMap();
-
-
-                        database.collection(Constants.KEY_CONVERSATION)
-                                .add(conversationMap)
-                                .addOnSuccessListener(documentReference -> {
-                                    // Sau khi tạo mới thành công một hội thoại => tạo mới 2 bản ghi groupMember
-                                    // truoc do them conversation vao room da
-                                    mConversation.setId(documentReference.getId());
-                                    ConversationDatabase.getInstance(getApplicationContext()).conversationDAO().insertConversation(mConversation);
-
-                                    GroupMember groupMember1 = new GroupMember();
-                                    groupMember1.setUserId(userChat.getId());
-                                    groupMember1.setConversationId(documentReference.getId());
-                                    groupMember1.setTimeJoin(new Date());
-                                    groupMember1.setStatus(1);
-
-                                    GroupMember groupMember2 = new GroupMember();
-                                    groupMember2.setUserId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
-                                    groupMember2.setConversationId(documentReference.getId());
-                                    groupMember2.setTimeJoin(new Date());
-                                    groupMember2.setStatus(1);
-
-                                    // Khởi tạo batch write (Đe them cung luc 2 ban ghi)
-                                    WriteBatch batch = FirebaseFirestore.getInstance().batch();
-
-                                    DocumentReference docRef1 = FirebaseFirestore.getInstance().collection(Constants.KEY_GROUP_MEMBER).document();
-                                    HashMap<String, Object> groupMember1Map = groupMember1.toHashMap();
-                                    batch.set(docRef1, groupMember1Map);
-
-                                    DocumentReference docRef2 = FirebaseFirestore.getInstance().collection(Constants.KEY_GROUP_MEMBER).document();
-                                    HashMap<String, Object> groupMember2Map = groupMember2.toHashMap();
-                                    batch.set(docRef2, groupMember2Map);
-
-                                    // Commit batch write
-                                    batch.commit()
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    // Thao tác thành công
-                                                    // insert 2 group member vao room
-                                                    groupMember1.setId(docRef1.getId());
-                                                    groupMember2.setId(docRef2.getId());
-                                                    GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().insertGroupMember(groupMember1);
-                                                    GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().insertGroupMember(groupMember2);
-
-                                                    //Thêm user đó và Room
-                                                    if (UserDatabase.getInstance(getApplicationContext()).userDAO().checkUser(userChat.getId()) == 0) {
-                                                        UserDatabase.getInstance(getApplicationContext()).userDAO().insertUser(userChat);
-                                                    }
-
-
-                                                    sendMessage(textSend, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT);
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    // Thao tác thất bại
-                                                }
-                                            });
-                                })
-                                .addOnFailureListener(runnable -> {
-                                    Toast.makeText(ChatMessageActivity.this, "Có một số lỗi xảy ra, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
-                                });
-                    } else { // tiếp tục nhắn tin
-                    sendMessage(textSend, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT);
-                    }
-                }
-                else if(styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
-                    sendMessage(textSend, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT);
-                }
-
+                sendMessage(textSend, Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT);
+                binding.inputMessage.setText("");
             }
         });
 
         //chuyển qua InfoChat
         binding.imageInfo.setOnClickListener(view -> {
-            if (!statusNewChat) { // nếu chưa nhắn tin bao h sẽ không cho qua
-                Intent intent = new Intent(getApplicationContext(), InfoChatActivity.class);
-                intent.putExtra(Constants.KEY_CONVERSATION, mConversation);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(getApplicationContext(), InfoChatActivity.class);
+            intent.putExtra(Constants.KEY_CONVERSATION, mConversation);
+            startActivity(intent);
         });
     }
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-//                if(result.getResultCode() == RESULT_OK) {
-//                    if(result.getData() != null) {
-//                        Uri imageUri = result.getData().getData();
-//                        ContentResolver cR = getContentResolver();
-//                        MimeTypeMap mime = MimeTypeMap.getSingleton();
-//                        StorageReference storageRef = storage.getReference();
-//
-//                        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-//                        String fileName = String.format("%s_%s.%s", account.getString(Constants.KEY_ACCOUNT_USER_ID), timestamp, mime.getExtensionFromMimeType(cR.getType(imageUri)));
-//                        String path = String.format("images/conversation/%s/%s", mConversation.getId(), fileName);
-//                        StorageReference imagesRef = storageRef.child(path);
-//                        imagesRef.putFile(imageUri)
-//                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                                    @Override
-//                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                                        // Upload successful
-//                                        sendMessage(fileName, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE);
-//                                    }
-//                                })
-//                                .addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        // Upload failed
-//                                    }
-//                                });
-//                    }
-//                }
                 if(result.getResultCode() == RESULT_OK) {
                     if(result.getData() != null) {
                         Uri imageUri = result.getData().getData();
@@ -438,19 +278,12 @@ public class ChatMessageActivity extends BaseActivity {
                 }
             }
     );
-    private void sendMessage(String textSend, String conversationId, int styleSend) {
-
-        if (styleSend == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT) {
-            binding.inputMessage.setText("");
-
-        } else if (styleSend == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE) {
-
-        }
+    private void sendMessage(String textSend, int styleSend) {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setSenderId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
         chatMessage.setMessage(textSend);
         chatMessage.setDataTime(new Date());
-        chatMessage.setConversationId(conversationId);
+        chatMessage.setConversationId(mConversation.getId());
         chatMessage.setStyleMessage(styleSend);
         HashMap<String, Object> message = chatMessage.toHashMap();
 
@@ -458,8 +291,9 @@ public class ChatMessageActivity extends BaseActivity {
                 .add(message)
                 .addOnSuccessListener(documentReference -> {
                     chatMessage.setId(documentReference.getId());
-//                    addOneMessageToBelow(chatMessage);
                     updateConversation(chatMessage);
+
+                    //Gửi thông báo
                     List<GroupMember> groupMemberList = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().getListGroupMember(account.getString(Constants.KEY_ACCOUNT_USER_ID), mConversation.getId());
                     for (GroupMember groupMember : groupMemberList) {
                         User user = UserDatabase.getInstance(getApplicationContext()).userDAO().getUser(groupMember.getUserId());
@@ -508,11 +342,7 @@ public class ChatMessageActivity extends BaseActivity {
                         }
                     }
                 })
-                .addOnFailureListener(runnable -> {
-
-                });
-
-
+                .addOnFailureListener(Throwable::printStackTrace);
     }
 
     private void listenChatMessage() {
@@ -552,19 +382,7 @@ public class ChatMessageActivity extends BaseActivity {
             }
         }
     };
-    private void addOneMessageToBelow(ChatMessage chatMessage) {
-        if (chatMessage == null)
-            return;
-        chatMessageList.add(chatMessage);
-        int count = chatMessageList.size();
-        Collections.sort(chatMessageList, (obj1, obj2) -> obj1.getDataTime().compareTo(obj2.getDataTime()));
-        if(count == 0) {
-            chatAdapter.notifyDataSetChanged();
-        }else{
-            chatAdapter.notifyItemRangeInserted(chatMessageList.size(), chatMessageList.size());
-            binding.chatRCV.smoothScrollToPosition(chatMessageList.size() - 1);
-        }
-    }
+
     private void updateConversation(ChatMessage chatMessage) {
         DocumentReference conversationReference = database.collection(Constants.KEY_CONVERSATION).document(mConversation.getId());
         mConversation.setMessageTime(new Date());
@@ -577,16 +395,9 @@ public class ChatMessageActivity extends BaseActivity {
         conversationReference.update(mConversation.toHashMap());
     }
 
-    private void  loadUserAvatar(@NonNull User user) {
-        binding.textName.setText(user.getLastName());
-        byte[] bytes = Base64.decode(user.getImage(), Base64.DEFAULT);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        binding.imageProfile.setImageBitmap(bitmap);
-        binding.imageProfile2.setImageBitmap(bitmap);
-    }
 
     private void listenAvailabilityOfReceiver() {
-        if (styleChat == Constants.KEY_TYPE_CHAT_SINGLE) {
+        if (mConversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
             database.collection(Constants.KEY_USER).document(userChat.getId())
                     .addSnapshotListener(ChatMessageActivity.this, (value, error) -> {
                         if (error != null) {
@@ -611,7 +422,7 @@ public class ChatMessageActivity extends BaseActivity {
                         }
 
                     });
-        } else if (styleChat == Constants.KEY_TYPE_CHAT_GROUP) {
+        } else if (mConversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
             /////
         }
 
@@ -660,27 +471,25 @@ public class ChatMessageActivity extends BaseActivity {
             if (result != null) {
                 imageUri = Uri.parse(result);
             }
-            ContentResolver cR = getContentResolver();
-            MimeTypeMap mime = MimeTypeMap.getSingleton();
-            StorageReference storageRef = storage.getReference();
 
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String fileName = String.format("%s_%s.%s", account.getString(Constants.KEY_ACCOUNT_USER_ID), timestamp, mime.getExtensionFromMimeType(cR.getType(imageUri)));
+            String typeFile = imageUri.getPath().substring(imageUri.getPath().lastIndexOf(".")); //VD: jpg, png , ....
+
+            String fileName = String.format("%s_%s.%s", account.getString(Constants.KEY_ACCOUNT_USER_ID), timestamp, typeFile);
             String path = String.format("images/conversation/%s/%s", mConversation.getId(), fileName);
-            StorageReference imagesRef = storageRef.child(path);
+
+//            StorageReference storageRef = storage.getReference();
+            StorageReference imagesRef = storage.getReference().child(path);
             imagesRef.putFile(imageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             // Upload successful
-                            sendMessage(fileName, mConversation.getId(), Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE);
+                            sendMessage(fileName, Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE);
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            // Upload failed
-                        }
+                    .addOnFailureListener(e -> {
+                        // Upload failed
                     });
         }
     }

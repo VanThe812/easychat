@@ -1,26 +1,25 @@
 package va.vanthe.app_chat_2.adapters;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
-import va.vanthe.app_chat_2.databinding.ItemContainerUserBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerUserCreateGroupBinding;
 import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.listeners.UserCreateGroupListener;
-import va.vanthe.app_chat_2.listeners.UserListener;
 
 public class UserCreateGroupAdapter extends RecyclerView.Adapter<UserCreateGroupAdapter.UserCreateGroupViewHolder>{
 
-    public static List<User> users;
-    public static UserCreateGroupListener userCreateGroupListener;
+    public List<User> users;
+    public UserCreateGroupListener userCreateGroupListener;
 
     public UserCreateGroupAdapter(List<User> users, UserCreateGroupListener userCreateGroupListener) {
         this.users = users;
@@ -41,7 +40,7 @@ public class UserCreateGroupAdapter extends RecyclerView.Adapter<UserCreateGroup
 
     @Override
     public void onBindViewHolder(@NonNull UserCreateGroupViewHolder holder, int position) {
-        holder.setData(users.get(position));
+        holder.setData(users.get(position), userCreateGroupListener);
 
 
     }
@@ -51,7 +50,7 @@ public class UserCreateGroupAdapter extends RecyclerView.Adapter<UserCreateGroup
         return users.size();
     }
 
-    class UserCreateGroupViewHolder extends RecyclerView.ViewHolder {
+    static class UserCreateGroupViewHolder extends RecyclerView.ViewHolder {
 
 
         ItemContainerUserCreateGroupBinding binding;
@@ -60,21 +59,23 @@ public class UserCreateGroupAdapter extends RecyclerView.Adapter<UserCreateGroup
             super(itemContainerUserCreateGroupBinding.getRoot());
             binding = itemContainerUserCreateGroupBinding;
         }
-        void setData(User user) {
+        void setData(User user, UserCreateGroupListener userCreateGroupListener) {
             binding.textName.setText(user.getLastName());
-            binding.imageProfile.setImageBitmap(getUserImage(user.getImage()));
+            Picasso.get().cancelRequest(binding.imageProfile);
+            if (user.getImage() != null) {
+                StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(user.getImage());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                        .addOnFailureListener(Throwable::printStackTrace);
+            }
             binding.getRoot().setOnClickListener(v -> {
-                if (binding.radioBtnChoose.isChecked())
-                    binding.radioBtnChoose.setChecked(false);
-                else
-                    binding.radioBtnChoose.setChecked(true);
+                binding.radioBtnChoose.setChecked(!binding.radioBtnChoose.isChecked());
                 userCreateGroupListener.onUserClicked(user, binding.radioBtnChoose.isChecked());
             });
         }
     }
 
-    private Bitmap getUserImage(String encodedImage) {
-        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-    }
 }

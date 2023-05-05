@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -91,8 +93,14 @@ public class DialogViewImageFragment extends androidx.fragment.app.DialogFragmen
         binding = LayoutFragmentViewImageBinding.inflate(inflater, container, false);
 
         String imagePath = getArguments().getString("image_path");
+        if (imagePath.substring(0, 4).equals("http")) {
+            Picasso.get().load(imagePath).into(binding.imageViewImage);
+        } else {
+            File file = new File(imagePath);
+            Picasso.get().load(file).into(binding.imageViewImage);
+        }
 
-        Picasso.get().load(imagePath).into(binding.imageViewImage);
+        Log.e(DialogViewImageFragment.class.toString(), imagePath);
 
         binding.imageBack.setOnClickListener(view -> {
             // Đóng Dialog

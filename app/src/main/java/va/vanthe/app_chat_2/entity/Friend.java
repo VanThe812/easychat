@@ -17,7 +17,7 @@ public class Friend {
     private int status;
     private Date timeStamp;
 
-
+    public Friend() {}
 
     public Friend(@NonNull String id, String userId, String userFriendId, int status, Date timeStamp) {
         this.id = id;
@@ -69,7 +69,6 @@ public class Friend {
     }
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> friendMap = new HashMap<>();
-        friendMap.put("friendId", id);
         friendMap.put("userId", userId);
         friendMap.put("userFriendId", userFriendId);
         friendMap.put("status", status);

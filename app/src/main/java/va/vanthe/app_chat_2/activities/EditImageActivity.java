@@ -34,7 +34,6 @@ public class EditImageActivity extends AppCompatActivity {
             UCrop.of(imageUri,Uri.fromFile(new File(getCacheDir(), dest_uri)))
                     .withOptions(options)
                     .withAspectRatio(2, 4)
-//                .useSourceImageAspectRatio()
                     .withMaxResultSize(2000, 2000)
                     .start(EditImageActivity.this);
         } else if (style == Constants.KEY_REQUEST_CODE_IMAGE_MESSAGE) {
@@ -44,7 +43,20 @@ public class EditImageActivity extends AppCompatActivity {
                     .useSourceImageAspectRatio()
                     .withMaxResultSize(2000, 2000)
                     .start(EditImageActivity.this);
+        } else if (style == Constants.KEY_REQUEST_CODE_USER_BACKGROUND_IMAGE) {
+            UCrop.of(imageUri,Uri.fromFile(new File(getCacheDir(), dest_uri)))
+                    .withOptions(options)
+                    .withAspectRatio(4, 2)
+                    .withMaxResultSize(2000, 2000)
+                    .start(EditImageActivity.this);
+        } else if (style == Constants.KEY_REQUEST_CODE_IMAGE_AVATAR) {
+            UCrop.of(imageUri,Uri.fromFile(new File(getCacheDir(), dest_uri)))
+                    .withOptions(options)
+                    .withAspectRatio(4, 4)
+                    .withMaxResultSize(2000, 2000)
+                    .start(EditImageActivity.this);
         }
+
 
 
     }

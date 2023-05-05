@@ -32,6 +32,7 @@ public class Constants {
     public static final String KEY_ACCOUNT_EMAIL = "email";
     public static final String KEY_ACCOUNT_PASSWORD = "password";
     public static final String KEY_ACCOUNT_IMAGE = "image";
+    public static final String KEY_ACCOUNT_BACKGROUND_IMAGE = "backgroundImage";
 
     public static final String KEY_IS_SIGNED_IN = "isSignedIn";
 
@@ -50,6 +51,7 @@ public class Constants {
     public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_FILE = 3;
     public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_LOCATION = 4;
     public static final int KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION  = 99;
+    public static final int KEY_CHAT_MESSAGE_STYLE_NEW_CHAT  = 88;
 
     /// group_member: id, userId, conversationId, status
         public static final String KEY_GROUP_MEMBER = "groupMember";
@@ -110,6 +112,8 @@ public class Constants {
     public static final int KEY_REQUEST_CODE_BACKGROUND = 1;
     public static final int KEY_REQUEST_CODE_AVATAR = 2;
     public static final int KEY_REQUEST_CODE_IMAGE_MESSAGE = 3;
+    public static final int KEY_REQUEST_CODE_IMAGE_AVATAR = 4;
+    public static final int KEY_REQUEST_CODE_USER_BACKGROUND_IMAGE = 5;
 
     public static final String EMOJI = "😀😃😄😁😆😅😂🤣☺️😊😇🙂🙃😉😌😍😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥸🤩😏😒😞😔😟😕🙁☹️😣😖😫😩🥺😢😭😤😠😡🤬🤯😳🥵🥶😶‍🌫️😱😨😰😥😓🤗🤔🤭🤫🤥😶😐😑😬🙄😯😦😧😮😲🥱😴🤤😪😮‍💨😵😵‍💫🤐🥴🤢🤮🤧😷🤒🤕🤑🤠😈👿👹👺🤡💩👻💀☠️👽👾🤖🎃😺😸😹😻😼😽🙀😿😾🤲🙌👐👏🏻🤝👍👎👊✊🤛🤜🤞✌️🤟🤘👌🤌🤏";
     public static final List<String> EMOJI_LIST = Arrays.asList("😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "☺️", "😊", "😇", "🙂", "🙃","😉","😌","😍","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🤩","😏","😒","😞","😔","😟","😕","🙁","😣","😖","😫","😩","😢","😭","😤","😠","😡","🤬","🤯","😳","😶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯","😦","😧","😮","😲","😴","🤤","😪","😮","😵","😵","💫","🤐","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈","👿","👹","👺","🤡","💩","👻","💀","☠","👽","👾","🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾","🤲","🙌","👐","👏","🤝","👍","👎","👊","✊","🤛","🤜","🤞","✌","🤟","🤘","👌");

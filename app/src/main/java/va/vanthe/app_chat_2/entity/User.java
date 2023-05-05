@@ -26,7 +26,9 @@ public class User implements Serializable {
     private String lastName;
     private String password;
     private String image;
+    private String backgroundImage;
     private String email;
+    private String describe;
     @Unique
     private String phoneNumber;
     private boolean sex;
@@ -35,13 +37,15 @@ public class User implements Serializable {
 
     public User() {}
 
-    public User(@NonNull String id, String firstName, String lastName, String password, String image, String email, @Unique String phoneNumber, boolean sex, String dateOfBrith, String fcmToken) {
+    public User(@NonNull String id, String firstName, String lastName, String password, String image, String backgroundImage, String email, String describe, @Unique String phoneNumber, boolean sex, String dateOfBrith, String fcmToken) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.image = image;
+        this.backgroundImage = backgroundImage;
         this.email = email;
+        this.describe = describe;
         this.phoneNumber = phoneNumber;
         this.sex = sex;
         this.dateOfBrith = dateOfBrith;
@@ -88,12 +92,28 @@ public class User implements Serializable {
         this.image = image;
     }
 
+    public String getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(String backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getDescribe() {
+        return describe;
+    }
+
+    public void setDescribe(String describe) {
+        this.describe = describe;
     }
 
     public String getPhoneNumber() {
@@ -128,6 +148,7 @@ public class User implements Serializable {
         this.fcmToken = fcmToken;
     }
 
+
     @Override
     public String toString() {
         return "User{" +
@@ -135,13 +156,16 @@ public class User implements Serializable {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", password='" + password + '\'' +
+                ", image='" + image + '\'' +
+                ", backgroundImage='" + backgroundImage + '\'' +
                 ", email='" + email + '\'' +
+                ", describe='" + describe + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", sex=" + sex +
                 ", dateOfBrith='" + dateOfBrith + '\'' +
+                ", fcmToken='" + fcmToken + '\'' +
                 '}';
     }
-
 
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> userMap = new HashMap<>();
@@ -149,7 +173,9 @@ public class User implements Serializable {
         userMap.put("lastName", lastName);
         userMap.put("password", password);
         userMap.put("image", image);
+        userMap.put("backgroundImage", backgroundImage);
         userMap.put("email", email);
+        userMap.put("describe", describe);
         userMap.put("phoneNumber", phoneNumber);
         userMap.put("sex", sex);
         userMap.put("dateOfBrith", dateOfBrith);

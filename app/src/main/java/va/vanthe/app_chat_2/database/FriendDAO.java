@@ -23,6 +23,9 @@ public interface FriendDAO {
     @Delete
     void deleteFriend(Friend friend);
 
+    @Query("delete from Friend")
+    void deleteAllFriend();
+
     @Query("SELECT * FROM friend")
     List<Friend> getAllFriend();
 

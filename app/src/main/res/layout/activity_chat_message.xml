@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/trans"
+    android:background="@color/gray_100"
     tools:context=".activities.ChatMessageActivity">
     <ImageView
         android:layout_width="match_parent"
@@ -120,35 +120,7 @@
         android:layout_marginTop="@dimen/_12sdp"
         app:layout_constraintTop_toBottomOf="@id/imageBack" />
 
-    <RelativeLayout
-        android:id="@+id/layoutNewChat"
-        android:layout_marginTop="@dimen/_50sdp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/viewSupporter"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone">
-        <com.makeramen.roundedimageview.RoundedImageView
-            android:id="@+id/imageProfile2"
-            android:layout_width="@dimen/_90sdp"
-            android:layout_height="@dimen/_90sdp"
-            android:layout_marginTop="@dimen/_15sdp"
-            android:background="@drawable/bg_icon"
-            android:scaleType="centerCrop"
-            android:layout_centerHorizontal="true"
-            app:riv_corner_radius="@dimen/_50sdp" />
-        <TextView
-            android:id="@+id/textViewNewChat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/you_are_not_friends_yet"
-            android:layout_marginVertical="@dimen/_10sdp"
-            android:textSize="@dimen/_15ssp"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/imageProfile2"
-            />
-    </RelativeLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRCV"

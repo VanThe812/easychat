@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">App Chat</string>
     <string name="welcome_to_easy_chat">Welcome to EasyChat</string>
     <string name="chat">Chat</string>
@@ -88,21 +88,31 @@
     <string name="number_detail">0123456789</string>
     <string name="choose_people">Choose people</string>
     <string name="avatar_conversation">Avatar conversation</string>
-    <string name="image_message">Image message</string>
-    <string name="new_group">New group</string>
-    <string name="create">Create</string>
-    <string name="group_name_required">Group Name (Required)</string>
-    <string name="confirm_password">Confirm Password</string>
-    <string name="registration">Registration</string>
-    <string name="login_account">Login Account</string>
-    <string name="enter_phone_number">Enter phone number</string>
-    <string name="enter_password">Enter password</string>
-    <string name="unable_to_sign_in">Unable to sign in</string>
-    <string name="verification_failed">Verification Failed</string>
-    <string name="sign_up_success">Sign Up Success</string>
-    <string name="the_verification_code_entered_was_invalid">The verification code entered was invalid</string>
-    <string name="password_and_confirm_password_must_be_same"><![CDATA[Password & confirm password must be same]]></string>
-    <string name="account_successfully_created">Account successfully created</string>
-    <string name="contact">Contact</string>
-    <string name="done">Done</string>
+    <string name="image_message">Tin nhắn hình ảnh</string>
+    <string name="new_group">Tạo nhóm mới</string>
+    <string name="create">Tạo</string>
+    <string name="group_name_required">Tên nhóm (Bắt buộc)</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="registration">Đăng ký</string>
+    <string name="login_account">Đăng nhập tài khoản</string>
+    <string name="enter_phone_number">Nhập số điện thoại</string>
+    <string name="enter_password">Nhập mật khẩu</string>
+    <string name="unable_to_sign_in">Không thể đăng nhập</string>
+    <string name="verification_failed">Xác minh không thành công</string>
+    <string name="sign_up_success">Đăng ký thành công</string>
+    <string name="the_verification_code_entered_was_invalid">Mã xác minh đã nhập không hợp lệ</string>
+    <string name="password_and_confirm_password_must_be_same"><![CDATA[Mật khẩu & xác nhận mật khẩu phải giống nhau]]></string>
+    <string name="account_successfully_created">Tạo tài khoản thành công</string>
+    <string name="contact">Liên hệ</string>
+    <string name="done">Xong</string>
+    <string name="add_friend">Kết bạn</string>
+    <string name="personal_page">Trang cá nhân</string>
+    <string name="cancel_invitation">Hủy yêu cầu</string>
+    <string name="texting">Nhắn tin</string>
+    <string name="accept">Chấp nhận</string>
+    <string name="refuse">Từ chối</string>
+    <string name="signing_out" tools:ignore="TypographyEllipsis">Đang đăng xuất...</string>
+    <string name="request_search">Request Search</string>
+    <string name="friend_request">Friend Request</string>
+    <string name="someone_you_may_know">Someone you may know</string>
 </resources>

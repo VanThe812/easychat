@@ -1,39 +1,36 @@
 package va.vanthe.app_chat_2.fragment;
 
-import android.content.ContentResolver;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.EditText;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
 import va.vanthe.app_chat_2.R;
+import va.vanthe.app_chat_2.activities.UserProfileActivity;
 import va.vanthe.app_chat_2.adapters.ContactAdapter;
-import va.vanthe.app_chat_2.database.FriendDatabase;
-import va.vanthe.app_chat_2.database.UserDatabase;
 import va.vanthe.app_chat_2.databinding.LayoutFragmentFriendBinding;
-import va.vanthe.app_chat_2.entity.Contact;
 import va.vanthe.app_chat_2.entity.Friend;
 import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.ulitilies.Constants;
@@ -45,12 +42,7 @@ public class MenuFriendFragment extends Fragment  {
     private LayoutFragmentFriendBinding binding;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
     private PreferenceManager account;
-    private final List<Friend> mFriends = new ArrayList<>();
-    private final List<User> mUserFriends = new ArrayList<>();
 
-
-    private static final int REQUEST_CONTACTS_ASK_PERMISSIONS = 1001;
-    private static final int REQUEST_SMS_ASK_PERMISSIONS = 1001;
 
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -63,6 +55,8 @@ public class MenuFriendFragment extends Fragment  {
         init();
         setListeners();
         getListFriend();
+
+
         return binding.getRoot();
 
     }
@@ -74,122 +68,253 @@ public class MenuFriendFragment extends Fragment  {
         } else { // nếu context null lập tức tải lại app
             requireActivity().recreate();
         }
-
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void setListeners() {
         binding.imageAddFriend.setOnClickListener(view -> {
-            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
-            View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_add_friend, null);
+            /// Gọi ra BottomSheetDialog
+            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+            @SuppressLint("InflateParams") View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_add_friend, null);
             bottomSheetDialog.setContentView(bottomSheetView);
-            // để set cho dialog hiện full màn hình, để có khoảng trống ở dưới, kéo dài 5inch
-            //do dùng view bên giao diện ở trên
-            View parentView = (View) bottomSheetView.getParent();
-            BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from(parentView);
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
+            BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from((View) bottomSheetView.getParent());
+            bottomSheetBehavior.setPeekHeight(2200);
+
+            bottomSheetDialog.setCancelable(false);
+            bottomSheetDialog.setCanceledOnTouchOutside(false);
             bottomSheetDialog.show();
-            // lấy những  contact  chưa kết bạn trong máy đt
+
+            bottomSheetView.findViewById(R.id.textviewDone).setOnClickListener(view2 -> bottomSheetDialog.dismiss());
+
+            // Bắt sự kiện của input search
+            RecyclerView rcvRequestSearch = bottomSheetView.findViewById(R.id.rcvRequestSearch);
+            EditText inputSearch = bottomSheetView.findViewById(R.id.searchContact);
+            inputSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    //Xử lý dữ liệu ở đây
+                    String textSearch = editable.toString().trim();
+                    if (textSearch.length() > 11 && textSearch.startsWith("+84")) {
+//                        if (!textSearch.equals(account.getString(Constants.KEY_ACCOUNT_PHONE_NUMBER))) {
+                            database.collection(Constants.KEY_USER)
+                                    .whereEqualTo(Constants.KEY_ACCOUNT_PHONE_NUMBER, textSearch)
+                                    .get()
+                                    .addOnSuccessListener(documentSnapshots -> {
+                                        List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
+                                        if (!documents.isEmpty()) {
+                                            User user = documents.get(0).toObject(User.class);
+                                            assert user != null;
+                                            user.setId(documents.get(0).getId());
+                                            List<User> users = new ArrayList<>();
+                                            users.add(user);
+                                            ContactAdapter userSearchAdapter = new ContactAdapter(users, user1 -> {
+                                                Intent intent = new Intent(getContext(), UserProfileActivity.class);
+                                                intent.putExtra(Constants.KEY_ACCOUNT_USER_ID, user1.getId());
+                                                startActivity(intent);
+                                            });
+                                            rcvRequestSearch.setAdapter(userSearchAdapter);
+                                            bottomSheetView.findViewById(R.id.layoutRequestSearch).setVisibility(View.VISIBLE);
+                                        }
+                                    });
+
+//                        } else {
+//                            // la chinh ban than mk
+//                        }
+
+                    }
+                    else {
+                        bottomSheetView.findViewById(R.id.layoutRequestSearch).setVisibility(View.GONE);
+                    }
+                }
+            });
+            /// Lấy dữ liệu cho BottomSheetDialog
+            // Ở giao diện sẽ hiện những người đã gửi lời mời kết bạn cho mình và những người có thể biết lấy từ trong danh bạ
+            // Đầu tiên sẽ lấy ra những người gửi lời mời kb
+            List<User> mUsersNhanLoiMoi = new ArrayList<>();
+            bottomSheetView.findViewById(R.id.layoutFriendRequest).setVisibility(View.GONE);
+            ContactAdapter nhanLoiMoiContactAdapter = new ContactAdapter(mUsersNhanLoiMoi, user -> {
+                Intent intent = new Intent(getContext(), UserProfileActivity.class);
+                intent.putExtra(Constants.KEY_ACCOUNT_USER_ID, user.getId());
+                startActivity(intent);
+            });
+
+            RecyclerView nhanLopMoiRCV = bottomSheetView.findViewById(R.id.contactRCV);
+            nhanLopMoiRCV.setAdapter(nhanLoiMoiContactAdapter);
+
+            database.collection(Constants.KEY_FRIEND)
+                .whereEqualTo(Constants.KEY_FRIEND_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
+                .whereEqualTo(Constants.KEY_FRIEND_STATUS, Constants.KEY_FRIEND_STATUS_NHANLOIMOI)
+                .addSnapshotListener((value, error) -> {
+                    if(error != null) {
+                        return;
+                    }
+                    if(value != null) {
+                        for (DocumentChange documentChange : value.getDocumentChanges()) {
+                            if(documentChange.getType() == DocumentChange.Type.ADDED) {
+                                Log.e("Log", "ADDED");
+                                DocumentSnapshot friendSnapshot = documentChange.getDocument();
+                                Friend friend = friendSnapshot.toObject(Friend.class);
+                                friend.setId(friendSnapshot.getId());
+
+                                database.collection(Constants.KEY_USER)
+                                        .document(friend.getUserFriendId())
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            User user = documentSnapshot.toObject(User.class);
+                                            assert user != null;
+                                            user.setId(documentSnapshot.getId());
+                                            mUsersNhanLoiMoi.add(user);
+                                            bottomSheetView.findViewById(R.id.layoutFriendRequest).setVisibility(View.VISIBLE);
+                                            mUsersNhanLoiMoi.sort(Comparator.comparing(User::getLastName));
+                                            nhanLoiMoiContactAdapter.notifyDataSetChanged();
+                                        })
+                                        .addOnFailureListener(Throwable::printStackTrace);
+                            } else if(documentChange.getType() == DocumentChange.Type.REMOVED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
+                                Log.e("Log", "REMOVED");
+                                DocumentSnapshot friendSnapshot = documentChange.getDocument();
+                                Friend friend = friendSnapshot.toObject(Friend.class);
+                                friend.setId(friendSnapshot.getId());
+
+                                database.collection(Constants.KEY_USER)
+                                        .document(friend.getUserFriendId())
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            User user = documentSnapshot.toObject(User.class);
+                                            assert user != null;
+                                            user.setId(documentSnapshot.getId());
+                                            mUsersNhanLoiMoi.remove(user);
+                                            if (mUsersNhanLoiMoi.size() <= 0) {
+                                                bottomSheetView.findViewById(R.id.layoutFriendRequest).setVisibility(View.GONE);
+                                            }
+                                            mUsersNhanLoiMoi.sort(Comparator.comparing(User::getLastName));
+                                            nhanLoiMoiContactAdapter.notifyDataSetChanged();
+                                        })
+                                        .addOnFailureListener(Throwable::printStackTrace);
+                            }
+                        }
+                    }
+                });
+
+            // Tiếp theo sẽ lấy ra những ng trong danh bạ mà chưa kết bạn
             Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-            //Trả về 1 cursor - quản lý dữ liệu contact trên điện thoại
-            Cursor cursor  = getContext().getContentResolver().query(uri, null, null, null, null);
-            List<Contact> mContacts = new ArrayList<>();
+            @SuppressLint("Recycle") Cursor cursor  = requireContext().getContentResolver().query(uri, null, null, null, null);
+            List<String> mPhones = new ArrayList<>();
             while (cursor.moveToNext()) {
-                String tenCotName = ContactsContract.Contacts.DISPLAY_NAME;
-                String tenCotPhone = ContactsContract.CommonDataKinds.Phone.NUMBER;
-
-                int viTriCotName = cursor.getColumnIndex(tenCotName);
-                int viTriCotPhone = cursor.getColumnIndex(tenCotPhone);
-
-                String name = cursor.getString(viTriCotName);
+                int viTriCotPhone = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 String phone = cursor.getString(viTriCotPhone);
-
-
-                Contact contact = new Contact(HelperFunction.convertPhoneNumber(phone.replaceAll("[^0-9]", "")), name);
-                mContacts.add(contact);
+                mPhones.add(HelperFunction.convertPhoneNumber(phone.replaceAll("[^0-9]", "")));
             }
-            List<User> mUsersDaGuiLoiMoi = new ArrayList<>();
             List<User> mUsersChuaLamGi = new ArrayList<>();
-            // kiểm tra xem những contact đã có tài khoản rồi
-            for(Contact contact : mContacts) {
+            ContactAdapter chuaLamGiContactAdapter = new ContactAdapter(mUsersChuaLamGi, user -> {
+                Intent intent = new Intent(getContext(), UserProfileActivity.class);
+                intent.putExtra(Constants.KEY_ACCOUNT_USER_ID, user.getId());
+                startActivity(intent);
+            });
+            RecyclerView chuaLamGiRCV = bottomSheetView.findViewById(R.id.someoneKnowRCV);
+            chuaLamGiRCV.setAdapter(chuaLamGiContactAdapter);
+
+            for (String phone : mPhones) {
                 database.collection(Constants.KEY_USER)
-                        .whereEqualTo(Constants.KEY_ACCOUNT_PHONE_NUMBER, contact.getPhone())
+                        .whereEqualTo(Constants.KEY_ACCOUNT_PHONE_NUMBER, phone)
                         .get()
-                        .addOnSuccessListener(queryDocumentSnapshots -> {
-                            List<DocumentSnapshot>  userSnapshots = queryDocumentSnapshots.getDocuments();
-                            if (!userSnapshots.isEmpty()) { // đã có tài khoản chat
-                                User user = userSnapshots.get(0).toObject(User.class);
-                                user.setId(userSnapshots.get(0).getId());
-                                //kiểm tra đã là bạn bè hay chưa
+                        .addOnSuccessListener(documentSnapshots -> {
+                            if (!documentSnapshots.isEmpty()) {
+                                User user  = documentSnapshots.getDocuments().get(0).toObject(User.class);
+                                assert user != null;
+                                user.setId(documentSnapshots.getDocuments().get(0).getId());
                                 database.collection(Constants.KEY_FRIEND)
                                         .whereEqualTo(Constants.KEY_FRIEND_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
                                         .whereEqualTo(Constants.KEY_FRIEND_USER_FRIEND_ID, user.getId())
                                         .get()
-                                        .addOnSuccessListener(friendDocumentSnapshots -> {
-                                            List<DocumentSnapshot>  friendSnapshots = friendDocumentSnapshots.getDocuments();
-                                            // nếu đã là bạn thì sẽ ko hiện lên ở đây
-                                            if (!friendSnapshots.isEmpty()) {
-                                                Friend friend = friendSnapshots.get(0).toObject(Friend.class);
-                                                friend.setId(friendSnapshots.get(0).getId());
-
-                                                if(friend != null) {
-                                                    if (friend.getStatus() == Constants.KEY_FRIEND_STATUS_DAGUILOIMOI) { //nếu là người mk đã gửi mời mời sẽ đưa vào mảng muser
-                                                        mUsersDaGuiLoiMoi.add(user);
-                                                    }
-                                                }
-                                            } else {
-                                                // Chưa kết bạn
+                                        .addOnSuccessListener(documentSnapshots1 -> {
+                                            if (documentSnapshots1.isEmpty()) {
                                                 mUsersChuaLamGi.add(user);
+                                                mUsersChuaLamGi.sort(Comparator.comparing(User::getLastName));
+                                                chuaLamGiContactAdapter.notifyDataSetChanged();
+                                            }
+                                        }).addOnFailureListener(Throwable::printStackTrace);
+                            }
+                        }).addOnFailureListener(Throwable::printStackTrace);
+            }
+
+        });
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void getListFriend() {
+        List<User> mUsers = new ArrayList<>();
+        binding.layoutListF.setVisibility(View.GONE);
+        ContactAdapter contactAdapter = new ContactAdapter(mUsers, user -> {
+            Intent intent = new Intent(getContext(), UserProfileActivity.class);
+            intent.putExtra(Constants.KEY_ACCOUNT_USER_ID, user.getId());
+            startActivity(intent);
+        });
+        binding.listFRCV.setAdapter(contactAdapter);
+        database.collection(Constants.KEY_FRIEND)
+                .whereEqualTo(Constants.KEY_FRIEND_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
+                .whereEqualTo(Constants.KEY_FRIEND_STATUS, Constants.KEY_FRIEND_STATUS_DAKETBAN)
+                .addSnapshotListener((value, error) -> {
+                    if(error != null) {
+                        return;
+                    }
+                    if(value != null) {
+                        for (DocumentChange documentChange : value.getDocumentChanges()) {
+                            if(documentChange.getType() == DocumentChange.Type.ADDED) {
+                                Log.e("Log", "ADDED");
+                                DocumentSnapshot friendSnapshot = documentChange.getDocument();
+                                Friend friend = friendSnapshot.toObject(Friend.class);
+                                friend.setId(friendSnapshot.getId());
+
+                                database.collection(Constants.KEY_USER)
+                                        .document(friend.getUserFriendId())
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            User user = documentSnapshot.toObject(User.class);
+                                            assert user != null;
+                                            user.setId(documentSnapshot.getId());
+                                            mUsers.add(user);
+                                            binding.layoutListF.setVisibility(View.VISIBLE);
+                                            mUsers.sort(Comparator.comparing(User::getLastName));
+                                            contactAdapter.notifyDataSetChanged();
+                                        })
+                                        .addOnFailureListener(Throwable::printStackTrace);
+                            } else if(documentChange.getType() == DocumentChange.Type.REMOVED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
+                                Log.e("Log", "REMOVED");
+                                DocumentSnapshot friendSnapshot = documentChange.getDocument();
+                                Friend friend = friendSnapshot.toObject(Friend.class);
+                                friend.setId(friendSnapshot.getId());
+
+                                database.collection(Constants.KEY_USER)
+                                        .document(friend.getUserFriendId())
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            User user = documentSnapshot.toObject(User.class);
+                                            assert user != null;
+                                            user.setId(documentSnapshot.getId());
+
+                                            mUsers.remove(user);
+                                            mUsers.sort(Comparator.comparing(User::getLastName));
+                                            contactAdapter.notifyDataSetChanged();
+
+                                            if (mUsers.size() <= 0) {
+                                                binding.layoutListF.setVisibility(View.GONE);
+                                                Toast.makeText(getContext(), "Bạn chưa có bạn bè, hãy tìm thêm bạn nhé", Toast.LENGTH_SHORT).show();
                                             }
                                         })
                                         .addOnFailureListener(Throwable::printStackTrace);
                             }
-                        });
-            }
-
-
-            ContactAdapter contactAdapter = new ContactAdapter(mContacts);
-            RecyclerView contactRCV = bottomSheetView.findViewById(R.id.contactRCV);
-            contactRCV.setAdapter(contactAdapter);
-        });
-    }
-
-    private void getListFriend() {
-        database.collection(Constants.KEY_FRIEND)
-                .whereEqualTo(Constants.KEY_FRIEND_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
-                .get()
-                .addOnSuccessListener(runnable -> {
-                    List<DocumentSnapshot> friendSnapshots = runnable.getDocuments();
-                    if (!friendSnapshots.isEmpty()) {
-                        for (DocumentSnapshot friendSnapshot : friendSnapshots) {
-                            Friend friend = friendSnapshot.toObject(Friend.class);
-                            assert friend != null;
-                            friend.setId(friendSnapshot.getId());
-                            AtomicReference<User> user = new AtomicReference<>(UserDatabase.getInstance(getContext()).userDAO().getUser(friend.getUserId()));
-
-                            if (user.get() == null) {
-                                database.collection(Constants.KEY_USER)
-                                        .document(friend.getUserId())
-                                        .get()
-                                        .addOnSuccessListener(userSnapshot -> {
-                                            User user1 = userSnapshot.toObject(User.class);
-                                            UserDatabase.getInstance(getContext()).userDAO().insertUser(user1);
-                                            user.set(user1);
-                                            mUserFriends.add(user1);
-                                        })
-                                        .addOnFailureListener(Throwable::printStackTrace);
-                            } else {
-                                mUserFriends.add(user.get());
-                            }
-                            mFriends.add(friend);
-                            FriendDatabase.getInstance(getContext()).friendDAO().insertFriend(friend);
                         }
-                        /// in list friend
-
                     }
                 });
 
     }
-
 
 }

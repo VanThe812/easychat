@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/bottomSheetBackground"
+    android:layout_margin="@dimen/_10sdp">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ảnh đại diện"
+        android:textStyle="normal"
+        android:textSize="@dimen/_14sdp"
+        android:gravity="center"
+        android:paddingVertical="@dimen/_8sdp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="1px"
+        android:background="@drawable/bg_content_top"
+        />
+
+    <TextView
+        android:id="@+id/textViewShowAvatar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xem ảnh đại diện"
+        android:textStyle="normal"
+        android:textSize="@dimen/_20sdp"
+        android:gravity="center"
+        android:paddingVertical="@dimen/_8sdp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_below="@id/textViewTitle"
+        android:layout_marginBottom="1dp"
+        android:background="@color/white"
+        />
+    <TextView
+        android:id="@+id/textViewNewPhotoShoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chụp ảnh mới"
+        android:textStyle="normal"
+        android:textSize="@dimen/_20sdp"
+        android:gravity="center"
+        android:paddingVertical="@dimen/_8sdp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_below="@id/textViewShowAvatar"
+        android:layout_marginBottom="1dp"
+        android:background="@color/white"
+        />
+    <TextView
+        android:id="@+id/textViewSelectPhotoFromDevice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chọn ảnh từ thiết bị"
+        android:textStyle="normal"
+        android:textSize="@dimen/_20sdp"
+        android:gravity="center"
+        android:paddingVertical="@dimen/_8sdp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/colorPrimary"
+        android:layout_below="@id/textViewNewPhotoShoot"
+        android:layout_marginBottom="1dp"
+        android:background="@drawable/bg_content_bottom"/>
+
+    <TextView
+        android:id="@+id/textViewCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewSelectPhotoFromDevice"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginVertical="@dimen/_5sdp"
+        android:background="@drawable/bg_content"
+        android:gravity="center"
+        android:paddingVertical="@dimen/_8sdp"
+        android:text="@string/cancel"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/_20sdp"
+        android:textStyle="bold" />
+</RelativeLayout>

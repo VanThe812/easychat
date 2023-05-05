@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import va.vanthe.app_chat_2.databinding.ItemContainerUserCreateGroupBinding;
@@ -64,15 +68,20 @@ public class UserCreateGroupCheckerAdapter extends RecyclerView.Adapter<UserCrea
         }
         void setData(User user) {
             binding.textName.setText(user.getLastName());
-            binding.imageProfile.setImageBitmap(getUserImage(user.getImage()));
+            Picasso.get().cancelRequest(binding.imageProfile);
+            if (user.getImage() != null) {
+                StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(user.getImage());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> Picasso.get().load(uri).resize(50, 50).into(binding.imageProfile))
+                        .addOnFailureListener(Throwable::printStackTrace);
+            }
             binding.getRoot().setOnClickListener(v -> {
                 userCreateGroupCheckerListener.onRemoveUser(user);
             });
         }
     }
 
-    private Bitmap getUserImage(String encodedImage) {
-        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-    }
 }

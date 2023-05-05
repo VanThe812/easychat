@@ -2,10 +2,7 @@ package va.vanthe.app_chat_2.fragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +12,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class MenuChatFragment extends Fragment {
     private ConversionsAdapter conversionsAdapter;
     private PreferenceManager account;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
 
 
     @Override
@@ -60,7 +62,6 @@ public class MenuChatFragment extends Fragment {
 
 
         init();
-        loadUserDetails();
         setListeners();
         listenConversations();
         return binding.getRoot();
@@ -73,6 +74,17 @@ public class MenuChatFragment extends Fragment {
             account = new PreferenceManager(getContext()); // khởi tạo dữ liệu cho account
         } else { // nếu context null lập tức tải lại app
             requireActivity().recreate();
+        }
+
+        //get avatar user
+        if (account.getString(Constants.KEY_ACCOUNT_IMAGE) != null && !account.getString(Constants.KEY_ACCOUNT_IMAGE).equals("")) {
+            StorageReference imagesRef = storage.getReference()
+                    .child("user")
+                    .child("avatar")
+                    .child(account.getString(Constants.KEY_ACCOUNT_IMAGE));
+            imagesRef.getDownloadUrl()
+                    .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                    .addOnFailureListener(Throwable::printStackTrace);
         }
 
         conversionsAdapter = new ConversionsAdapter(mConversations, account.getString(Constants.KEY_ACCOUNT_USER_ID));
@@ -210,6 +222,7 @@ public class MenuChatFragment extends Fragment {
         mConversations.sort((obj1, obj2) -> obj2.getMessageTime().compareTo(obj1.getMessageTime()));
         conversionsAdapter.notifyDataSetChanged();
         binding.conversionsRCV.smoothScrollToPosition(0);
+        binding.conversionsRCV.invalidate();
 
 //        if(count == 0) {
 //            conversionsAdapter.notifyDataSetChanged();
@@ -217,12 +230,6 @@ public class MenuChatFragment extends Fragment {
 //            conversionsAdapter.notifyItemRangeInserted(mConversations.size(), mConversations.size());
 //            binding.conversionsRCV.smoothScrollToPosition(mConversations.size() - 1);
 //        }
-    }
-
-    private void loadUserDetails() {
-        byte[] bytes = Base64.decode(account.getString(Constants.KEY_ACCOUNT_IMAGE), Base64.DEFAULT);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        binding.imageProfile.setImageBitmap(bitmap);
     }
 
 

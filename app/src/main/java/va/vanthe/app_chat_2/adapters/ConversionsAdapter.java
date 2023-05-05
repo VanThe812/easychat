@@ -15,6 +15,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +27,7 @@ import java.util.TimerTask;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
+import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.activities.ChatMessageActivity;
 import va.vanthe.app_chat_2.database.GroupMemberDatabase;
 import va.vanthe.app_chat_2.database.UserDatabase;
@@ -43,14 +48,12 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
     public ConversionsAdapter(List<Conversation> conversationList, String userId) {
         this.conversationList = conversationList;
         this.userId = userId;
-
     }
 
     @NonNull
     @Override
     public ConversionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ConversionViewHolder(
-
                 ItemContainerConversionBinding.inflate(
                         LayoutInflater.from(parent.getContext()),
                         parent,
@@ -62,7 +65,6 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
     @Override
     public void onBindViewHolder(@NonNull ConversionViewHolder holder, int position) {
         holder.setData(conversationList.get(position));
-
     }
 
     @Override
@@ -76,21 +78,23 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
         ConversionViewHolder(ItemContainerConversionBinding itemContainerConversionBinding) {
             super(itemContainerConversionBinding.getRoot());
             binding = itemContainerConversionBinding;
-
-
-
         }
         void setData(@NonNull Conversation conversation) {
-            Log.e(ConversionsAdapter.class.toString(), conversation.getStyleChat() + "");
             if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
                 GroupMember groupMember = GroupMemberDatabase.getInstance(itemView.getContext()).groupMemberDAO().getGroupMember(userId, conversation.getId());
-
                 if (groupMember != null) {
-
                     User user = UserDatabase.getInstance(itemView.getContext()).userDAO().getUser(groupMember.getUserId());
-
                     binding.textName.setText(user.getFirstName() + " " + user.getLastName());
-                    binding.imageProfile.setImageBitmap(getConverdionImage(user.getImage()));
+                    Picasso.get().cancelRequest(binding.imageProfile);
+                    if (user.getImage() != null) {
+                        StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                                .child("user")
+                                .child("avatar")
+                                .child(user.getImage());
+                        imagesRef.getDownloadUrl()
+                                .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                                .addOnFailureListener(Throwable::printStackTrace);
+                    }
                     binding.textRecentMessage.setText(conversation.getNewMessage());
 
                     // Lấy ra TextView cần cập nhật thời gian
@@ -113,9 +117,6 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
                         Intent intent = new Intent(view.getContext(), ChatMessageActivity.class);
                         intent.putExtra(Constants.KEY_USER, user);
                         intent.putExtra(Constants.KEY_CONVERSATION, conversation);
-                        intent.putExtra(Constants.KEY_CONVERSATION_ID, conversation.getId());
-                        intent.putExtra(Constants.KEY_TYPE, Constants.KEY_TYPE_CHAT_SINGLE);
-                        intent.putExtra(Constants.KEY_IS_NEW_CHAT, false);
                         view.getContext().startActivity(intent);
                     });
                 }
@@ -127,9 +128,18 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
             } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
                 binding.textRecentMessage.setText(conversation.getNewMessage());
                 binding.textName.setText(conversation.getConversationName());
+                Picasso.get().cancelRequest(binding.imageProfile);
                 if (conversation.getConversationAvatar() != null) {
-                    ///
-                    binding.imageProfile.setImageBitmap(getConverdionImage(conversation.getConversationAvatar()));
+                    StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                            .child("user")
+                            .child("avatar")
+                            .child(conversation.getConversationAvatar());
+                    imagesRef.getDownloadUrl()
+                            .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                            .addOnFailureListener(Throwable::printStackTrace);
+                } else {
+
+                    binding.imageProfile.setBackgroundResource(R.drawable.ic_telegram);
                 }
                 TextView textViewTimeAgo = binding.textTime;
                 Date dateOld = conversation.getMessageTime();
@@ -148,11 +158,6 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
             // Cập nhật lại nội dung của TextView
             textView.setText(timeAgo);
         }
-    }
-
-    private Bitmap getConverdionImage(String encededImage) {
-        byte[] bytes = Base64.decode(encededImage, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
     private String getTimeAgo(Date dateOld) {
         Date now = new Date();

@@ -56,14 +56,39 @@
         android:padding="@dimen/_15sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textName"
-        >
+        app:layout_constraintTop_toBottomOf="@id/textName">
 
+        <LinearLayout
+            android:id="@+id/buttonUserProfile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_content_top"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/_5sdp"
+            android:paddingTop="@dimen/_8ssp"
+            android:paddingBottom="@dimen/_8sdp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_margin="@dimen/_5sdp"
+                android:background="@drawable/ic_user"
+                android:tint="@color/blue" />
+
+            <TextView
+                android:id="@+id/textUserProfile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:text="@string/personal_page"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_18sdp" />
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/buttonDarkMode"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_content_top"
+            android:background="@color/white"
             android:orientation="horizontal"
             android:paddingHorizontal="@dimen/_5sdp"
             android:paddingTop="@dimen/_8ssp"

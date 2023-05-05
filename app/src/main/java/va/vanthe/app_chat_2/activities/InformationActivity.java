@@ -2,31 +2,23 @@ package va.vanthe.app_chat_2.activities;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Base64;
-import android.util.Patterns;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 import va.vanthe.app_chat_2.databinding.ActivityInformationBinding;
-import va.vanthe.app_chat_2.dataencrypt.SHA256Encryptor;
+import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.fragment.DatePickerFragment;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
@@ -34,9 +26,10 @@ import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 public class InformationActivity extends AppCompatActivity {
 
     private ActivityInformationBinding binding;
-    private String encodedImage;
     private PreferenceManager account;
-    private FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private Uri imageAvatarUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,21 +51,35 @@ public class InformationActivity extends AppCompatActivity {
             pickImage.launch(intent);
         });
         binding.buttonNext.setOnClickListener(view -> {
-            if (isValidInforDetails()) {
-                DocumentReference documentReference =
-                        database.collection(Constants.KEY_USER).document(account.getString(Constants.KEY_ACCOUNT_USER_ID));
-                documentReference.update(
-                        Constants.KEY_ACCOUNT_IMAGE, encodedImage,
-                        Constants.KEY_ACCOUNT_FIRST_NAME, binding.inputFirstName.getText().toString().trim(),
-                        Constants.KEY_ACCOUNT_LAST_NAME, binding.inputLastName.getText().toString().trim(),
-                        Constants.KEY_ACCOUNT_SEX, binding.maleRadioButton.isChecked(),
-                        Constants.KEY_ACCOUNT_DateOfBirth, binding.inputDateOfBirth.getText().toString().trim()
-                );
-                account.putString(Constants.KEY_ACCOUNT_IMAGE, encodedImage);
-                account.putString(Constants.KEY_ACCOUNT_FIRST_NAME, binding.inputFirstName.getText().toString().trim());
-                account.putString(Constants.KEY_ACCOUNT_LAST_NAME, binding.inputLastName.getText().toString().trim());
-                account.putBoolean(Constants.KEY_ACCOUNT_SEX, binding.maleRadioButton.isChecked());
-                account.putString(Constants.KEY_ACCOUNT_DateOfBirth, binding.inputDateOfBirth.getText().toString().trim());
+            if (isValidInfoDetails()) {
+                DocumentReference documentReference = database.collection(Constants.KEY_USER).document(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+                User user = new User();
+                user.setId(documentReference.getId());
+                user.setPhoneNumber(account.getString(Constants.KEY_ACCOUNT_PHONE_NUMBER));
+                user.setPassword(account.getString(Constants.KEY_ACCOUNT_PASSWORD));
+
+                String typeFile = imageAvatarUri.getPath().substring(imageAvatarUri.getPath().lastIndexOf(".")); //VD: jpg, png , ....
+
+                String fileName = String.format("avatar_%s.%s", user.getId(), typeFile);
+
+                StorageReference imagesRef = storage.getReference()
+                                .child("user")
+                                .child("avatar")
+                                .child(fileName);
+                imagesRef.putFile(imageAvatarUri)
+                        .addOnSuccessListener(taskSnapshot -> user.setImage(fileName))
+                        .addOnFailureListener(Throwable::printStackTrace);
+                user.setFirstName(binding.inputFirstName.getText().toString().trim());
+                user.setLastName(binding.inputLastName.getText().toString().trim());
+                user.setSex(binding.maleRadioButton.isChecked());
+                user.setDateOfBrith(binding.inputDateOfBirth.getText().toString().trim());
+                documentReference.update(user.toHashMap());
+
+                account.putString(Constants.KEY_ACCOUNT_IMAGE, user.getImage());
+                account.putString(Constants.KEY_ACCOUNT_FIRST_NAME, user.getFirstName());
+                account.putString(Constants.KEY_ACCOUNT_LAST_NAME, user.getLastName());
+                account.putBoolean(Constants.KEY_ACCOUNT_SEX, user.isSex());
+                account.putString(Constants.KEY_ACCOUNT_DateOfBirth, user.getDateOfBrith());
 
                 Intent intent = new Intent(InformationActivity.this, BeginActivity.class);
                 startActivity(intent);
@@ -85,21 +92,34 @@ public class InformationActivity extends AppCompatActivity {
                 if(result.getResultCode() == RESULT_OK) {
                     if(result.getData() != null) {
                         Uri imageUri = result.getData().getData();
-                        try {
-                            InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            binding.imageProfile.setImageBitmap(bitmap);
-                            binding.textAddImage.setVisibility(View.GONE);
-                            encodedImage = encodeImage(bitmap);
-                        }catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
+                        Intent intent = new Intent(getApplicationContext(), EditImageActivity.class);
+                        intent.putExtra("DATA", imageUri.toString());
+                        intent.putExtra("style", Constants.KEY_REQUEST_CODE_IMAGE_AVATAR);
+                        startActivityForResult(intent, Constants.KEY_REQUEST_CODE_IMAGE_AVATAR);
                     }
                 }
             }
     );
-    private Boolean isValidInforDetails() {
-        if(encodedImage == null) {
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == -1 && requestCode == Constants.KEY_REQUEST_CODE_IMAGE_MESSAGE) {
+            assert data != null;
+            String result = data.getStringExtra("RESULT");
+            imageAvatarUri = null;
+            if (result != null) {
+                imageAvatarUri = Uri.parse(result);
+            }
+
+            Picasso.get()
+                    .load(imageAvatarUri)
+                    .into(binding.imageProfile);
+        }
+    }
+
+    private Boolean isValidInfoDetails() {
+        if(imageAvatarUri == null) {
             showToast("Select profile image");
             return false;
         }else if(binding.inputFirstName.getText().toString().isEmpty()) {
@@ -117,15 +137,6 @@ public class InformationActivity extends AppCompatActivity {
     }
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
-    private String encodeImage(Bitmap bitmap) {
-        int previewWidth = 150;
-        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
-        Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
     public void showDatePickerDialog() {
         DialogFragment newFragment = new DatePickerFragment();

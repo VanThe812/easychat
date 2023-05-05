@@ -18,6 +18,9 @@ public interface ConversationDAO {
     @Update
     void updateConversation(Conversation conversation);
 
+    @Query("delete from Conversation")
+    void deleteAllConversation();
+
     @Query("select * from Conversation")
     List<Conversation> getConversation();
 

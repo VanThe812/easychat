@@ -1,31 +1,22 @@
 package va.vanthe.app_chat_2.adapters;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -39,8 +30,6 @@ import va.vanthe.app_chat_2.databinding.ItemContainerReceivedMessageBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerSentMessageBinding;
 import va.vanthe.app_chat_2.entity.ChatMessage;
 import va.vanthe.app_chat_2.entity.User;
-import va.vanthe.app_chat_2.fragment.DialogFragment;
-import va.vanthe.app_chat_2.fragment.DialogViewImageFragment;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.HelperFunction;
 
@@ -51,8 +40,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private final String senderId;
     private final int styleChat;
 
-    public static final int VIEW_TYPE_SENT = 1;
-    public static final int VIEW_TYPE_RECEIVED = 2;
+    public static final int VIEW_TYPE_SENT = 1; // bản thân
+    public static final int VIEW_TYPE_RECEIVED = 2; // người kia
 
     public static OnItemClickListener onItemClickListener;
 
@@ -70,12 +59,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if(viewType == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
+            return new NotificationViewHolder(ItemChatNotificationBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        } else
         if(viewType == VIEW_TYPE_SENT) {
             return new SentMessageViewHolder(ItemContainerSentMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }else if(viewType == VIEW_TYPE_RECEIVED){
             return new ReceivedMessageViewHolder(ItemContainerReceivedMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        } else if(viewType == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
-            return new NotificationViewHolder(ItemChatNotificationBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
         return null;
     }
@@ -111,6 +101,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     @Override
     public int getItemViewType(int position) {
         if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
+            return chatMessages.get(position).getStyleMessage();
+        }
+        if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT) {
             return chatMessages.get(position).getStyleMessage();
         }
         if(chatMessages.get(position).getSenderId().equals(senderId)) {
@@ -229,7 +222,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
 
                                 binding.textName.setText(sender.getLastName());
-                                binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(sender.getImage()));
+                                if (sender.getImage() != null) {
+                                    StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                                            .child("user")
+                                            .child("avatar")
+                                            .child(sender.getImage());
+                                    imagesRef.getDownloadUrl()
+                                            .addOnSuccessListener(uri -> Picasso.get().load(uri).resize(50, 50).into(binding.imageProfile))
+                                            .addOnFailureListener(Throwable::printStackTrace);
+                                }
                             }
                         });
             }

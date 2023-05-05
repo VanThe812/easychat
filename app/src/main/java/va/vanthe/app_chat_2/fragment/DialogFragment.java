@@ -1,5 +1,6 @@
 package va.vanthe.app_chat_2.fragment;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
@@ -20,6 +21,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -27,12 +29,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.activities.ChatMessageActivity;
+import va.vanthe.app_chat_2.activities.UserProfileActivity;
+import va.vanthe.app_chat_2.adapters.ContactAdapter;
 import va.vanthe.app_chat_2.adapters.UserCreateGroupAdapter;
 import va.vanthe.app_chat_2.adapters.UserCreateGroupCheckerAdapter;
 import va.vanthe.app_chat_2.database.ConversationDatabase;
@@ -40,6 +45,7 @@ import va.vanthe.app_chat_2.database.GroupMemberDatabase;
 import va.vanthe.app_chat_2.database.UserDatabase;
 import va.vanthe.app_chat_2.databinding.LayoutFragmentCreateAGroupBinding;
 import va.vanthe.app_chat_2.entity.Conversation;
+import va.vanthe.app_chat_2.entity.Friend;
 import va.vanthe.app_chat_2.entity.GroupMember;
 import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.listeners.UserCreateGroupListener;
@@ -122,23 +128,7 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
                 }
             }
         });
-        userCreateGroupCheckerAdapter = new UserCreateGroupCheckerAdapter(mUsersChecker, user -> {
-            mUsersChecker.remove(user);
-//            int position = -1;
-//            for (int i = 0; i < mUsers.size(); i++) {
-//                User user1 = mUsers.get(i);
-//                if (user1.getId() == user.getId()) {
-//                    position = i;
-//                    break;
-//                }
-//            }
-            if (!mUsersChecker.isEmpty() && mUsersChecker.size() >= 2 && binding.inputNameGroup.length() > 0) {
-                binding.textCreateGroup.setTextColor(Color.BLUE);
-            }else {
-                binding.textCreateGroup.setTextColor(Color.GRAY);
-            }
-           userCreateGroupCheckerAdapter.notifyDataSetChanged();
-        });
+
         binding.textCreateGroup.setOnClickListener(view -> {
             if (!mUsersChecker.isEmpty() && mUsersChecker.size() >= 2 && binding.inputNameGroup.length() > 0) {
                 // bắt đầu tạo nhóm chat
@@ -213,11 +203,29 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
                 /// Tạo các bản ghi groupMember
             }
         });
+        userCreateGroupCheckerAdapter = new UserCreateGroupCheckerAdapter(mUsersChecker, user -> {
+            mUsersChecker.remove(user);
+//            int position = -1;
+//            for (int i = 0; i < mUsers.size(); i++) {
+//                User user1 = mUsers.get(i);
+//                if (user1.getId() == user.getId()) {
+//                    position = i;
+//                    break;
+//                }
+//            }
+            if (!mUsersChecker.isEmpty() && mUsersChecker.size() >= 2 && binding.inputNameGroup.length() > 0) {
+                binding.textCreateGroup.setTextColor(Color.BLUE);
+            }else {
+                binding.textCreateGroup.setTextColor(Color.GRAY);
+            }
+            userCreateGroupCheckerAdapter.notifyDataSetChanged();
+        });
         binding.usersCheckerRcv.setAdapter(userCreateGroupCheckerAdapter);
         binding.usersCheckerRcv.setVisibility(View.VISIBLE);
-        getSuggested();
+        getListFriend();
         return binding.getRoot();
     }
+
     private void getSuggested() {
         database.collection(Constants.KEY_USER)
 //                .whereEqualTo()
@@ -238,23 +246,66 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
 
                             }
 //                            mUsers = users;
-                            UserCreateGroupAdapter userCreateGroupAdapter = new UserCreateGroupAdapter(mUsers, (user, checker) -> {
-                                if (checker) {
-                                    mUsersChecker.add(user);
-                                } else {
-                                    mUsersChecker.remove(user);
-                                }
-                                userCreateGroupCheckerAdapter.notifyDataSetChanged();
-                                if (!mUsersChecker.isEmpty() && mUsersChecker.size() >= 2 && binding.inputNameGroup.length() > 0) {
-                                    binding.textCreateGroup.setTextColor(Color.BLUE);
-                                }else {
-                                    binding.textCreateGroup.setTextColor(Color.GRAY);
-                                }
-                            });
-                            binding.usersRcv.setAdapter(userCreateGroupAdapter);
+
                         }
                     }
                 });
+    }
+
+    private void getListFriend() {
+        List<User> mUsers = new ArrayList<>();
+
+
+        UserCreateGroupAdapter userCreateGroupAdapter = new UserCreateGroupAdapter(mUsers, (user, checker) -> {
+            if (checker) {
+                mUsersChecker.add(user);
+            } else {
+                mUsersChecker.remove(user);
+            }
+            userCreateGroupCheckerAdapter.notifyDataSetChanged();
+            if (!mUsersChecker.isEmpty() && mUsersChecker.size() >= 2 && binding.inputNameGroup.length() > 0) {
+                binding.textCreateGroup.setTextColor(Color.BLUE);
+            }else {
+                binding.textCreateGroup.setTextColor(Color.GRAY);
+            }
+        });
+        binding.usersRcv.setAdapter(userCreateGroupAdapter);
+
+        database.collection(Constants.KEY_FRIEND)
+                .whereEqualTo(Constants.KEY_FRIEND_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
+                .whereEqualTo(Constants.KEY_FRIEND_STATUS, Constants.KEY_FRIEND_STATUS_DAKETBAN)
+                .addSnapshotListener((value, error) -> {
+                    if(error != null) {
+                        return;
+                    }
+                    if(value != null) {
+                        for (DocumentChange documentChange : value.getDocumentChanges()) {
+                            if(documentChange.getType() == DocumentChange.Type.ADDED) {
+                                DocumentSnapshot friendSnapshot = documentChange.getDocument();
+                                Friend friend = friendSnapshot.toObject(Friend.class);
+                                friend.setId(friendSnapshot.getId());
+
+                                database.collection(Constants.KEY_USER)
+                                        .document(friend.getUserFriendId())
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            User user = documentSnapshot.toObject(User.class);
+                                            assert user != null;
+                                            user.setId(documentSnapshot.getId());
+
+                                            mUsers.add(user);
+
+                                            mUsers.sort(Comparator.comparing(User::getLastName));
+
+                                            userCreateGroupAdapter.notifyDataSetChanged();
+                                            binding.usersRcv.invalidate();
+                                        })
+                                        .addOnFailureListener(Throwable::printStackTrace);
+                            }
+                        }
+                    }
+                });
+
     }
 
 }

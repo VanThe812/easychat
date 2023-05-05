@@ -6,9 +6,11 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.util.Base64;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RemoteViews;
@@ -24,6 +26,8 @@ import java.util.Date;
 import va.vanthe.app_chat_2.MyApplication;
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.activities.test;
+import va.vanthe.app_chat_2.dataencrypt.SHA256Encryptor;
+import va.vanthe.app_chat_2.entity.User;
 
 public class HelperFunction {
     public static Bitmap getBitmapFromEncodedImageString(String encodedImage) {
@@ -79,6 +83,35 @@ public class HelperFunction {
             return phoneNumber;
         }
     }
+
+
+//    Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+//    //Trả về 1 cursor - quản lý dữ liệu contact trên điện thoại
+//    Cursor cursor  = getContext().getContentResolver().query(uri, null, null, null, null);
+//    int i = 1;
+//        while (cursor.moveToNext()) {
+//        String tenCotPhone = ContactsContract.CommonDataKinds.Phone.NUMBER;
+//
+//        int viTriCotPhone = cursor.getColumnIndex(tenCotPhone);
+//
+//        String phone = cursor.getString(viTriCotPhone);
+//        User user = new User();
+//        user.setFirstName("Người dùng");
+//        user.setLastName("Easy Chat" + i);
+//        user.setPassword(SHA256Encryptor.encrypt("1"));
+//        user.setSex(true);
+//        user.setDateOfBrith("08/10/2002");
+//        user.setPhoneNumber(HelperFunction.convertPhoneNumber(phone.replaceAll("[^0-9]", "")));
+//        i++;
+//
+//        database.collection(Constants.KEY_USER)
+//                .add(user.toHashMap())
+//                .addOnFailureListener(runnable -> {
+//
+//                });
+//    }
+
+
 //    public static void sendCustomNotification(AppCompatActivity appCompatActivity, Uri sound, Bitmap bitmapImage, ) {
 //        // Cài âm thanh thông báo
 ////        Uri sound = Uri.parse("android.resource://" + appCompatActivity.getActivity().getPackageName() + "/" + R.raw.messaging);
