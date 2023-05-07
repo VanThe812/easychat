@@ -115,6 +115,7 @@ public class MenuChatFragment extends Fragment {
     private void listenConversations() {
         database.collection(Constants.KEY_GROUP_MEMBER)
                 .whereEqualTo(Constants.KEY_GROUP_MEMBER_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
+                .whereEqualTo(Constants.KEY_GROUP_MEMBER_STATUS, Constants.KEY_GROUP_MEMBER_STATUS_OK)
 //                .orderBy(Constants.KEY_GROUP_MEMBER_TIME_JOIN)
 //                .limit(10)
                 .addSnapshotListener(eventListenerConversation);
@@ -127,39 +128,45 @@ public class MenuChatFragment extends Fragment {
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 if(documentChange.getType() == DocumentChange.Type.ADDED) { //nếu có thêm dữ liệu hoặc là khi vừa mở app
                     DocumentSnapshot groupMemberSnapshot = documentChange.getDocument();
-
-                    database.collection(Constants.KEY_CONVERSATION)
-                            .document(Objects.requireNonNull(groupMemberSnapshot.getString(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID)))
-                            .addSnapshotListener((conversationSnapshot, e) -> {
-                                if (e != null) {
-                                    Log.w(MenuChatFragment.class.toString(), "Lỗi khi lắng nghe sự thay đổi của bản ghi", e);
-                                    return;
-                                }
-
-                                if (conversationSnapshot != null && conversationSnapshot.exists()) {
-                                    int checkConversation = ConversationDatabase.getInstance(getContext()).conversationDAO().checkConversation(conversationSnapshot.getId());
-                                    Conversation conversation = conversationSnapshot.toObject(Conversation.class);
-                                    if (conversation != null) {
-                                        conversation.setId(conversationSnapshot.getId());
-                                        if (checkConversation == 0) {
-                                            ConversationDatabase.getInstance(getContext()).conversationDAO().insertConversation(conversation);
-
-                                            getGroupMembers(() -> addOneConversationToList(conversation), conversation.getId());
-
-                                        } else {
-                                            addOneConversationToList(conversation);
-                                        }
+                    Log.e(MenuChatFragment.class.toString(), groupMemberSnapshot.getLong(Constants.KEY_GROUP_MEMBER_STATUS) + "");
+//                    if (groupMemberSnapshot.getLong(Constants.KEY_GROUP_MEMBER_STATUS) != Constants.KEY_GROUP_MEMBER_STATUS_LEAVE) {
+                        database.collection(Constants.KEY_CONVERSATION)
+                                .document(Objects.requireNonNull(groupMemberSnapshot.getString(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID)))
+                                .addSnapshotListener((conversationSnapshot, e) -> {
+                                    if (e != null) {
+                                        Log.w(MenuChatFragment.class.toString(), "Lỗi khi lắng nghe sự thay đổi của bản ghi", e);
+                                        return;
                                     }
 
+                                    if (conversationSnapshot != null && conversationSnapshot.exists()) {
+                                        int checkConversation = ConversationDatabase.getInstance(getContext()).conversationDAO().checkConversation(conversationSnapshot.getId());
+                                        Conversation conversation = conversationSnapshot.toObject(Conversation.class);
+                                        if (conversation != null) {
+                                            conversation.setId(conversationSnapshot.getId());
+                                            if (checkConversation == 0) {
+                                                ConversationDatabase.getInstance(getContext()).conversationDAO().insertConversation(conversation);
+
+                                                getGroupMembers(() -> addOneConversationToList(conversation), conversation.getId());
+
+                                            } else {
+                                                addOneConversationToList(conversation);
+                                            }
+                                        }
 
 
-                                } else {
-                                    Log.d(MenuChatFragment.class.toString(), "Bản ghi đã bị xóa");
-                                }
-                            });
+
+                                    } else {
+                                        Log.d(MenuChatFragment.class.toString(), "Bản ghi đã bị xóa");
+                                    }
+                                });
+//                    }
+
 
                 } else if(documentChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
-                    Log.d("MenuChatFragment", "MODIFIED");
+//                    DocumentSnapshot groupMemberSnapshot = documentChange.getDocument();
+//                    if (groupMemberSnapshot.getLong(Constants.KEY_GROUP_MEMBER_STATUS) != Constants.KEY_GROUP_MEMBER_STATUS_LEAVE) {
+//
+//                    }
                 }
             }
         }

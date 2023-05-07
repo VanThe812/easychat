@@ -60,6 +60,9 @@ public class Constants {
     public static final String KEY_GROUP_MEMBER_TIME_JOIN = "timeJoin";
     public static final String KEY_GROUP_MEMBER_CONVERSATION_ID = "conversationId";
     public static final String KEY_GROUP_MEMBER_STATUS = "status";
+    public static final int KEY_GROUP_MEMBER_STATUS_OK = 1;
+    public static final int KEY_GROUP_MEMBER_STATUS_LEAVE = 2;
+    public static final int KEY_GROUP_MEMBER_STATUS_DELETE = 3;
 
     /// conversation: id,
     public static final String KEY_CONVERSATION = "conversation";

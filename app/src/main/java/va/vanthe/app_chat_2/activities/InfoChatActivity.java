@@ -156,6 +156,9 @@ public class InfoChatActivity extends BaseActivity {
         binding.buttonSeeGroupMember.setOnClickListener(view -> {
             onClickButtonSeeGroupMember();
         });
+        binding.buttonLeaveConversation.setOnClickListener(view -> {
+            onClickButtonLeaveConversation();
+        });
     }
 
     private void onClickButtonBackground() {
@@ -319,6 +322,50 @@ public class InfoChatActivity extends BaseActivity {
             onClickButtonAddMember(users);
         });
 
+    }
+
+    private void onClickButtonLeaveConversation() {
+        Toast.makeText(this, mConversation.getId(), Toast.LENGTH_SHORT).show();
+        database.collection(Constants.KEY_GROUP_MEMBER)
+                .whereEqualTo(Constants.KEY_GROUP_MEMBER_CONVERSATION_ID, mConversation.getId())
+                .whereEqualTo(Constants.KEY_GROUP_MEMBER_USER_ID, account.getString(Constants.KEY_ACCOUNT_USER_ID))
+                .get()
+                .addOnSuccessListener(documentSnapshots -> {
+                    if (!documentSnapshots.isEmpty()) {
+                        DocumentReference documentReference = database.collection(Constants.KEY_GROUP_MEMBER)
+                                .document(documentSnapshots.getDocuments().get(0).getId());
+                        documentReference.update(Constants.KEY_GROUP_MEMBER_STATUS, Constants.KEY_GROUP_MEMBER_STATUS_LEAVE)
+                                .addOnSuccessListener(runnable -> {
+                                    HelperFunction.showToast("Đã rời khỏi nhóm thành công", getApplicationContext());
+
+                                    DocumentReference conversationReference = database.collection(Constants.KEY_CONVERSATION).document(mConversation.getId());
+                                    mConversation.setMessageTime(new Date());
+                                    mConversation.setNewMessage(account.getString(Constants.KEY_ACCOUNT_LAST_NAME) + " đã rời khỏi nhóm.");
+                                    mConversation.setSenderId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+
+                                    conversationReference.update(mConversation.toHashMap());
+                                    //insert chatMessage style notification(1 dòng thông báo trên đoạn chat)
+                                    ChatMessage chatMessage = new ChatMessage();
+                                    chatMessage.setSenderId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+                                    chatMessage.setMessage(account.getString(Constants.KEY_ACCOUNT_LAST_NAME) + " đã rời khỏi nhóm.");
+                                    chatMessage.setDataTime(new Date());
+                                    chatMessage.setConversationId(mConversation.getId());
+                                    chatMessage.setStyleMessage(Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION);
+                                    HashMap<String, Object> message = chatMessage.toHashMap();
+                                    database.collection(Constants.KEY_CHAT_MESSAGE).add(message);
+
+                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Log.e(InfoChatActivity.class.toString(), e.getMessage());
+                                });
+                    }
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void onClickButtonAddMember(List<User> users) {

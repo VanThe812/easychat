@@ -129,6 +129,7 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
 //                else {
 //                    binding.getRoot().setVisibility(View.GONE);
 //                }
+
                 if (groupMember != null) {
                     FirebaseFirestore.getInstance().collection(Constants.KEY_USER)
                             .document(groupMember.getUserId())
