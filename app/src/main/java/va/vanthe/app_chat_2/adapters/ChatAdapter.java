@@ -400,7 +400,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                     imagesRef2.getDownloadUrl()
                                             .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageAvatar2))
                                             .addOnFailureListener(Throwable::printStackTrace);
+                                } else {
+                                    binding.imageAvatar2.setBackgroundResource(R.drawable.ic_telegram);
                                 }
+                                binding.textViewTitle.setText("Bắt đầu cuộc trò chuyện nhóm mới \uD83D\uDC93");
                             }
                             else {
                                 GroupMember groupMember = GroupMemberDatabase.getInstance(itemView.getContext()).groupMemberDAO().getGroupMember(account.getString(Constants.KEY_ACCOUNT_IMAGE), documentSnapshot.getId());

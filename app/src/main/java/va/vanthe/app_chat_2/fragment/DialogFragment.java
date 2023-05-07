@@ -44,6 +44,7 @@ import va.vanthe.app_chat_2.database.ConversationDatabase;
 import va.vanthe.app_chat_2.database.GroupMemberDatabase;
 import va.vanthe.app_chat_2.database.UserDatabase;
 import va.vanthe.app_chat_2.databinding.LayoutFragmentCreateAGroupBinding;
+import va.vanthe.app_chat_2.entity.ChatMessage;
 import va.vanthe.app_chat_2.entity.Conversation;
 import va.vanthe.app_chat_2.entity.Friend;
 import va.vanthe.app_chat_2.entity.GroupMember;
@@ -182,6 +183,15 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
                                             for (GroupMember groupMember : mGroupMembers) {
                                                 GroupMemberDatabase.getInstance(getContext()).groupMemberDAO().insertGroupMember(groupMember);
                                             }
+                                            ChatMessage chatMessage = new ChatMessage();
+                                            chatMessage.setConversationId(conversation.getId());
+                                            chatMessage.setDataTime(new Date());
+                                            chatMessage.setMessage("");
+                                            chatMessage.setSenderId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+                                            chatMessage.setStyleMessage(Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT);
+
+                                            database.collection(Constants.KEY_CHAT_MESSAGE).add(chatMessage.toHashMap());
+
                                             // xong là đóng dialog
                                             Dialog dialog = getDialog();
                                             if (dialog != null) {
@@ -226,31 +236,7 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
         return binding.getRoot();
     }
 
-    private void getSuggested() {
-        database.collection(Constants.KEY_USER)
-//                .whereEqualTo()
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot userSnapshots) {
-                        List<DocumentSnapshot> usersSnapshots = userSnapshots.getDocuments();
-                        List<User> users = new ArrayList<>();
-                        if (!usersSnapshots.isEmpty()) {
-                            for (DocumentSnapshot userSnapshot : userSnapshots) {
-                                User user = userSnapshot.toObject(User.class);
-                                user.setId(userSnapshot.getId());
-                                if (!userSnapshot.getId().equals(account.getString(Constants.KEY_ACCOUNT_USER_ID))) {
-                                    mUsers.add(user);
-                                }
 
-
-                            }
-//                            mUsers = users;
-
-                        }
-                    }
-                });
-    }
 
     private void getListFriend() {
         List<User> mUsers = new ArrayList<>();
