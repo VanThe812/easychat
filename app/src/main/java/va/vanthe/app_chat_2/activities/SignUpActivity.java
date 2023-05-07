@@ -108,6 +108,7 @@ public class SignUpActivity extends AppCompatActivity {
                 // Account exists
                 loading(false);
                 binding.inputPhoneNumber.findFocus();
+                HelperFunction.showToast("Số điện thoại đã tồn tại, vui lòng thử với số điện thoại khác!", getApplicationContext());
             } else {
                 // Account does not exist
                 // Send OTP

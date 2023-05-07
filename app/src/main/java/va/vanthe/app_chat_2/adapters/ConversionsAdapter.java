@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -83,8 +84,12 @@ public class ConversionsAdapter extends RecyclerView.Adapter<ConversionsAdapter.
             if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
                 GroupMember groupMember = GroupMemberDatabase.getInstance(itemView.getContext()).groupMemberDAO().getGroupMember(userId, conversation.getId());
                 if (groupMember != null) {
+//                    FirebaseFirestore.getInstance().collection(Constants.KEY_USER)
+//                            .document(groupMember.getUserId())
                     User user = UserDatabase.getInstance(itemView.getContext()).userDAO().getUser(groupMember.getUserId());
-                    binding.textName.setText(user.getFirstName() + " " + user.getLastName());
+                    if (user.getLastName() != null) {
+                        binding.textName.setText(user.getFirstName() + " " + user.getLastName());
+                    }
                     Picasso.get().cancelRequest(binding.imageProfile);
                     if (user.getImage() != null) {
                         StorageReference imagesRef = FirebaseStorage.getInstance().getReference()

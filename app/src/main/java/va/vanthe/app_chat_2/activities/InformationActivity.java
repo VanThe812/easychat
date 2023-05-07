@@ -67,22 +67,25 @@ public class InformationActivity extends AppCompatActivity {
                                 .child("avatar")
                                 .child(fileName);
                 imagesRef.putFile(imageAvatarUri)
-                        .addOnSuccessListener(taskSnapshot -> user.setImage(fileName))
+                        .addOnSuccessListener(taskSnapshot -> {
+                            user.setImage(fileName);
+                            user.setFirstName(binding.inputFirstName.getText().toString().trim());
+                            user.setLastName(binding.inputLastName.getText().toString().trim());
+                            user.setSex(binding.maleRadioButton.isChecked());
+                            user.setDateOfBrith(binding.inputDateOfBirth.getText().toString().trim());
+                            documentReference.update(user.toHashMap());
+
+                            account.putString(Constants.KEY_ACCOUNT_IMAGE, user.getImage());
+                            account.putString(Constants.KEY_ACCOUNT_FIRST_NAME, user.getFirstName());
+                            account.putString(Constants.KEY_ACCOUNT_LAST_NAME, user.getLastName());
+                            account.putBoolean(Constants.KEY_ACCOUNT_SEX, user.isSex());
+                            account.putString(Constants.KEY_ACCOUNT_DateOfBirth, user.getDateOfBrith());
+
+                            Intent intent = new Intent(InformationActivity.this, BeginActivity.class);
+                            startActivity(intent);
+                        })
                         .addOnFailureListener(Throwable::printStackTrace);
-                user.setFirstName(binding.inputFirstName.getText().toString().trim());
-                user.setLastName(binding.inputLastName.getText().toString().trim());
-                user.setSex(binding.maleRadioButton.isChecked());
-                user.setDateOfBrith(binding.inputDateOfBirth.getText().toString().trim());
-                documentReference.update(user.toHashMap());
 
-                account.putString(Constants.KEY_ACCOUNT_IMAGE, user.getImage());
-                account.putString(Constants.KEY_ACCOUNT_FIRST_NAME, user.getFirstName());
-                account.putString(Constants.KEY_ACCOUNT_LAST_NAME, user.getLastName());
-                account.putBoolean(Constants.KEY_ACCOUNT_SEX, user.isSex());
-                account.putString(Constants.KEY_ACCOUNT_DateOfBirth, user.getDateOfBrith());
-
-                Intent intent = new Intent(InformationActivity.this, BeginActivity.class);
-                startActivity(intent);
             }
         });
     }
@@ -104,7 +107,7 @@ public class InformationActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == -1 && requestCode == Constants.KEY_REQUEST_CODE_IMAGE_MESSAGE) {
+        if (resultCode == -1 && requestCode == Constants.KEY_REQUEST_CODE_IMAGE_AVATAR) {
             assert data != null;
             String result = data.getStringExtra("RESULT");
             imageAvatarUri = null;

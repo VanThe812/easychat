@@ -41,8 +41,8 @@ public class SearchActivity extends BaseActivity implements UserListener {
 
         init();
         setListeners();
-        dataTest();
-        dataTest2();
+//        dataTest();
+//        dataTest2();
     }
     private void init() {
         account = new PreferenceManager(getApplicationContext());
@@ -81,19 +81,16 @@ public class SearchActivity extends BaseActivity implements UserListener {
                             database.collection(Constants.KEY_USER)
                                     .whereEqualTo(Constants.KEY_ACCOUNT_PHONE_NUMBER, textSearch)
                                     .get()
-                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onSuccess(QuerySnapshot documentSnapshots) {
-                                            List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
-                                            if (!documents.isEmpty()) {
-                                                User user = documents.get(0).toObject(User.class);
-                                                user.setId(documents.get(0).getId());
+                                    .addOnSuccessListener(documentSnapshots -> {
+                                        List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
+                                        if (!documents.isEmpty()) {
+                                            User user = documents.get(0).toObject(User.class);
+                                            user.setId(documents.get(0).getId());
 
-                                                UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getApplicationContext(),user);
+                                            UserSearchAdapter userSearchAdapter = new UserSearchAdapter(getApplicationContext(),user);
 
-                                                binding.searchRCV.setAdapter(userSearchAdapter);
-                                                binding.searchRCV.setVisibility(View.VISIBLE);
-                                            }
+                                            binding.searchRCV.setAdapter(userSearchAdapter);
+                                            binding.searchRCV.setVisibility(View.VISIBLE);
                                         }
                                     });
 

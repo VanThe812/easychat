@@ -366,8 +366,9 @@ public class ChatMessageActivity extends BaseActivity {
                     DocumentSnapshot chatMessageSnapshot = documentChange.getDocument();
                     ChatMessage chatMessage = chatMessageSnapshot.toObject(ChatMessage.class);
                     chatMessage.setId(chatMessageSnapshot.getId());
-
+//
                     chatMessageList.add(chatMessage);
+                    Log.d("LogChatMessage", "ADDED");
 
                 } else if(documentChange.getType() == DocumentChange.Type.MODIFIED)  { // nếu có thay đổi của dữ liệu trong 1 bản ghi nào đó
                     Log.d("LogChatMessage", "MODIFIED");

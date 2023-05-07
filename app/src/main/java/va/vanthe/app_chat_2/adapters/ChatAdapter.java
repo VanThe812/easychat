@@ -62,9 +62,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         if(viewType == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
             return new NotificationViewHolder(ItemChatNotificationBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         } else
-        if(viewType == VIEW_TYPE_SENT) {
+            if(viewType == VIEW_TYPE_SENT) {
             return new SentMessageViewHolder(ItemContainerSentMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        }else if(viewType == VIEW_TYPE_RECEIVED){
+        }else
+            if(viewType == VIEW_TYPE_RECEIVED){
             return new ReceivedMessageViewHolder(ItemContainerReceivedMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
         return null;
@@ -73,7 +74,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(getItemViewType(position) == VIEW_TYPE_SENT) {
-            ((SentMessageViewHolder) holder).setData(chatMessages.get(position), styleChat);
+            ((SentMessageViewHolder) holder).setData(chatMessages.get(position));
         }else if(getItemViewType(position) == VIEW_TYPE_RECEIVED){
             ((ReceivedMessageViewHolder) holder).setData(chatMessages.get(position), styleChat);
         } else if(getItemViewType(position) == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
@@ -103,9 +104,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
             return chatMessages.get(position).getStyleMessage();
         }
-        if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT) {
-            return chatMessages.get(position).getStyleMessage();
-        }
+//        if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT) {
+//            return chatMessages.get(position).getStyleMessage();
+//        }
         if(chatMessages.get(position).getSenderId().equals(senderId)) {
             return VIEW_TYPE_SENT;
         }else {
@@ -121,7 +122,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             super(itemContainerSentMessageBinding.getRoot());
             binding = itemContainerSentMessageBinding;
         }
-        void setData(ChatMessage chatMessage, int styleChat) {
+        void setData(ChatMessage chatMessage) {
 
 
             binding.textTime.setText(getTimeAgo(chatMessage.getDataTime()));
@@ -157,29 +158,23 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 binding.textMessage.setVisibility(View.GONE);
 
                 StorageReference storageRef = FirebaseStorage.getInstance().getReference()
-                    .child("images")
-                    .child("conversation")
-                    .child(chatMessage.getConversationId())
-                    .child(chatMessage.getMessage());
+                        .child("images")
+                        .child("conversation")
+                        .child(chatMessage.getConversationId())
+                        .child(chatMessage.getMessage());
 
                 // Tải ảnh xuống và gán vào ImageView
-                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        // Sử dụng thư viện Picasso để tải ảnh từ URL về và gán vào ImageView
-                        Picasso.get()
-                                .load(uri)
-                                .into(binding.imageMessage);
-                        binding.imageMessage.setOnClickListener(view -> {
-                            onItemClickListener.onItemClick(uri);
-                        });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Xử lý khi có lỗi xảy ra
-                        Log.e(ChatAdapter.class.toString(), "Error getting image from Firebase Storage.", e);
-                    }
+                storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    // Sử dụng thư viện Picasso để tải ảnh từ URL về và gán vào ImageView
+                    Picasso.get()
+                            .load(uri)
+                            .into(binding.imageMessage);
+                    binding.imageMessage.setOnClickListener(view -> {
+                        onItemClickListener.onItemClick(uri);
+                    });
+                }).addOnFailureListener(e -> {
+                    // Xử lý khi có lỗi xảy ra
+                    Log.e(ChatAdapter.class.toString(), "Error getting image from Firebase Storage.", e);
                 });
 
 
@@ -300,7 +295,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(user.getImage()));
             } catch (Exception e) {}
 
-           
+
 
 
         }

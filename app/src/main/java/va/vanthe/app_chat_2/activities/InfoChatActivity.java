@@ -100,7 +100,13 @@ public class InfoChatActivity extends BaseActivity {
             try {
                 GroupMember groupMember = GroupMemberDatabase.getInstance(getApplicationContext()).groupMemberDAO().getGroupMember(account.getString(Constants.KEY_ACCOUNT_USER_ID), mConversation.getId());
                 User user = UserDatabase.getInstance(getApplicationContext()).userDAO().getUser(groupMember.getUserId());
-                binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(user.getImage()));
+                StorageReference imagesRef = storage.getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(user.getImage());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                        .addOnFailureListener(Throwable::printStackTrace);
                 binding.textViewConversationName.setText(user.getFirstName() + " " + user.getLastName());
                 binding.imageChangeImage.setVisibility(View.GONE);
 
@@ -114,7 +120,13 @@ public class InfoChatActivity extends BaseActivity {
 
         } else if (mConversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
             if (mConversation.getConversationAvatar() != null) {
-                binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(mConversation.getConversationColor()));
+                StorageReference imagesRef = storage.getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(mConversation.getConversationAvatar());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                        .addOnFailureListener(Throwable::printStackTrace);
             }
             binding.textViewConversationName.setText(mConversation.getConversationName());
 
