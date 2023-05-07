@@ -58,7 +58,11 @@ public class SignInActivity extends AppCompatActivity {
         }else if(binding.inputPassword.getText().toString().trim().isEmpty()) {
             HelperFunction.showToast(getString(R.string.enter_password), getApplicationContext());
             return false;
-        }else {
+            // check valiDate
+//        }else if(!HelperFunction.checkPassword(binding.inputPassword.getText().toString().trim())){
+//            HelperFunction.showToast("Mật khẩu không đủ điều kiện", getApplicationContext());
+//            return false;
+        } else {
             return true;
         }
     }

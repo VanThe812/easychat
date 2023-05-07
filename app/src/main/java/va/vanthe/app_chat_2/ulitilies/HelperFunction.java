@@ -83,6 +83,33 @@ public class HelperFunction {
             return phoneNumber;
         }
     }
+    public static boolean checkPassword(String password) {
+        // Kiểm tra độ dài mật khẩu
+        if (password.length() < 8) {
+            return false;
+        }
+
+        // Kiểm tra có chữ hoa, chữ thường, chữ số và ký tự đặc biệt hay không
+        boolean hasUpperCase = false;
+        boolean hasLowerCase = false;
+        boolean hasDigit = false;
+        boolean hasSpecialChar = false;
+        for (int i = 0; i < password.length(); i++) {
+            char c = password.charAt(i);
+            if (Character.isUpperCase(c)) {
+                hasUpperCase = true;
+            } else if (Character.isLowerCase(c)) {
+                hasLowerCase = true;
+            } else if (Character.isDigit(c)) {
+                hasDigit = true;
+            } else {
+                hasSpecialChar = true;
+            }
+        }
+
+        // Nếu đủ các yêu cầu thì trả về true, ngược lại trả về false
+        return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+    }
 
 
 //    Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
