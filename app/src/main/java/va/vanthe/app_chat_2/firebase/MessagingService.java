@@ -1,6 +1,7 @@
 package va.vanthe.app_chat_2.firebase;
 
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import org.checkerframework.checker.units.qual.C;
 
@@ -48,6 +50,7 @@ public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        int id = getNotificationId();
         Log.e("FCM", remoteMessage.getData().toString());
         // lấy dữ liệu về
         String userId = remoteMessage.getData().get(Constants.KEY_ACCOUNT_USER_ID);
@@ -68,7 +71,7 @@ public class MessagingService extends FirebaseMessagingService {
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
         PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(getNotificationId(),
+                stackBuilder.getPendingIntent(id,
                         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         // gọi đến layout thông báo và config dữ liệu trong thông báo
@@ -76,43 +79,34 @@ public class MessagingService extends FirebaseMessagingService {
         // config title and avatar notification
         if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
             notificationLayout.setTextViewText(R.id.textViewTitleCustomNotification, user.getLastName());
-            notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(user.getImage()));
+
         } else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP) {
             notificationLayout.setTextViewText(R.id.textViewNameSender, user.getLastName() + ": ");
             notificationLayout.setTextViewText(R.id.textViewTitleCustomNotification, conversation.getConversationName());
-            if (conversation.getConversationAvatar() != null)
-                notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(conversation.getConversationAvatar()));
         }
         // config messaging notification
         if (styleMessage == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_TEXT) {
             notificationLayout.setTextViewText(R.id.textViewMessageCustomNotification, message);
         } else if (styleMessage == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE) {
             notificationLayout.setTextViewText(R.id.textViewMessageCustomNotification, "Đã gửi 1 ảnh");
-            if (conversation.getConversationAvatar() != null) {
-                notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(conversation.getConversationAvatar()));
-            }
-            Log.e("getBytes", message);
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference()
-                    .child("images")
-                    .child("conversation")
-                    .child(conversation.getId())
-                    .child(message);
-            storageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                @Override
-                public void onSuccess(byte[] bytes) {
-                    // Chuyển đổi mảng byte thành Bitmap
-                    Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    Log.e("getBytes", bytes.toString());
-                    // Sử dụng bitmap
-                    notificationLayout.setImageViewBitmap(R.id.imageMessageImage, bmp);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    // Xử lý khi có lỗi xảy ra
-                    Log.e(MessagingService.class.toString(), "Error getting image from Firebase Storage.", e);
-                }
-            });
+//            if (conversation.getConversationAvatar() != null) {
+//                notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(conversation.getConversationAvatar()));
+//            }
+//            StorageReference storageRef = FirebaseStorage.getInstance().getReference()
+//                    .child("images")
+//                    .child("conversation")
+//                    .child(conversation.getId())
+//                    .child(message);
+//            storageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
+//                // Chuyển đổi mảng byte thành Bitmap
+//                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//                Log.e("getBytes", bytes.toString());
+//                // Sử dụng bitmap
+//                notificationLayout.setImageViewBitmap(R.id.imageMessageImage, bmp);
+//            }).addOnFailureListener(e -> {
+//                // Xử lý khi có lỗi xảy ra
+//                Log.e(MessagingService.class.toString(), "Error getting image from Firebase Storage.", e);
+//            });
         }
 
 
@@ -123,10 +117,38 @@ public class MessagingService extends FirebaseMessagingService {
                 .setCustomContentView(notificationLayout)
                 .setContentIntent(resultPendingIntent)
                 .setAutoCancel(true);
+        if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_SINGLE) {
+            if (user.getImage() != null) {
+                StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(user.getImage());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            Notification notification = builder.build();
+                            Picasso.get().load(uri).into(notificationLayout, R.id.imageAvatar, id, notification);
+                        })
+                        .addOnFailureListener(Throwable::printStackTrace);
+            }
+        }
+        else if (conversation.getStyleChat() == Constants.KEY_TYPE_CHAT_GROUP){
+            if (conversation.getConversationAvatar() != null) {
+                StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(conversation.getConversationAvatar());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            Notification notification = builder.build();
+                            Picasso.get().load(uri).into(notificationLayout, R.id.imageAvatar, id, notification);
+                        })
+                        .addOnFailureListener(Throwable::printStackTrace);
+            }
+        }
 
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(getNotificationId(), builder.build());
+        notificationManager.notify(id, builder.build());
     }
     private void sendCustomNotification(Conversation conversation) {
         // Cài âm thanh thông báo

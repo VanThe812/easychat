@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import va.vanthe.app_chat_2.databinding.ItemContainerUserCreateGroupBinding;
@@ -62,7 +66,15 @@ public class UserGroupMembersAdapter extends RecyclerView.Adapter<UserGroupMembe
         }
         void setData(User user) {
             binding.textName.setText(user.getLastName());
-            binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(user.getImage()));
+            if (user.getImage() != null) {
+                StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(user.getImage());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                        .addOnFailureListener(Throwable::printStackTrace);
+            }
             binding.radioBtnChoose.setVisibility(View.GONE);
         }
     }

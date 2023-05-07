@@ -48,7 +48,8 @@
         </LinearLayout>
 
     </LinearLayout>
-    <com.makeramen.roundedimageview.RoundedImageView
+    <ImageView
+        android:background="@drawable/bg_content"
         android:id="@+id/imageMessageImage"
         android:layout_width="50dp"
         android:layout_height="50dp"

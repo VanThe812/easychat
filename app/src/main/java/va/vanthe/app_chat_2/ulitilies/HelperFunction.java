@@ -30,10 +30,7 @@ import va.vanthe.app_chat_2.dataencrypt.SHA256Encryptor;
 import va.vanthe.app_chat_2.entity.User;
 
 public class HelperFunction {
-    public static Bitmap getBitmapFromEncodedImageString(String encodedImage) {
-        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-    }
+
     public static String getEncodedImageStringFromBitmap(Bitmap bitmap) {
         int previewWidth = 150;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();

@@ -292,7 +292,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
             }
             try {
-                binding.imageProfile.setImageBitmap(HelperFunction.getBitmapFromEncodedImageString(user.getImage()));
+                StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(user.getImage());
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageProfile))
+                        .addOnFailureListener(Throwable::printStackTrace);
             } catch (Exception e) {}
 
 
