@@ -69,6 +69,7 @@ public class Constants {
     public static final String KEY_CONVERSATION_NEW_MESSAGE = "newMessage";
     public static final String KEY_CONVERSATION_MESSAGE_TIME = "messageTime";
     public static final String KEY_CONVERSATION_STYLE_CHAT = "styleChat";
+    public static final String KEY_CONVERSATION_AVATAR = "conversationAvatar";
     public static final String KEY_CONVERSATION_BACKGROUND_IMAGE = "backgroundImage";
 
     public static final String KEY_IMAGE = "image";

@@ -11,6 +11,8 @@
         android:layout_height="30dp"
         android:layout_centerVertical="true"
         android:src="@drawable/ic_telegram"
+        android:background="@drawable/bg_content"
+        android:scaleType="centerCrop"
         android:contentDescription="@string/avatar_conversation"/>
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -51,10 +53,12 @@
     <ImageView
         android:background="@drawable/bg_content"
         android:id="@+id/imageMessageImage"
+        android:visibility="gone"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         app:riv_corner_radius="@dimen/_15sdp"
+        android:scaleType="centerCrop"
         android:contentDescription="@string/image_message"/>
 </RelativeLayout>

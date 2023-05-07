@@ -382,21 +382,21 @@ public class InfoChatActivity extends BaseActivity {
                 if(result.getResultCode() == RESULT_OK) {
                     if(result.getData() != null) {
                         Uri imageUri = result.getData().getData();
-                        try {
-                            InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            binding.imageProfile.setImageBitmap(bitmap);
-                            String encodedImage = HelperFunction.getEncodedImageStringFromBitmap(bitmap);
+//                        try {
+//                            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+//                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+//                            binding.imageProfile.setImageBitmap(bitmap);
+//                            String encodedImage = HelperFunction.getEncodedImageStringFromBitmap(bitmap);
+//
+//                            DocumentReference documentReference = database.collection(Constants.KEY_CONVERSATION).document(mConversation.getId());
+//                            mConversation.setConversationAvatar(encodedImage);
+//                            documentReference.update(mConversation.toHashMap());
 
-                            DocumentReference documentReference = database.collection(Constants.KEY_CONVERSATION).document(mConversation.getId());
-                            mConversation.setConversationAvatar(encodedImage);
-                            documentReference.update(mConversation.toHashMap());
-
-                            ConversationDatabase.getInstance(getApplicationContext()).conversationDAO().updateConversation(mConversation);
-                            Toast.makeText(this, R.string.change_avatar_successfully, Toast.LENGTH_SHORT).show();
-                        }catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
+//                            ConversationDatabase.getInstance(getApplicationContext()).conversationDAO().updateConversation(mConversation);
+//                            Toast.makeText(this, R.string.change_avatar_successfully, Toast.LENGTH_SHORT).show();
+//                        }catch (FileNotFoundException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 }
             }

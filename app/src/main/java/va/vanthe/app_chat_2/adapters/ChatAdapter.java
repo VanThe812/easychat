@@ -24,14 +24,18 @@ import java.util.Date;
 import java.util.List;
 
 import va.vanthe.app_chat_2.R;
+import va.vanthe.app_chat_2.database.GroupMemberDatabase;
 import va.vanthe.app_chat_2.database.UserDatabase;
 import va.vanthe.app_chat_2.databinding.ItemChatNotificationBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerReceivedMessageBinding;
 import va.vanthe.app_chat_2.databinding.ItemContainerSentMessageBinding;
+import va.vanthe.app_chat_2.databinding.ItemNewChatBinding;
 import va.vanthe.app_chat_2.entity.ChatMessage;
+import va.vanthe.app_chat_2.entity.GroupMember;
 import va.vanthe.app_chat_2.entity.User;
 import va.vanthe.app_chat_2.ulitilies.Constants;
 import va.vanthe.app_chat_2.ulitilies.HelperFunction;
+import va.vanthe.app_chat_2.ulitilies.PreferenceManager;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -68,6 +72,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             if(viewType == VIEW_TYPE_RECEIVED){
             return new ReceivedMessageViewHolder(ItemContainerReceivedMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         }
+        else if(viewType == Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT){
+            return new NewChatViewHolder(ItemNewChatBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        }
         return null;
     }
 
@@ -79,6 +86,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             ((ReceivedMessageViewHolder) holder).setData(chatMessages.get(position), styleChat);
         } else if(getItemViewType(position) == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
             ((NotificationViewHolder) holder).setData(chatMessages.get(position));
+        }else if(getItemViewType(position) == Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT) {
+            ((NewChatViewHolder) holder).setData(chatMessages.get(position).getConversationId());
         }
         //kiểm tra khoảng thời gian từ tin nhắn trước tới tin nhắn này là bao nhiêu,
         //nếu lớn hơn 10p sẽ hiện ra màn hình thời gian chính xác tin nhắn này dc nhắn: VD 14:00
@@ -101,13 +110,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public int getItemViewType(int position) {
+
         if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_NOTIFICATION) {
             return chatMessages.get(position).getStyleMessage();
-        }
-//        if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT) {
-//            return chatMessages.get(position).getStyleMessage();
-//        }
-        if(chatMessages.get(position).getSenderId().equals(senderId)) {
+        } else if (chatMessages.get(position).getStyleMessage() == Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT) {
+            return chatMessages.get(position).getStyleMessage();
+        } else if(chatMessages.get(position).getSenderId().equals(senderId)) {
             return VIEW_TYPE_SENT;
         }else {
             return VIEW_TYPE_RECEIVED;
@@ -352,6 +360,68 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
         void setData(ChatMessage chatMessage) {
             binding.textViewMessageNotification.setText(chatMessage.getMessage());
+        }
+
+    }
+
+    static class NewChatViewHolder extends RecyclerView.ViewHolder {
+
+        private final ItemNewChatBinding binding;
+        private PreferenceManager account;
+        NewChatViewHolder(ItemNewChatBinding itemNewChatBinding) {
+            super(itemNewChatBinding.getRoot());
+            binding = itemNewChatBinding;
+            account  = new PreferenceManager(itemNewChatBinding.getRoot().getContext());
+        }
+
+        void setData(String conversationId) {
+
+            if (account.getString(Constants.KEY_ACCOUNT_IMAGE) != null) {
+                StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                        .child("user")
+                        .child("avatar")
+                        .child(account.getString(Constants.KEY_ACCOUNT_IMAGE));
+                imagesRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageAvatar1))
+                        .addOnFailureListener(Throwable::printStackTrace);
+            }
+
+            FirebaseFirestore.getInstance().collection(Constants.KEY_CONVERSATION)
+                    .document(conversationId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            if(documentSnapshot.getLong(Constants.KEY_CONVERSATION_STYLE_CHAT) == Constants.KEY_TYPE_CHAT_GROUP) {
+                                if (documentSnapshot.getString(Constants.KEY_CONVERSATION_AVATAR) != null) {
+                                    StorageReference imagesRef2 = FirebaseStorage.getInstance().getReference()
+                                            .child("user")
+                                            .child("avatar")
+                                            .child(documentSnapshot.getString(Constants.KEY_CONVERSATION_AVATAR));
+                                    imagesRef2.getDownloadUrl()
+                                            .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageAvatar2))
+                                            .addOnFailureListener(Throwable::printStackTrace);
+                                }
+                            }
+                            else {
+                                GroupMember groupMember = GroupMemberDatabase.getInstance(itemView.getContext()).groupMemberDAO().getGroupMember(account.getString(Constants.KEY_ACCOUNT_IMAGE), documentSnapshot.getId());
+                                User user = UserDatabase.getInstance(itemView.getContext()).userDAO().getUser(groupMember.getUserId());
+                                if (user.getImage() != null) {
+                                    StorageReference imagesRef2 = FirebaseStorage.getInstance().getReference()
+                                            .child("user")
+                                            .child("avatar")
+                                            .child(user.getImage());
+                                    imagesRef2.getDownloadUrl()
+                                            .addOnSuccessListener(uri -> Picasso.get().load(uri).into(binding.imageAvatar2))
+                                            .addOnFailureListener(Throwable::printStackTrace);
+                                }
+                            }
+                        }
+
+                    }).addOnFailureListener(Throwable::printStackTrace);
+
+
+
+
         }
 
     }

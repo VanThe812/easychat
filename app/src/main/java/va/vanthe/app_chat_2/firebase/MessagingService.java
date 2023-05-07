@@ -89,6 +89,7 @@ public class MessagingService extends FirebaseMessagingService {
             notificationLayout.setTextViewText(R.id.textViewMessageCustomNotification, message);
         } else if (styleMessage == Constants.KEY_CHAT_MESSAGE_STYLE_MESSAGE_IMAGE) {
             notificationLayout.setTextViewText(R.id.textViewMessageCustomNotification, "Đã gửi 1 ảnh");
+
 //            if (conversation.getConversationAvatar() != null) {
 //                notificationLayout.setImageViewBitmap(R.id.imageAvatar, HelperFunction.getBitmapFromEncodedImageString(conversation.getConversationAvatar()));
 //            }

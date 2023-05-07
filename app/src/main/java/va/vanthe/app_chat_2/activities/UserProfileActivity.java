@@ -46,6 +46,7 @@ import java.util.concurrent.CountDownLatch;
 import va.vanthe.app_chat_2.R;
 import va.vanthe.app_chat_2.database.UserDatabase;
 import va.vanthe.app_chat_2.databinding.ActivityUserProfileBinding;
+import va.vanthe.app_chat_2.entity.ChatMessage;
 import va.vanthe.app_chat_2.entity.Conversation;
 import va.vanthe.app_chat_2.entity.Friend;
 import va.vanthe.app_chat_2.entity.GroupMember;
@@ -381,6 +382,15 @@ public class UserProfileActivity extends AppCompatActivity {
                                 binding.buttonAccept.setVisibility(View.GONE);
                                 binding.buttonRefuse.setVisibility(View.GONE);
                                 binding.buttonChatMessage.setVisibility(View.VISIBLE);
+                                ChatMessage chatMessage = new ChatMessage();
+                                chatMessage.setConversationId(documentReference.getId());
+                                chatMessage.setDataTime(new Date());
+                                chatMessage.setMessage("");
+                                chatMessage.setSenderId(account.getString(Constants.KEY_ACCOUNT_USER_ID));
+                                chatMessage.setStyleMessage(Constants.KEY_CHAT_MESSAGE_STYLE_NEW_CHAT);
+
+                                database.collection(Constants.KEY_CHAT_MESSAGE).add(chatMessage.toHashMap());
+
                                 HelperFunction.showToast("Kết bạn thành công, chúc 2 bạn nhắn tin vui vẻ \uD83C\uDF49", getApplicationContext());
                             }).addOnFailureListener(Throwable::printStackTrace);
 
