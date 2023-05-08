@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".thiandroidNC.hoten_lop.DanhSachTaiKhoanActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_10sdp">
+            <EditText
+                android:drawableStart="@drawable/ic_search_24"
+                android:drawablePadding="@dimen/_8sdp"
+                android:id="@+id/inputSearch"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:background="@drawable/bg_input"
+                android:hint="@string/search"
+                android:inputType="text"
+                android:textColor="@color/primary_text"
+                android:textSize="@dimen/_13sdp"
+                android:focusable="false"
+                android:autofillHints="username"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/RCVListTaiKhoan"
+                android:layout_below="@id/inputSearch"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:layout_marginTop="@dimen/_10sdp"/>
+        </RelativeLayout>
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonAddTaiKhoan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:layout_marginEnd="@dimen/_15sdp"
+        android:layout_marginBottom="@dimen/_15sdp"
+        android:backgroundTint="@color/blue"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_add_friend" />
+</RelativeLayout>
